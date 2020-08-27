@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-"""Threaded IMAP4 client.
+"""Threaded IMAP4 client for Python 3.
 
 Based on RFC 3501 and original imaplib module.
 
@@ -18,9 +18,9 @@ __all__ = ("IMAP4", "IMAP4_SSL", "IMAP4_stream",
            "Internaldate2Time", "ParseFlags", "Time2Internaldate",
            "Mon2num", "MonthNames", "InternalDate")
 
-__version__ = "2.101"
-__release__ = "2"
-__revision__ = "101"
+__version__ = "3.05"
+__release__ = "3"
+__revision__ = "05"
 __credits__ = """
 Authentication code contributed by Donn Cave <donn@u.washington.edu> June 1998.
 String method conversion by ESR, February 2001.
@@ -53,11 +53,11 @@ Fix for correct Python 3 exception handling by Tobias Brink <tobias.brink@gmail.
 Fix to allow interruptible IDLE command by Tim Peoples <dromedary512@users.sf.net> September 2015.
 Add support for TLS levels by Ben Boeckel <mathstuf@gmail.com> September 2015.
 Fix for shutown exception by Sebastien Gross <seb@chezwam.org> November 2015."""
-__author__ = "Piers Lauder <piers@janeelix.com> & offlineimap team"
+__author__ = "Piers Lauder <piers@janeelix.com>"
 __URL__ = "http://imaplib2.sourceforge.net"
 __license__ = "Python License"
 
-import binascii, errno, os, random, re, select, socket, sys, time, threading, zlib
+import binascii, calendar, errno, os, random, re, select, socket, sys, time, threading, zlib
 
 if bytes != str:
     # Python 3, but NB assumes strings in all I/O
@@ -299,16 +299,12 @@ class IMAP4(object):
     class abort(error): pass        # Service errors - close and retry
     class readonly(abort): pass     # Mailbox status changed to READ-ONLY
 
-
     # These must be encoded according to utf8 setting in _mode_xxx():
     _literal = br'.*{(?P<size>\d+)}$'
     _untagged_status = br'\* (?P<data>\d+) (?P<type>[A-Z-]+)( (?P<data2>.*))?'
 
     continuation_cre = re.compile(r'\+( (?P<data>.*))?')
     mapCRLF_cre = re.compile(r'\r\n|\r|\n')
-        # Need to quote "atom-specials" :-
-        #   "(" / ")" / "{" / SP / 0x00 - 0x1f / 0x7f / "%" / "*" / DQUOTE / "\" / "]"
-        # so match not the inverse set
     mustquote_cre = re.compile(r"[^!#$&'+,./0-9:;<=>?@A-Z\[^_`a-z|}~-]")
     response_code_cre = re.compile(r'\[(?P<type>[A-Z-]+)( (?P<data>[^\]]*))?\]')
     untagged_response_cre = re.compile(r'\* (?P<type>[A-Z-]+)( (?P<data>.*))?')
@@ -343,7 +339,7 @@ class IMAP4(object):
                         + self.tagpre
                         + r'\d+) (?P<type>[A-Z]+) ?(?P<data>.*)')
 
-        self._mode_ascii()	# Only option in py2
+        self._mode_ascii()
 
         if __debug__: self._init_debug(debug, debug_file, debug_buf_lvl)
 
@@ -554,6 +550,7 @@ class IMAP4(object):
                 self.sock = ctx.wrap_socket(self.sock, server_hostname=self.host)
             else:
                 self.sock = ssl.wrap_socket(self.sock, self.keyfile, self.certfile, ca_certs=self.ca_certs, cert_reqs=cert_reqs, ssl_version=ssl_version)
+
             ssl_exc = ssl.SSLError
             self.read_fd = self.sock.fileno()
         except ImportError:
@@ -2085,7 +2082,7 @@ class IMAP4(object):
             if lvl > self.debug:
                 return
 
-            l = self.untagged_responses
+            l = self.untagged_responses  # NB: bytes array
             if not l:
                 return
 
