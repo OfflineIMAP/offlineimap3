@@ -33,9 +33,9 @@ def goTo(path):
         chdir(path)
         return True
     except FileNotFoundError:
-        print("Could not find the '{}' directory in '{}'...".format(
+        print(("Could not find the '{}' directory in '{}'...".format(
             path, getcwd())
-        )
+        ))
     return False
 
 
@@ -215,7 +215,7 @@ class User(object):
     @staticmethod
     def request(msg, prompt='--> '):
         print(msg)
-        return input(prompt)
+        return eval(input(prompt))
 
     @staticmethod
     def pause(msg=False):
