@@ -284,7 +284,7 @@ class LocalStatusSQLiteFolder(BaseFolder):
 
         with self._databaseFileLock.getLock():
             data = []
-            for uid, msg in self.messagelist.items():
+            for uid, msg in list(self.messagelist.items()):
                 mtime = msg['mtime']
                 flags = ''.join(sorted(msg['flags']))
                 labels = ', '.join(sorted(msg['labels']))
@@ -391,9 +391,9 @@ class LocalStatusSQLiteFolder(BaseFolder):
         Saves labels from a dictionary in a single database operation.
 
         """
-        data = [(', '.join(sorted(l)), uid) for uid, l in labels.items()]
+        data = [(', '.join(sorted(l)), uid) for uid, l in list(labels.items())]
         self.__sql_write('UPDATE status SET labels=? WHERE id=?', data, executemany=True)
-        for uid, l in labels.items():
+        for uid, l in list(labels.items()):
             self.messagelist[uid]['labels'] = l
 
 
@@ -424,9 +424,9 @@ class LocalStatusSQLiteFolder(BaseFolder):
     def savemessagesmtimebulk(self, mtimes):
         """Saves mtimes from the mtimes dictionary in a single database operation."""
 
-        data = [(mt, uid) for uid, mt in mtimes.items()]
+        data = [(mt, uid) for uid, mt in list(mtimes.items())]
         self.__sql_write('UPDATE status SET mtime=? WHERE id=?', data, executemany=True)
-        for uid, mt in mtimes.items():
+        for uid, mt in list(mtimes.items()):
             self.messagelist[uid]['mtime'] = mt
 
 

@@ -19,7 +19,7 @@ import datetime
 import hmac
 import socket
 import json
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import time
 import errno
 import socket
@@ -247,8 +247,8 @@ class IMAPServer(object):
             original_socket = socket.socket
             socket.socket = self.authproxied_socket
             try:
-                response = urllib.urlopen(
-                    self.oauth2_request_url, urllib.urlencode(params)).read()
+                response = urllib.request.urlopen(
+                    self.oauth2_request_url, urllib.parse.urlencode(params)).read()
             except Exception as e:
                 try:
                     msg = "%s (configuration is: %s)"% (e, str(params))
@@ -260,11 +260,11 @@ class IMAPServer(object):
 
             resp = json.loads(response)
             self.ui.debug('imap', 'xoauth2handler: response "%s"'% resp)
-            if u'error' in resp:
+            if 'error' in resp:
                 raise OfflineImapError("xoauth2handler got: %s"% resp,
                     OfflineImapError.ERROR.REPO)
             self.oauth2_access_token = resp['access_token']
-            if u'expires_in' in resp:
+            if 'expires_in' in resp:
                 self.oauth2_access_token_expires_at = now + datetime.timedelta(
                     seconds=resp['expires_in']/2
                 )
@@ -444,7 +444,7 @@ class IMAPServer(object):
                     continue
 
             tried_to_authn = True
-            self.ui.debug('imap', u'Attempting '
+            self.ui.debug('imap', 'Attempting '
               '%s authentication'% m)
             try:
                 if func(imapobj):
@@ -461,7 +461,7 @@ class IMAPServer(object):
         if not tried_to_authn:
             methods = ", ".join([x[5:] for x in
                 [x for x in imapobj.capabilities if x[0:5] == "AUTH="]])
-            raise OfflineImapError(u"Repository %s: no supported "
+            raise OfflineImapError("Repository %s: no supported "
               "authentication mechanisms found; configured %s, "
               "server advertises %s"% (self.repos,
               ", ".join(self.authmechs), methods),

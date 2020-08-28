@@ -65,8 +65,8 @@ if bytes != str:
     import queue
     string_types = str
 else:
-    import Queue as queue
-    string_types = basestring
+    import queue as queue
+    string_types = str
 
 select_module = select
 
@@ -1871,7 +1871,7 @@ class IMAP4(object):
                 select.POLLHUP:     'Hang up',
                 select.POLLNVAL:    'Invalid request: descriptor not open',
             }
-            return ' '.join([PollErrors[s] for s in PollErrors.keys() if (s & state)])
+            return ' '.join([PollErrors[s] for s in list(PollErrors.keys()) if (s & state)])
 
         if bytes != str:
             line_part = b''
@@ -2698,9 +2698,9 @@ if __name__ == '__main__':
             print('Tests failed.')
 
             if not debug:
-                print('''
+                print(('''
 If you would like to see debugging output,
 try: %s -d5
-''' % sys.argv[0])
+''' % sys.argv[0]))
 
             raise

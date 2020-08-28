@@ -23,7 +23,7 @@ import sys
 import traceback
 import threading
 try:
-    from Queue import Queue
+    from queue import Queue
 except ImportError: # python3
     from queue import Queue
 from collections import deque

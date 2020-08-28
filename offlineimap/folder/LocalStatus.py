@@ -177,7 +177,7 @@ class LocalStatusFolder(BaseFolder):
         with self.savelock:
             cachefd = open(self.filename + ".tmp", "wt")
             cachefd.write((self.magicline % self.cur_version) + "\n")
-            for msg in self.messagelist.values():
+            for msg in list(self.messagelist.values()):
                 flags = ''.join(sorted(msg['flags']))
                 labels = ', '.join(sorted(msg['labels']))
                 cachefd.write("%s|%s|%d|%s\n" % (msg['uid'], flags, msg['mtime'], labels))
@@ -237,7 +237,7 @@ class LocalStatusFolder(BaseFolder):
     def savemessageslabelsbulk(self, labels):
         """Saves labels from a dictionary in a single database operation."""
 
-        for uid, lb in labels.items():
+        for uid, lb in list(labels.items()):
             self.messagelist[uid]['labels'] = lb
         self.save()
 
@@ -257,7 +257,7 @@ class LocalStatusFolder(BaseFolder):
     def savemessagesmtimebulk(self, mtimes):
         """Saves mtimes from the mtimes dictionary in a single database operation."""
 
-        for uid, mt in mtimes.items():
+        for uid, mt in list(mtimes.items()):
             self.messagelist[uid]['mtime'] = mt
         self.save()
 

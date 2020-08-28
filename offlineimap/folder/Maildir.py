@@ -227,7 +227,7 @@ class MaildirFolder(BaseFolder):
             positive_uids = [uid for uid in retval if uid > 0]
             if positive_uids:
                 min_uid = min(positive_uids)
-                for uid in date_excludees.keys():
+                for uid in list(date_excludees.keys()):
                     if uid > min_uid:
                         # This message was originally excluded because of
                         # its date. It is re-included now because we want all
@@ -245,7 +245,7 @@ class MaildirFolder(BaseFolder):
                 sorted(statusfolder.getmessageuidlist()):
             return True
         # Also check for flag changes, it's quick on a Maildir.
-        for (uid, message) in self.getmessagelist().items():
+        for (uid, message) in list(self.getmessagelist().items()):
             if message['flags'] != statusfolder.getmessageflags(uid):
                 return True
         return False  # Nope, nothing changed.
@@ -523,7 +523,7 @@ class MaildirFolder(BaseFolder):
         """
         oldfmd5 = md5(self.name).hexdigest()
         msglist = self._scanfolder()
-        for mkey, mvalue in msglist.items():
+        for mkey, mvalue in list(msglist.items()):
             filename = os.path.join(self.getfullname(), mvalue['filename'])
             match = re.search("FMD5=([a-fA-F0-9]+)", filename)
             if match is None:

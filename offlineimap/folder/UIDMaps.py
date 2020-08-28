@@ -110,7 +110,7 @@ class MappedIMAPFolder(IMAPFolder):
             except NameError:
                 pass # Windows...
             with open(mapfilenametmp, 'wt') as mapfilefd:
-                for (key, value) in self.diskl2r.items():
+                for (key, value) in list(self.diskl2r.items()):
                     mapfilefd.write("%d:%d\n"% (key, value))
                 if self.dofsync():
                     fsync(mapfilefd)
@@ -139,7 +139,7 @@ class MappedIMAPFolder(IMAPFolder):
         with self.maplock:
             # OK.  Now we've got a nice list.  First, delete things from the
             # summary that have been deleted from the folder.
-            for luid in self.diskl2r.keys():
+            for luid in list(self.diskl2r.keys()):
                 if not luid in reallist:
                     ruid = self.diskl2r[luid]
                     #XXX: the following KeyError are sightly unexpected. This
@@ -166,7 +166,7 @@ class MappedIMAPFolder(IMAPFolder):
             self.r2l = self.diskr2l.copy()
             self.l2r = self.diskl2r.copy()
 
-            for luid in reallist.keys():
+            for luid in list(reallist.keys()):
                 if not luid in self.l2r:
                     ruid = nextneg
                     nextneg -= 1
@@ -192,7 +192,7 @@ class MappedIMAPFolder(IMAPFolder):
 
         # This implementation overrides the one in BaseFolder, as it is
         # much more efficient for the mapped case.
-        return self.r2l.keys()
+        return list(self.r2l.keys())
 
     # Interface from BaseFolder
     def getmessagecount(self):

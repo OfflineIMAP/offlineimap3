@@ -57,13 +57,13 @@ class LocalStatusRepository(BaseRepository):
         return self.LocalStatusFolderClass(foldername, self) # Instanciate.
 
     def setup_backend(self, backend):
-        if backend in self.backends.keys():
+        if backend in list(self.backends.keys()):
             self._backend = backend
             self.root = self.backends[backend]['root']
             self.LocalStatusFolderClass = self.backends[backend]['class']
 
     def import_other_backend(self, folder):
-        for bk, dic in self.backends.items():
+        for bk, dic in list(self.backends.items()):
             # Skip folder's own type.
             if dic['class'] == type(folder):
                 continue

@@ -17,7 +17,7 @@
 
 from threading import Lock, Thread, BoundedSemaphore, currentThread
 try:
-    from Queue import Queue, Empty
+    from queue import Queue, Empty
 except ImportError: # python3
     from queue import Queue, Empty
 import traceback

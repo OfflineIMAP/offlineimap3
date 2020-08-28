@@ -191,9 +191,9 @@ class OfflineImap(object):
         glob.set_options(options)
 
         if options.version:
-            print("offlineimap v%s, %s"% (
+            print(("offlineimap v%s, %s"% (
                 offlineimap.__version__, self.get_env_info())
-            )
+            ))
             sys.exit(0)
 
         # Read in configuration file.
@@ -255,7 +255,7 @@ class OfflineImap(object):
             ui_type = ui_type.split('.')[-1]
             # TODO, make use of chosen ui for logging
             logging.warning('Using old interface name, consider using one '
-                            'of %s'% ', '.join(UI_LIST.keys()))
+                            'of %s'% ', '.join(list(UI_LIST.keys())))
         if options.diagnostics:
             ui_type = 'ttyui' # Enforce this UI for --info.
 
@@ -269,7 +269,7 @@ class OfflineImap(object):
             self.ui = UI_LIST[ui_type.lower()](config)
         except KeyError:
             logging.error("UI '%s' does not exist, choose one of: %s"%
-                (ui_type, ', '.join(UI_LIST.keys())))
+                (ui_type, ', '.join(list(UI_LIST.keys()))))
             sys.exit(1)
         setglobalui(self.ui)
 
@@ -363,10 +363,10 @@ class OfflineImap(object):
             d = collections.defaultdict(lambda: 0)
             for v in l:
                 d[tuple(v)] += 1
-            return list((k, v) for k, v in d.items())
+            return list((k, v) for k, v in list(d.items()))
 
         stack_displays = []
-        for threadId, stack in sys._current_frames().items():
+        for threadId, stack in list(sys._current_frames().items()):
             stack_display = []
             for filename, lineno, name, line in traceback.extract_stack(stack):
                 stack_display.append('  File: "%s", line %d, in %s'
@@ -387,7 +387,7 @@ class OfflineImap(object):
             self.ui.debug('thread', msg % (times, '\n'.join(stack[- (context * 2):])))
 
         self.ui.debug('thread', "Dumped a total of %d Threads." %
-                      len(sys._current_frames().keys()))
+                      len(list(sys._current_frames().keys())))
 
     def _get_activeaccounts(self, options):
         activeaccounts = []

@@ -286,7 +286,7 @@ class BaseFolder(object):
     def ismessagelistempty(self):
         """Is the list of messages empty."""
 
-        if len(self.messagelist.keys()) < 1:
+        if len(list(self.messagelist.keys())) < 1:
             return True
         return False
 
@@ -1059,14 +1059,14 @@ class BaseFolder(object):
                     delflaglist[flag] = []
                 delflaglist[flag].append(uid)
 
-        for flag, uids in addflaglist.items():
+        for flag, uids in list(addflaglist.items()):
             self.ui.addingflags(uids, flag, dstfolder)
             if self.repository.account.dryrun:
                 continue # Don't actually add in a dryrun.
             dstfolder.addmessagesflags(uids, set(flag))
             statusfolder.addmessagesflags(uids, set(flag))
 
-        for flag, uids in delflaglist.items():
+        for flag, uids in list(delflaglist.items()):
             self.ui.deletingflags(uids, flag, dstfolder)
             if self.repository.account.dryrun:
                 continue # Don't actually remove in a dryrun.

@@ -13,7 +13,7 @@ def dump(out):
 	for th in threading.enumerate():
 		id2name[th.ident] = th.name
 	n = 0
-	for i, stack in sys._current_frames().items():
+	for i, stack in list(sys._current_frames().items()):
 		out.write ("\n# Thread #%d (id=%d), %s\n" % \
 		  (n, i, id2name[i]))
 		n = n + 1

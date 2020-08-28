@@ -20,7 +20,7 @@ from sys import exc_info
 import six
 
 try:
-    from ConfigParser import SafeConfigParser, Error
+    from configparser import SafeConfigParser, Error
 except ImportError: # Python3.
     from configparser import SafeConfigParser, Error
 from offlineimap.localeval import LocalEval

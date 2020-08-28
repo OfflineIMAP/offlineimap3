@@ -20,7 +20,7 @@ from sys import exc_info
 try:
     from configparser import NoSectionError
 except ImportError: #python2
-    from ConfigParser import NoSectionError
+    from configparser import NoSectionError
 
 from offlineimap.repository.IMAP import IMAPRepository, MappedIMAPRepository
 from offlineimap.repository.Gmail import GmailRepository

@@ -57,11 +57,11 @@ class GmailMaildirFolder(MaildirFolder):
                 sorted(statusfolder.getmessageuidlist()):
             return True
         # Check for flag changes, it's quick on a Maildir.
-        for (uid, message) in self.getmessagelist().items():
+        for (uid, message) in list(self.getmessagelist().items()):
             if message['flags'] != statusfolder.getmessageflags(uid):
                 return True
         # check for newer mtimes. it is also fast
-        for (uid, message) in self.getmessagelist().items():
+        for (uid, message) in list(self.getmessagelist().items()):
             if message['mtime'] > statusfolder.getmessagemtime(uid):
                 return True
         return False  # Nope, nothing changed.
@@ -302,7 +302,7 @@ class GmailMaildirFolder(MaildirFolder):
                         dellabellist[lb] = []
                     dellabellist[lb].append(uid)
 
-            for lb, uids in addlabellist.items():
+            for lb, uids in list(addlabellist.items()):
                 # Bail out on CTRL-C or SIGTERM.
                 if offlineimap.accounts.Account.abort_NOW_signal.is_set():
                     break
@@ -313,7 +313,7 @@ class GmailMaildirFolder(MaildirFolder):
                 dstfolder.addmessageslabels(uids, set([lb]))
                 statusfolder.addmessageslabels(uids, set([lb]))
 
-            for lb, uids in dellabellist.items():
+            for lb, uids in list(dellabellist.items()):
                 # Bail out on CTRL-C or SIGTERM.
                 if offlineimap.accounts.Account.abort_NOW_signal.is_set():
                     break

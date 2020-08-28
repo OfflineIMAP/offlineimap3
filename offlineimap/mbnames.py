@@ -23,7 +23,7 @@ from threading import Lock
 from os import listdir, makedirs, path, unlink
 from sys import exc_info
 try:
-    from ConfigParser import NoSectionError
+    from configparser import NoSectionError
 except ImportError: # Py3.
     from configparser import NoSectionError
 
