@@ -599,7 +599,7 @@ class IMAPServer(object):
                 imapobj.capabilities = tuple(dat[-1].upper().split())
 
             if self.delim == None:
-                listres = imapobj.list(self.reference, '""')[1]
+                listres = imapobj.list(self.reference, '')[1]
                 if listres == [None] or listres == None:
                     # Some buggy IMAP servers do not respond well to LIST "" ""
                     # Work around them.
