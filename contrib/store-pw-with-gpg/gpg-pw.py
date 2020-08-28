@@ -53,7 +53,7 @@ def get_gpg_pass(account, storage):
     '''GPG method'''
     command = ("gpg", "-d", storage)
     # get attention
-    print '\a'  # BEL
+    print('\a')  # BEL
     output = subprocess.check_output(command)
     # p = subprocess.Popen(command, stdout=subprocess.PIPE)
     # output, err = p.communicate()
@@ -96,4 +96,4 @@ class Tester(unittest.TestCase):
 
 
 if __name__ == "__main__":
-    print get_pass(argv[1], argv[2], argv[3])
+    print(get_pass(argv[1], argv[2], argv[3]))
