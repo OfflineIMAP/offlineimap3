@@ -86,7 +86,7 @@ class App(object):
         print("New list:")
         self.feedbacks = None
         self.listTesters()
-        print("Removed: {}".format(removed))
+        print(("Removed: {}".format(removed)))
         ans = User.request("Save on disk? (s/Q)").lower()
         if ans in ['s']:
             self.testers.write()
@@ -100,10 +100,10 @@ class App(object):
             feedback = "ok"
             if tester.getFeedback() is not True:
                 feedback = "no"
-            print("{:02d} - {} {}: {}".format(
+            print(("{:02d} - {} {}: {}".format(
                     count, tester.getName(), tester.getEmail(), feedback
                 )
-            )
+            ))
             count += 1
 
     def switchFeedback(self):
