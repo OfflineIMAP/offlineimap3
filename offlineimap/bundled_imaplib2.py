@@ -73,7 +73,6 @@ select_module = select
 #       Globals
 
 CRLF = '\r\n'
-Debug = None                                    # Backward compatibility
 IMAP4_PORT = 143
 IMAP4_SSL_PORT = 993
 
@@ -2066,7 +2065,7 @@ class IMAP4(object):
         def _init_debug(self, debug=None, debug_file=None, debug_buf_lvl=None):
             self.debug_lock = threading.Lock()
 
-            self.debug = self._choose_nonull_or_dflt(0, debug, Debug)
+            self.debug = self._choose_nonull_or_dflt(0, debug)
             self.debug_file = self._choose_nonull_or_dflt(sys.stderr, debug_file)
             self.debug_buf_lvl = self._choose_nonull_or_dflt(DFLT_DEBUG_BUF_LVL, debug_buf_lvl)
 

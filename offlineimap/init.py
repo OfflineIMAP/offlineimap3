@@ -299,8 +299,6 @@ class OfflineImap(object):
             for dtype in debugtypes:
                 dtype = dtype.strip()
                 self.ui.add_debug(dtype)
-                if dtype.lower() == u'imap':
-                    imaplib.Debug = 5
 
         if options.runonce:
             # Must kill the possible default option.
