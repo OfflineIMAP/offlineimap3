@@ -16,4 +16,4 @@ def isInternetConnected(url="www.ietf.org"):
     result = False
   return result
 
-print isInternetConnected()
+print(isInternetConnected())
