@@ -2268,9 +2268,9 @@ class _Authenticator(object):
             else:
                 t = inp
                 inp = b''
-            e = binascii.b2a_base64(t)
+            e = binascii.b2a_base64(t, newline=False)
             if e:
-                oup = oup + e[:-1]
+                oup = oup + e
         return oup
 
     def decode(self, inp):
