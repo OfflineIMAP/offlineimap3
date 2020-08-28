@@ -112,7 +112,7 @@ class _IntermediateMbnames(object):
             if self._folderfilter(self._accountname, foldername):
                 itemlist.append({
                     'accountname': self._accountname,
-                    'foldername': foldername.decode('utf-8'),
+                    'foldername': foldername,
                     'localfolders': self._folder_root,
                 })
 
