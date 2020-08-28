@@ -2282,9 +2282,10 @@ class IMAP4_stream(IMAP4):
             read, send, shutdown, socket."""
 
         from subprocess import Popen, PIPE
+        from io import DEFAULT_BUFFER_SIZE
 
         if __debug__: self._log(0, 'opening stream from command "%s"' % self.command)
-        self._P = Popen(self.command, shell=True, stdin=PIPE, stdout=PIPE, close_fds=True)
+        self._P = Popen(self.command, shell=True, stdin=PIPE, stdout=PIPE, close_fds=True, bufsize=DEFAULT_BUFFER_SIZE)
         self.writefile, self.readfile = self._P.stdin, self._P.stdout
         self.read_fd = self.readfile.fileno()
 
