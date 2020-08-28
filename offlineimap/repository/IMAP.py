@@ -19,7 +19,6 @@
 import os
 import netrc
 import errno
-import codecs
 from sys import exc_info
 from threading import Event
 
@@ -389,7 +388,7 @@ class IMAPRepository(BaseRepository):
         # 1. Evaluate Repository 'remotepasseval'.
         passwd = self.getconf('remotepasseval', None)
         if passwd is not None:
-            return self.localeval.eval(passwd).encode('UTF-8')
+            return self.localeval.eval(passwd).encode('utf-8')
         # 2. Read password from Repository 'remotepass'.
         password = self.getconf('remotepass', None)
         if password is not None:
@@ -399,7 +398,7 @@ class IMAPRepository(BaseRepository):
         # 3. Read password from file specified in Repository 'remotepassfile'.
         passfile = self.getconf('remotepassfile', None)
         if passfile is not None:
-            fd = codecs.open(os.path.expanduser(passfile), 'r', 'UTF-8')
+            fd = open(os.path.expanduser(passfile), 'r', 'utf-8')
             password = fd.readline().strip()
             fd.close()
             return password.encode('UTF-8')

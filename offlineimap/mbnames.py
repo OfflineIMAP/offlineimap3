@@ -16,7 +16,6 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 
-import codecs
 import re   # For folderfilter.
 import json
 from threading import Lock
@@ -120,8 +119,8 @@ class _IntermediateMbnames(object):
         if self._dryrun:
             self.ui.info("mbnames would write %s"% self._path)
         else:
-            with codecs.open(
-                self._path, "wt", encoding='UTF-8') as intermediateFD:
+            with open(
+                self._path, "w", encoding='utf-8') as intermediateFD:
                 json.dump(itemlist, intermediateFD)
 
 
@@ -235,8 +234,8 @@ class _Mbnames(object):
 
         for intermediateFile in self._iterIntermediateFiles():
             try:
-                with codecs.open(
-                    intermediateFile, 'rt', encoding="UTF-8") as intermediateFD:
+                with open(
+                    intermediateFile, 'r', encoding="utf-8") as intermediateFD:
                     for item in json.load(intermediateFD):
                         itemlist.append(item)
             except (OSError, IOError) as e:
@@ -257,8 +256,8 @@ class _Mbnames(object):
             self.ui.info("mbnames would write %s"% self._path)
         else:
             try:
-                with codecs.open(
-                    self._path, 'wt', encoding='UTF-8') as mbnamesFile:
+                with open(
+                    self._path, 'w', encoding='utf-8') as mbnamesFile:
                     mbnamesFile.write(self._header)
                     mbnamesFile.write(self._sep.join(itemlist))
                     mbnamesFile.write(self._footer)
