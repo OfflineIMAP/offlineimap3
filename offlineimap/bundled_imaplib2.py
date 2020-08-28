@@ -16,7 +16,7 @@ Public functions: Internaldate2Time
 
 __all__ = ("IMAP4", "IMAP4_SSL", "IMAP4_stream",
            "Internaldate2Time", "ParseFlags", "Time2Internaldate",
-           "Mon2num", "MonthNames", "InternalDate")
+           "MonthNames", "InternalDate")
 
 __version__ = "3.05"
 __release__ = "3"
@@ -58,7 +58,7 @@ __URL__ = "http://imaplib2.sourceforge.net"
 __license__ = "Python License"
 
 import binascii, calendar, errno, os, queue, random, re, select, socket, sys, time, threading, zlib
-
+import datetime
 
 select_module = select
 
@@ -2306,13 +2306,11 @@ class _IdleCont(object):
 MonthNames = [None, 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-Mon2num = {s.encode():n+1 for n, s in enumerate(MonthNames[1:])}
-
-InternalDate = re.compile(br'.*INTERNALDATE "'
-    br'(?P<day>[ 0123][0-9])-(?P<mon>[A-Z][a-z][a-z])-(?P<year>[0-9][0-9][0-9][0-9])'
-    br' (?P<hour>[0-9][0-9]):(?P<min>[0-9][0-9]):(?P<sec>[0-9][0-9])'
-    br' (?P<zonen>[-+])(?P<zoneh>[0-9][0-9])(?P<zonem>[0-9][0-9])'
-    br'"')
+InternalDate = re.compile(r'.*INTERNALDATE "'
+    r'(?P<day>[ 0123][0-9])-(?P<mon>[A-Z][a-z][a-z])-(?P<year>[0-9][0-9][0-9][0-9])'
+    r' (?P<hour>[0-9][0-9]):(?P<min>[0-9][0-9]):(?P<sec>[0-9][0-9])'
+    r' (?P<zonen>[-+])(?P<zoneh>[0-9][0-9])(?P<zonem>[0-9][0-9])'
+    r'"')
 
 
 def Internaldate2Time(resp):
@@ -2328,7 +2326,10 @@ def Internaldate2Time(resp):
     if not mo:
         return None
 
-    mon = Mon2num[mo.group('mon')]
+    # Get the month number
+    datetime_object = datetime.datetime.strptime(mo.group('mon'), "%b")
+    mon = datetime_object.month
+
     zonen = mo.group('zonen')
 
     day = int(mo.group('day'))

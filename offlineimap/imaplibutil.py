@@ -13,7 +13,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
+import datetime
 import os
 import fcntl
 import time
@@ -30,7 +30,7 @@ import six
 
 from offlineimap import OfflineImapError
 from offlineimap.ui import getglobalui
-from offlineimap.virtual_imaplib2 import IMAP4, IMAP4_SSL, InternalDate, Mon2num
+from offlineimap.virtual_imaplib2 import IMAP4, IMAP4_SSL, InternalDate
 
 
 class UsefulIMAPMixIn(object):
@@ -248,7 +248,10 @@ def Internaldate2epoch(resp):
     if not mo:
         return None
 
-    mon = Mon2num[mo.group('mon')]
+    # Get the month number
+    datetime_object = datetime.datetime.strptime(mo.group('mon'), "%b")
+    mon = datetime_object.month
+
     zonen = mo.group('zonen')
 
     day = int(mo.group('day'))
