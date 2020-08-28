@@ -157,7 +157,7 @@ class Changelog(object):
     def showPrevious(self):
         output = run(shlex.split("cat '{}'".format(CHANGELOG_EXCERPT_OLD)))
         for line in output.splitlines():
-            print(line.decode('utf-8')) # Weird to have to decode bytes here.
+            print((line.decode('utf-8'))) # Weird to have to decode bytes here.
 
     def usePrevious(self):
         rename(CHANGELOG_EXCERPT_OLD, CHANGELOG_EXCERPT)
@@ -278,13 +278,13 @@ class Website(object):
             if check_call(shlex.split("{} --version".format(SPHINXBUILD))) != 0:
                 raise RuntimeError("{} not found".format(SPHINXBUILD))
         except:
-            print("""
+            print(("""
 Oops! you don't have {} installed?"
 Cannot update the webite documentation..."
 You should install it and manually run:"
   $ cd {}"
   $ make websitedoc"
-Then, commit and push changes of the website.""".format(SPHINXBUILD, DOCSDIR))
+Then, commit and push changes of the website.""".format(SPHINXBUILD, DOCSDIR)))
             User.pause()
             return False
 
@@ -467,11 +467,11 @@ if __name__ == '__main__':
         release.after()
 
         websiteBranch = release.getWebsiteBranch()
-        print(END_MESSAGE.format(
+        print((END_MESSAGE.format(
                 announce=ANNOUNCE_FILE,
                 new_version=newVersion,
                 website_branch=websiteBranch)
-        )
+        ))
     except Exception as e:
         release.restore()
         raise
