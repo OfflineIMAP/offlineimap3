@@ -278,7 +278,7 @@ class IMAPFolder(BaseFolder):
 
             # Get the flags and UIDs for these. single-quotes prevent
             # imaplib2 from quoting the sequence.
-            fetch_msg = "'%s'"% msgsToFetch
+            fetch_msg = "%s"% msgsToFetch
             self.ui.debug('imap', "calling imaplib2 fetch command: %s %s"%
                 (fetch_msg, '(FLAGS UID INTERNALDATE)'))
             res_type, response = imapobj.fetch(
