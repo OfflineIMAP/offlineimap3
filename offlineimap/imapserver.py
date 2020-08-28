@@ -209,14 +209,13 @@ class IMAPServer(object):
                                    OfflineImapError.ERROR.REPO)
 
         passwd = self.__getpassword()
-        authz = b''
+        authz = ''
+        NULL = '\x00'
         if self.user_identity != None:
             authz = self.user_identity
-        # At this point all authz, authc and passwd are expected bytes encoded
-        # in UTF-8.
-        NULL = b'\x00'
+
         retval = NULL.join((authz, authc, passwd))
-        logsafe_retval = NULL.join((authz, authc, b'(passwd hidden for log)'))
+        logsafe_retval = NULL.join((authz, authc, '(passwd hidden for log)'))
         self.ui.debug('imap', '__plainhandler: returning %s'% logsafe_retval)
         return retval
 
