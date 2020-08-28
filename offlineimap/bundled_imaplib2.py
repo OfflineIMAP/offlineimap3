@@ -1358,6 +1358,8 @@ class IMAP4(object):
         data = rqb.tag + b' ' + name
         for arg in args:
             if arg is None: continue
+            if arg == '':
+                arg = '""'
             if isinstance(arg, str):
                 arg = bytes(arg, self._encoding)
             data = data + b' ' + arg
