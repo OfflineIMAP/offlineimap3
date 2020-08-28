@@ -295,7 +295,7 @@ class IMAPFolder(BaseFolder):
             # Discard initial message number.
             if messagestr is None:
                 continue
-            messagestr = messagestr.split(' ', 1)[1]
+            messagestr = messagestr.decode('utf-8').split(' ', 1)[1]
             options = imaputil.flags2hash(messagestr)
             if 'UID' not in options:
                 self.ui.warn('No UID in message with options %s'%
