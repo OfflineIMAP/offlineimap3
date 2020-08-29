@@ -27,21 +27,24 @@ from test.OLItest import OLITestLib
 if not OLITestLib.cred_file:
     OLITestLib(cred_file='./test/credentials.conf', cmd='./offlineimap.py')
 
+
 def setUpModule():
     logging.info("Set Up test module %s" % __name__)
     tdir = OLITestLib.create_test_dir(suffix=__name__)
+
 
 def tearDownModule():
     logging.info("Tear Down test module")
     # comment out next line to keep testdir after test runs. TODO: make nicer
     OLITestLib.delete_test_dir()
 
-#Stuff that can be used
-#self.assertEqual(self.seq, range(10))
+
+# Stuff that can be used
+# self.assertEqual(self.seq, range(10))
 # should raise an exception for an immutable sequence
-#self.assertRaises(TypeError, random.shuffle, (1,2,3))
-#self.assertTrue(element in self.seq)
-#self.assertFalse(element in self.seq)
+# self.assertRaises(TypeError, random.shuffle, (1,2,3))
+# self.assertTrue(element in self.seq)
+# self.assertFalse(element in self.seq)
 
 class TestInternalFunctions(unittest.TestCase):
     """While the other test files test OfflineImap as a program, these
@@ -50,8 +53,8 @@ class TestInternalFunctions(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        #This is run before all tests in this class
-        config= OLITestLib.get_default_config()
+        # This is run before all tests in this class
+        config = OLITestLib.get_default_config()
         setglobalui(UI_LIST['quiet'](config))
 
     def test_01_imapsplit(self):
@@ -90,5 +93,5 @@ class TestInternalFunctions(unittest.TestCase):
 
     def test_07_uid_sequence(self):
         """Test imaputil.uid_sequence()"""
-        res = imaputil.uid_sequence([1,2,3,4,5,10,12,13])
+        res = imaputil.uid_sequence([1, 2, 3, 4, 5, 10, 12, 13])
         self.assertEqual(res, b'1:5,10,12:13')

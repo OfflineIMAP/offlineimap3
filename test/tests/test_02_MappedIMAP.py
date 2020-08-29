@@ -29,30 +29,32 @@ def setUpModule():
     logging.info("Set Up test module %s" % __name__)
     tdir = OLITestLib.create_test_dir(suffix=__name__)
 
+
 def tearDownModule():
     logging.info("Tear Down test module")
     OLITestLib.delete_test_dir()
 
-#Stuff that can be used
-#self.assertEqual(self.seq, range(10))
+
+# Stuff that can be used
+# self.assertEqual(self.seq, range(10))
 # should raise an exception for an immutable sequence
-#self.assertRaises(TypeError, random.shuffle, (1,2,3))
-#self.assertTrue(element in self.seq)
-#self.assertFalse(element in self.seq)
+# self.assertRaises(TypeError, random.shuffle, (1,2,3))
+# self.assertTrue(element in self.seq)
+# self.assertFalse(element in self.seq)
 
 class TestBasicFunctions(unittest.TestCase):
-    #@classmethod
-    #def setUpClass(cls):
-    #This is run before all tests in this class
+    # @classmethod
+    # def setUpClass(cls):
+    # This is run before all tests in this class
     #    cls._connection = createExpensiveConnectionObject()
 
-    #@classmethod
-    #This is run after all tests in this class
-    #def tearDownClass(cls):
+    # @classmethod
+    # This is run after all tests in this class
+    # def tearDownClass(cls):
     #    cls._connection.destroy()
 
     # This will be run before each test
-    #def setUp(self):
+    # def setUp(self):
     #    self.seq = range(10)
 
     def test_01_MappedImap(self):
@@ -61,11 +63,11 @@ class TestBasicFunctions(unittest.TestCase):
         Cleans existing remote test folders. Then syncs all "OLItest*
         (specified in the default config) to our local IMAP (Gmail). The
         result should be 0 folders and 0 mails."""
-        pass #TODO
-        #OLITestLib.delete_remote_testfolders()
-        #code, res = OLITestLib.run_OLI()
-        #self.assertEqual(res, "")
-        #boxes, mails = OLITestLib.count_maildir_mails('')
-        #self.assertTrue((boxes, mails)==(0,0), msg="Expected 0 folders and 0"
+        pass  # TODO
+        # OLITestLib.delete_remote_testfolders()
+        # code, res = OLITestLib.run_OLI()
+        # self.assertEqual(res, "")
+        # boxes, mails = OLITestLib.count_maildir_mails('')
+        # self.assertTrue((boxes, mails)==(0,0), msg="Expected 0 folders and 0"
         #    "mails, but sync led to {} folders and {} mails".format(
         #        boxes, mails))
