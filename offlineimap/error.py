@@ -28,7 +28,7 @@ class OfflineImapError(Exception):
 
         :type severity: OfflineImapError.ERROR value"""
 
-        self.errcode  = errcode
+        self.errcode = errcode
         self.severity = severity
 
         # 'reason' is stored in the Exception().args tuple.
