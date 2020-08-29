@@ -16,16 +16,16 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 
-import re   # For folderfilter.
+import re  # For folderfilter.
 import json
 from threading import Lock
 from os import listdir, makedirs, path, unlink
 from sys import exc_info
+
 try:
     from configparser import NoSectionError
-except ImportError: # Py3.
+except ImportError:  # Py3.
     from configparser import NoSectionError
-
 
 _mbLock = Lock()
 _mbnames = None
@@ -86,14 +86,14 @@ class _IntermediateMbnames(object):
     """mbnames data for one account."""
 
     def __init__(self, accountname, folder_root, mbnamesdir, folderfilter,
-            dry_run, ui):
+                 dry_run, ui):
 
         self.ui = ui
         self._foldernames = []
         self._accountname = accountname
         self._folder_root = folder_root
         self._folderfilter = folderfilter
-        self._path = path.join(mbnamesdir, "%s.json"% accountname)
+        self._path = path.join(mbnamesdir, "%s.json" % accountname)
         self._dryrun = dry_run
 
     def add(self, foldername):
@@ -117,10 +117,10 @@ class _IntermediateMbnames(object):
                 })
 
         if self._dryrun:
-            self.ui.info("mbnames would write %s"% self._path)
+            self.ui.info("mbnames would write %s" % self._path)
         else:
             with open(
-                self._path, "w", encoding='utf-8') as intermediateFD:
+                    self._path, "w", encoding='utf-8') as intermediateFD:
                 json.dump(itemlist, intermediateFD)
 
 
@@ -183,10 +183,10 @@ class _Mbnames(object):
 
     def _removeIntermediateFile(self, path):
         if self._dryrun:
-            self.ui.info("mbnames would remove %s"% path)
+            self.ui.info("mbnames would remove %s" % path)
         else:
             unlink(path)
-            self.ui.info("removed %s"% path)
+            self.ui.info("removed %s" % path)
 
     def addAccountFolder(self, accountname, folder_root, foldername):
         """Add foldername entry for an account."""
@@ -235,29 +235,29 @@ class _Mbnames(object):
         for intermediateFile in self._iterIntermediateFiles():
             try:
                 with open(
-                    intermediateFile, 'r', encoding="utf-8") as intermediateFD:
+                        intermediateFile, 'r', encoding="utf-8") as intermediateFD:
                     for item in json.load(intermediateFD):
                         itemlist.append(item)
             except (OSError, IOError) as e:
                 self.ui.error("could not read intermediate mbnames file '%s':"
-                    "%s"% (intermediateFile, str(e)))
+                              "%s" % (intermediateFile, str(e)))
             except Exception as e:
                 self.ui.error(
                     e,
                     exc_info()[2],
-                    ("intermediate mbnames file %s not properly read"%
-                        intermediateFile)
+                    ("intermediate mbnames file %s not properly read" %
+                     intermediateFile)
                 )
 
         itemlist.sort(key=self._func_sortkey)
         itemlist = [self._peritem % d for d in itemlist]
 
         if self._dryrun:
-            self.ui.info("mbnames would write %s"% self._path)
+            self.ui.info("mbnames would write %s" % self._path)
         else:
             try:
                 with open(
-                    self._path, 'w', encoding='utf-8') as mbnamesFile:
+                        self._path, 'w', encoding='utf-8') as mbnamesFile:
                     mbnamesFile.write(self._header)
                     mbnamesFile.write(self._sep.join(itemlist))
                     mbnamesFile.write(self._footer)
@@ -265,7 +265,7 @@ class _Mbnames(object):
                 self.ui.error(
                     e,
                     exc_info()[2],
-                    "mbnames file %s not properly written"% self._path
+                    "mbnames file %s not properly written" % self._path
                 )
 
     def writeIntermediateFile(self, accountname):
@@ -275,5 +275,5 @@ class _Mbnames(object):
             self.ui.error(
                 e,
                 exc_info()[2],
-                "intermediate mbnames file %s not properly written"% self._path
+                "intermediate mbnames file %s not properly written" % self._path
             )
