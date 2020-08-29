@@ -20,20 +20,25 @@ import logging
 import offlineimap
 from offlineimap.ui.UIBase import UIBase
 
+
 class Basic(UIBase):
     """'Basic' simply sets log level to INFO."""
 
-    def __init__(self, config, loglevel = logging.INFO):
+    def __init__(self, config, loglevel=logging.INFO):
         return super(Basic, self).__init__(config, loglevel)
+
 
 class Quiet(UIBase):
     """'Quiet' simply sets log level to WARNING"""
-    def __init__(self, config, loglevel = logging.WARNING):
+
+    def __init__(self, config, loglevel=logging.WARNING):
         return super(Quiet, self).__init__(config, loglevel)
+
 
 class Syslog(UIBase):
     """'Syslog' sets log level to INFO and outputs to syslog instead of stdout"""
-    def __init__(self, config, loglevel = logging.INFO):
+
+    def __init__(self, config, loglevel=logging.INFO):
         return super(Syslog, self).__init__(config, loglevel)
 
     def setup_consolehandler(self):
@@ -48,4 +53,4 @@ class Syslog(UIBase):
         return ch
 
     def setup_sysloghandler(self):
-        pass # Do not honor -s (log to syslog) CLI option.
+        pass  # Do not honor -s (log to syslog) CLI option.
