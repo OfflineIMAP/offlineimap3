@@ -26,10 +26,6 @@ try:
     from hashlib import md5
 except ImportError:
     from md5 import md5
-try: # python 2.6 has set() built in
-    set
-except NameError:
-    from sets import Set as set
 
 from offlineimap import OfflineImapError, emailutil
 from .Base import BaseFolder
