@@ -19,7 +19,7 @@ from sys import exc_info
 
 try:
     from configparser import NoSectionError
-except ImportError: #python2
+except ImportError:  # python2
     from configparser import NoSectionError
 
 from offlineimap.repository.IMAP import IMAPRepository, MappedIMAPRepository
@@ -44,13 +44,13 @@ class Repository(object):
             name = account.getconf('remoterepository')
             # We don't support Maildirs on the remote side.
             typemap = {'IMAP': IMAPRepository,
-                'Gmail': GmailRepository}
+                       'Gmail': GmailRepository}
 
         elif reqtype == 'local':
             name = account.getconf('localrepository')
             typemap = {'IMAP': MappedIMAPRepository,
-                'Maildir': MaildirRepository,
-                'GmailMaildir': GmailMaildirRepository}
+                       'Maildir': MaildirRepository,
+                       'GmailMaildir': GmailMaildirRepository}
 
         elif reqtype == 'status':
             # create and return a LocalStatusRepository.
@@ -75,8 +75,8 @@ class Repository(object):
         try:
             repo = typemap[repostype]
         except KeyError:
-            errstr = "'%s' repository not supported for '%s' repositories."% \
-                (repostype, reqtype)
+            errstr = "'%s' repository not supported for '%s' repositories." % \
+                     (repostype, reqtype)
             six.reraise(OfflineImapError,
                         OfflineImapError(errstr, OfflineImapError.ERROR.REPO),
                         exc_info()[2])
