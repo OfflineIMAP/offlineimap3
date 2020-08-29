@@ -20,12 +20,11 @@ from queue import Queue, Empty
 import traceback
 from offlineimap.ui import getglobalui
 
-
 STOP_MONITOR = 'STOP_MONITOR'
 
-######################################################################
+
 # General utilities
-######################################################################
+
 
 def semaphorereset(semaphore, originalstate):
     """Block until `semaphore` gets back to its original state, ie all acquired
@@ -36,6 +35,7 @@ def semaphorereset(semaphore, originalstate):
     # Now release these.
     for i in range(originalstate):
         semaphore.release()
+
 
 class accountThreads(object):
     """Store the list of all threads in the software so it can be used to find out
@@ -72,6 +72,7 @@ class accountThreads(object):
 ######################################################################
 
 exitedThreads = Queue()
+
 
 def monitor():
     """An infinite "monitoring" loop watching for finished ExitNotifyThread's.
@@ -111,16 +112,16 @@ def monitor():
                     # Do not send it back to UI layer right now.
                     # Maybe later send it to ui.terminate?
                     raise SystemExit
-                ui.threadException(thread) # Expected to terminate the program.
+                ui.threadException(thread)  # Expected to terminate the program.
                 # Should never hit this line.
                 raise AssertionError("thread has 'exit_exception' set to"
-                    " '%s' [%s] but this value is unexpected"
-                    " and the ui did not stop the program."%
-                    (repr(thread.exit_exception), type(thread.exit_exception)))
+                                     " '%s' [%s] but this value is unexpected"
+                                     " and the ui did not stop the program." %
+                                     (repr(thread.exit_exception), type(thread.exit_exception)))
 
             # Only the monitor thread has this exit message set.
             elif thread.exit_message == STOP_MONITOR:
-                break # Exit the loop here.
+                break  # Exit the loop here.
             else:
                 ui.threadExited(thread)
         except Empty:
@@ -188,6 +189,7 @@ class ExitNotifyThread(Thread):
 ######################################################################
 
 limitedNamespaces = {}
+
 
 def initInstanceLimit(limitNamespace, instancemax):
     """Initialize the instance-limited thread implementation.
