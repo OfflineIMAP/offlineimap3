@@ -47,22 +47,22 @@ class CursesUtil:
         """Initialize the curses color pairs available."""
 
         # set special colors 'gray' and 'banner'
-        self.colormap['white'] = 0 #hardcoded by curses
+        self.colormap['white'] = 0  # hardcoded by curses
         curses.init_pair(1, curses.COLOR_WHITE, curses.COLOR_BLUE)
-        self.colormap['banner'] = 1 # color 'banner' for bannerwin
+        self.colormap['banner'] = 1  # color 'banner' for bannerwin
 
         bcol = curses.COLOR_BLACK
-        colors = ( # name, color, bold?
-                ('black', curses.COLOR_BLACK, False),
-                ('blue', curses.COLOR_BLUE,False),
-                ('red', curses.COLOR_RED, False),
-                ('purple', curses.COLOR_MAGENTA, False),
-                ('cyan', curses.COLOR_CYAN, False),
-                ('green', curses.COLOR_GREEN, False),
-                ('orange', curses.COLOR_YELLOW, False))
-        #set the rest of all colors starting at pair 2
+        colors = (  # name, color, bold?
+            ('black', curses.COLOR_BLACK, False),
+            ('blue', curses.COLOR_BLUE, False),
+            ('red', curses.COLOR_RED, False),
+            ('purple', curses.COLOR_MAGENTA, False),
+            ('cyan', curses.COLOR_CYAN, False),
+            ('green', curses.COLOR_GREEN, False),
+            ('orange', curses.COLOR_YELLOW, False))
+        # set the rest of all colors starting at pair 2
         i = 1
-        for name, fcol, bold  in colors:
+        for name, fcol, bold in colors:
             i += 1
             self.colormap[name] = i
             curses.init_pair(i, fcol, bcol)
@@ -99,6 +99,7 @@ class CursesUtil:
         def lockedstuff():
             curses.panel.update_panels()
             curses.doupdate()
+
         self.exec_locked(lockedstuff)
 
     def isactive(self):
@@ -129,19 +130,20 @@ class CursesAccountFrame:
         self.location = 0
         # length of the account prefix string
 
-    def drawleadstr(self, secs = 0):
+    def drawleadstr(self, secs=0):
         """Draw the account status string.
 
         secs tells us how long we are going to sleep."""
 
-        sleepstr = '%3d:%02d'% (secs // 60, secs % 60) if secs else 'active'
-        accstr = '%s: [%s] %12.12s: '% (self.acc_num, sleepstr, self.account)
+        sleepstr = '%3d:%02d' % (secs // 60, secs % 60) if secs else 'active'
+        accstr = '%s: [%s] %12.12s: ' % (self.acc_num, sleepstr, self.account)
 
         def addstr():
             try:
                 self.window.addstr(0, 0, accstr)
-            except curses.error as e: # Occurs when the terminal is very small
+            except curses.error as e:  # Occurs when the terminal is very small
                 pass
+
         self.ui.exec_locked(addstr);
 
         self.location = len(accstr)
@@ -187,9 +189,10 @@ class CursesAccountFrame:
         # if this belongs to an Account (and not *Control), set the
         # skipsleep pref
         if isinstance(self.account, offlineimap.accounts.Account):
-            self.ui.info("Requested synchronization for acc: %s"% self.account)
-            self.account.config.set('Account %s'% self.account.name,
-                'skipsleep', '1')
+            self.ui.info("Requested synchronization for acc: %s" % self.account)
+            self.account.config.set('Account %s' % self.account.name,
+                                    'skipsleep', '1')
+
 
 class CursesThreadFrame:
     """curses_color: current color pair for logging."""
@@ -203,7 +206,7 @@ class CursesThreadFrame:
         self.window = acc_win
         self.x = x
         self.y = y
-        self.curses_color = curses.color_pair(0) #default color
+        self.curses_color = curses.color_pair(0)  # default color
 
     def setcolor(self, color, modifier=0):
         """Draw the thread symbol '@' in the specified color
@@ -219,9 +222,10 @@ class CursesThreadFrame:
         def locked_display():
             try:
                 self.window.addch(self.y, self.x, '@', self.curses_color)
-            except curses.error: # Occurs when the terminal is very small
+            except curses.error:  # Occurs when the terminal is very small
                 pass
             self.window.refresh()
+
         # lock the curses IO while fudging stuff
         self.ui.exec_locked(locked_display)
 
@@ -240,10 +244,10 @@ class CursesThreadFrame:
 class InputHandler(ExitNotifyThread):
     """Listens for input via the curses interfaces"""
 
-    #TODO, we need to use the ugly exitnotifythread (rather than simply
-    #threading.Thread here, so exiting this thread via the callback
-    #handler, kills off all parents too. Otherwise, they would simply
-    #continue.
+    # TODO, we need to use the ugly exitnotifythread (rather than simply
+    # threading.Thread here, so exiting this thread via the callback
+    # handler, kills off all parents too. Otherwise, they would simply
+    # continue.
     def __init__(self, ui):
         super(InputHandler, self).__init__()
         self.char_handler = None
@@ -252,7 +256,7 @@ class InputHandler(ExitNotifyThread):
         # We will only parse input if we are enabled.
         self.inputlock = RLock()
         # denotes whether we should be handling the next char.
-        self.start() #automatically start the thread
+        self.start()  # automatically start the thread
 
     def get_next_char(self):
         """Return the key pressed or -1.
@@ -272,7 +276,7 @@ class InputHandler(ExitNotifyThread):
             char_gen = self.get_next_char()
             for char in char_gen:
                 self.char_handler(char)
-                #curses.ungetch(char)
+                # curses.ungetch(char)
 
     def set_char_hdlr(self, callback):
         """Sets a character callback handler.
@@ -321,14 +325,15 @@ class CursesLogHandler(logging.StreamHandler):
         self.ui.tframe_lock.acquire()
         self.ui.lock()
         try:
-            y,x = self.ui.logwin.getyx()
-            if y or x: self.ui.logwin.addch(10) # no \n before 1st item
+            y, x = self.ui.logwin.getyx()
+            if y or x: self.ui.logwin.addch(10)  # no \n before 1st item
             self.ui.logwin.addstr(log_str, color)
             self.ui.logwin.noutrefresh()
             self.ui.stdscr.refresh()
         finally:
             self.ui.unlock()
             self.ui.tframe_lock.release()
+
 
 class Blinkenlights(UIBase, CursesUtil):
     """Curses-cased fancy UI.
@@ -356,7 +361,7 @@ class Blinkenlights(UIBase, CursesUtil):
 
         # create console handler with a higher log level
         ch = CursesLogHandler()
-        #ch.setLevel(logging.DEBUG)
+        # ch.setLevel(logging.DEBUG)
         # create formatter and add it to the handlers
         self.formatter = logging.Formatter("%(message)s")
         ch.setFormatter(self.formatter)
@@ -378,7 +383,7 @@ class Blinkenlights(UIBase, CursesUtil):
         # Test if ncurses actually starts up fine. Only do so for
         # python>=2.6.6 as calling initscr() twice messing things up.
         # see http://bugs.python.org/issue7567 in python 2.6 to 2.6.5
-        if sys.version_info[0:3] < (2,6) or sys.version_info[0:3] >= (2,6,6):
+        if sys.version_info[0:3] < (2, 6) or sys.version_info[0:3] >= (2, 6, 6):
             try:
                 curses.initscr()
                 curses.endwin()
@@ -476,7 +481,7 @@ class Blinkenlights(UIBase, CursesUtil):
         self.gettf().setcolor('white')
         super(Blinkenlights, self).callhook(*args)
 
-    ############ Generic logging functions #############################
+    # Generic logging functions #
     def warn(self, msg, minor=0):
         self.gettf().setcolor('red', curses.A_BOLD)
         super(Blinkenlights, self).warn(msg)
@@ -495,7 +500,7 @@ class Blinkenlights(UIBase, CursesUtil):
         """Return the ThreadFrame() of the current thread."""
 
         cur_thread = currentThread()
-        acc = self.getthreadaccount() #Account() or None
+        acc = self.getthreadaccount()  # Account() or None
 
         with self.tframe_lock:
             # Ideally we already have self.threadframes[accountname][thread]
@@ -531,7 +536,7 @@ class Blinkenlights(UIBase, CursesUtil):
         try:
             index = int(chr(key))
         except ValueError:
-            return # Key not a valid number: exit.
+            return  # Key not a valid number: exit.
         if index >= len(self.hotkeys):
             # Not in our list of valid hotkeys.
             return
@@ -540,7 +545,7 @@ class Blinkenlights(UIBase, CursesUtil):
 
     def sleep(self, sleepsecs, account):
         self.gettf().setcolor('red')
-        self.info("Next sync in %d:%02d"% (sleepsecs / 60, sleepsecs % 60))
+        self.info("Next sync in %d:%02d" % (sleepsecs / 60, sleepsecs % 60))
         return super(Blinkenlights, self).sleep(sleepsecs, account)
 
     def sleeping(self, sleepsecs, remainingsecs):
@@ -565,10 +570,10 @@ class Blinkenlights(UIBase, CursesUtil):
         # See comment on _msg for info on why both locks are obtained.
         self.lock()
         try:
-            #s.gettf().setcolor('white')
+            # s.gettf().setcolor('white')
             self.warn(" *** Input Required")
             self.warn(" *** Please enter password for user '%s': " % \
-                          username)
+                      username)
             self.logwin.refresh()
             password = self.logwin.getstr()
         finally:
@@ -596,8 +601,8 @@ class Blinkenlights(UIBase, CursesUtil):
             self.logwin = curses.newwin(self.logheight, self.width, 1, 0)
 
         self.draw_bannerwin()
-        self.logwin.idlok(True)    # needed for scrollok below
-        self.logwin.scrollok(True) # scroll window when too many lines added
+        self.logwin.idlok(True)  # needed for scrollok below
+        self.logwin.scrollok(True)  # scroll window when too many lines added
         self.draw_logwin()
         self.accounts = reversed(sorted(self.accframes.keys()))
         pos = self.height - 1
@@ -618,8 +623,8 @@ class Blinkenlights(UIBase, CursesUtil):
             color = curses.A_BOLD | self.curses_colorpair('banner')
         else:
             color = curses.A_REVERSE
-        self.bannerwin.clear() # Delete old content (eg before resizes)
-        self.bannerwin.bkgd(' ', color) # Fill background with that color
+        self.bannerwin.clear()  # Delete old content (eg before resizes)
+        self.bannerwin.bkgd(' ', color)  # Fill background with that color
         string = "%s %s" % (offlineimap.__productname__,
                             offlineimap.__version__)
         spaces = " " * max(1, (self.width - len(offlineimap.__copyright__)
@@ -632,7 +637,7 @@ class Blinkenlights(UIBase, CursesUtil):
         """(Re)draw the current logwindow."""
 
         if curses.has_colors():
-            color = curses.color_pair(0) #default colors
+            color = curses.color_pair(0)  # default colors
         else:
             color = curses.A_NORMAL
         self.logwin.move(0, 0)
@@ -650,7 +655,7 @@ class Blinkenlights(UIBase, CursesUtil):
             if acc_name in self.accframes: return self.accframes[acc_name]
             self.accframes[acc_name] = CursesAccountFrame(self, acc_name)
             # update the window layout
-            self.setupwindows(resize= True)
+            self.setupwindows(resize=True)
         return self.accframes[acc_name]
 
     def terminate(self, *args, **kwargs):
@@ -668,6 +673,5 @@ class Blinkenlights(UIBase, CursesUtil):
         super(Blinkenlights, self).terminate(*args, **kwargs)
 
     def threadException(self, thread):
-        #self._log_con_handler.stop()
+        # self._log_con_handler.stop()
         UIBase.threadException(self, thread)
-
