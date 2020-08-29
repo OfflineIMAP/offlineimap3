@@ -28,17 +28,20 @@ from collections import deque
 import offlineimap
 from offlineimap.error import OfflineImapError
 
-debugtypes = {'':'Other offlineimap related sync messages',
+debugtypes = {'': 'Other offlineimap related sync messages',
               'imap': 'IMAP protocol debugging',
               'maildir': 'Maildir repository debugging',
               'thread': 'Threading debugging'}
 
 globalui = None
+
+
 def setglobalui(newui):
     """Set the global ui object to be used for logging."""
 
     global globalui
     globalui = newui
+
 
 def getglobalui():
     """Return the current ui object."""
@@ -81,7 +84,7 @@ class UIBase(object):
 
         # create console handler with a higher log level
         ch = logging.StreamHandler(sys.stdout)
-        #ch.setLevel(logging.DEBUG)
+        # ch.setLevel(logging.DEBUG)
         # create formatter and add it to the handlers
         self.formatter = logging.Formatter("%(message)s")
         ch.setFormatter(self.formatter)
@@ -105,15 +108,15 @@ class UIBase(object):
         """Create file handler which logs to file."""
 
         fh = logging.FileHandler(logfile, 'at')
-        #fh.setLevel(logging.DEBUG)
+        # fh.setLevel(logging.DEBUG)
         file_formatter = logging.Formatter("%(asctime)s %(levelname)s: "
-            "%(message)s", '%Y-%m-%d %H:%M:%S')
+                                           "%(message)s", '%Y-%m-%d %H:%M:%S')
         fh.setFormatter(file_formatter)
         self.logger.addHandler(fh)
         # write out more verbose initial info blurb on the log file
         p_ver = ".".join([str(x) for x in sys.version_info[0:3]])
-        msg = "OfflineImap %s starting...\n  Python: %s Platform: %s\n  "\
-              "Args: %s"% (offlineimap.__version__, p_ver, sys.platform,
+        msg = "OfflineImap %s starting...\n  Python: %s Platform: %s\n  " \
+              "Args: %s" % (offlineimap.__version__, p_ver, sys.platform,
                             " ".join(sys.argv))
         record = logging.LogRecord('OfflineImap', logging.INFO, __file__,
                                    None, msg, None, None)
@@ -158,9 +161,9 @@ class UIBase(object):
                "repo %s")
         """
         if msg:
-            self.logger.error("ERROR: %s\n  %s"% (msg, exc))
+            self.logger.error("ERROR: %s\n  %s" % (msg, exc))
         else:
-            self.logger.error("ERROR: %s"% (exc))
+            self.logger.error("ERROR: %s" % (exc))
 
         instant_traceback = exc_traceback
         if not self.debuglist:
@@ -178,11 +181,11 @@ class UIBase(object):
         if cur_thread in self.threadaccounts:
             # was already associated with an old account, update info
             self.debug('thread', "Register thread '%s' (previously '%s', now "
-                    "'%s')"% (cur_thread.getName(),
-                              self.getthreadaccount(cur_thread), account))
+                                 "'%s')" % (cur_thread.getName(),
+                                            self.getthreadaccount(cur_thread), account))
         else:
-            self.debug('thread', "Register new thread '%s' (account '%s')"%
-                (cur_thread.getName(), account))
+            self.debug('thread', "Register new thread '%s' (account '%s')" %
+                       (cur_thread.getName(), account))
         self.threadaccounts[cur_thread] = account
 
     def unregisterthread(self, thr):
@@ -190,7 +193,7 @@ class UIBase(object):
 
         if thr in self.threadaccounts:
             del self.threadaccounts[thr]
-        self.debug('thread', "Unregister thread '%s'"% thr.getName())
+        self.debug('thread', "Unregister thread '%s'" % thr.getName())
 
     def getthreadaccount(self, thr=None):
         """Get Account() for a thread (current if None)
@@ -216,7 +219,7 @@ class UIBase(object):
         if len(self.debugmessages[cur_thread]) > self.debugmsglen:
             self.debugmessages[cur_thread].popleft()
 
-        if debugtype in self.debuglist: # log if we are supposed to do so
+        if debugtype in self.debuglist:  # log if we are supposed to do so
             self.logger.debug("[%s]: %s" % (debugtype, msg))
 
     def add_debug(self, debugtype):
@@ -254,50 +257,50 @@ class UIBase(object):
 
     ################################################## INPUT
 
-    def getpass(self, username, config, errmsg = None):
+    def getpass(self, username, config, errmsg=None):
         raise NotImplementedError("Prompting for a password is not supported"
-            " in this UI backend.")
+                                  " in this UI backend.")
 
     def folderlist(self, folder_list):
-        return ', '.join(["%s[%s]"% \
-            (self.getnicename(x), x.getname()) for x in folder_list])
+        return ', '.join(["%s[%s]" % \
+                          (self.getnicename(x), x.getname()) for x in folder_list])
 
     ################################################## WARNINGS
     def msgtoreadonly(self, destfolder, uid, content, flags):
         if self.config.has_option('general', 'ignore-readonly') and \
-            self.config.getboolean('general', 'ignore-readonly'):
+                self.config.getboolean('general', 'ignore-readonly'):
             return
         self.warn("Attempted to synchronize message %d to folder %s[%s], "
-            "but that folder is read-only.  The message will not be "
-            "copied to that folder."% (
-            uid, self.getnicename(destfolder), destfolder))
+                  "but that folder is read-only.  The message will not be "
+                  "copied to that folder." % (
+                      uid, self.getnicename(destfolder), destfolder))
 
     def flagstoreadonly(self, destfolder, uidlist, flags):
         if self.config.has_option('general', 'ignore-readonly') and \
                 self.config.getboolean('general', 'ignore-readonly'):
             return
         self.warn("Attempted to modify flags for messages %s in folder %s[%s], "
-            "but that folder is read-only.  No flags have been modified "
-            "for that message."% (
-            str(uidlist), self.getnicename(destfolder), destfolder))
+                  "but that folder is read-only.  No flags have been modified "
+                  "for that message." % (
+                      str(uidlist), self.getnicename(destfolder), destfolder))
 
     def labelstoreadonly(self, destfolder, uidlist, labels):
         if self.config.has_option('general', 'ignore-readonly') and \
                 self.config.getboolean('general', 'ignore-readonly'):
             return
         self.warn("Attempted to modify labels for messages %s in folder %s[%s], "
-            "but that folder is read-only.  No labels have been modified "
-            "for that message."% (
-            str(uidlist), self.getnicename(destfolder), destfolder))
+                  "but that folder is read-only.  No labels have been modified "
+                  "for that message." % (
+                      str(uidlist), self.getnicename(destfolder), destfolder))
 
     def deletereadonly(self, destfolder, uidlist):
         if self.config.has_option('general', 'ignore-readonly') and \
                 self.config.getboolean('general', 'ignore-readonly'):
             return
         self.warn("Attempted to delete messages %s in folder %s[%s], but that "
-            "folder is read-only.  No messages have been deleted in that "
-            "folder."% (str(uidlist), self.getnicename(destfolder),
-            destfolder))
+                  "folder is read-only.  No messages have been deleted in that "
+                  "folder." % (str(uidlist), self.getnicename(destfolder),
+                               destfolder))
 
     ################################################## MESSAGES
 
@@ -314,32 +317,32 @@ class UIBase(object):
         if not self.logger.isEnabledFor(logging.INFO): return
         displaystr = ''
         hostname = hostname if hostname else ''
-        port = "%s"% port if port else ''
+        port = "%s" % port if port else ''
         if hostname:
             displaystr = ' to %s:%s' % (hostname, port)
-        self.logger.info("Establishing connection%s (%s)"%
-            (displaystr, reposname))
+        self.logger.info("Establishing connection%s (%s)" %
+                         (displaystr, reposname))
 
     def acct(self, account):
         """Output that we start syncing an account (and start counting)."""
 
         self.acct_startimes[account] = time.time()
-        self.logger.info("*** Processing account %s"% account)
+        self.logger.info("*** Processing account %s" % account)
 
     def acctdone(self, account):
         """Output that we finished syncing an account (in which time)."""
 
         sec = time.time() - self.acct_startimes[account]
         del self.acct_startimes[account]
-        self.logger.info("*** Finished account '%s' in %d:%02d"%
-            (account, sec // 60, sec % 60))
+        self.logger.info("*** Finished account '%s' in %d:%02d" %
+                         (account, sec // 60, sec % 60))
 
     def syncfolders(self, src_repo, dst_repo):
         """Log 'Copying folder structure...'."""
 
         if self.logger.isEnabledFor(logging.DEBUG):
-            self.debug('', "Copying folder structure from %s to %s" %\
-                           (src_repo, dst_repo))
+            self.debug('', "Copying folder structure from %s to %s" % \
+                       (src_repo, dst_repo))
 
     ############################## Folder syncing
     def makefolder(self, repo, foldername):
@@ -352,9 +355,9 @@ class UIBase(object):
     def syncingfolder(self, srcrepos, srcfolder, destrepos, destfolder):
         """Called when a folder sync operation is started."""
 
-        self.logger.info("Syncing %s: %s -> %s"% (srcfolder,
-            self.getnicename(srcrepos),
-            self.getnicename(destrepos)))
+        self.logger.info("Syncing %s: %s -> %s" % (srcfolder,
+                                                   self.getnicename(srcrepos),
+                                                   self.getnicename(destrepos)))
 
     def skippingfolder(self, folder):
         """Called when a folder sync operation is started."""
@@ -364,38 +367,38 @@ class UIBase(object):
         self.uidval_problem = True
         self.logger.warning("UID validity problem for folder %s (repo %s) "
                             "(saved %d; got %d); skipping it. Please see FAQ "
-                            "and manual on how to handle this."% \
-               (folder, folder.getrepository(),
-                folder.get_saveduidvalidity(), folder.get_uidvalidity()))
+                            "and manual on how to handle this." % \
+                            (folder, folder.getrepository(),
+                             folder.get_saveduidvalidity(), folder.get_uidvalidity()))
 
     def loadmessagelist(self, repos, folder):
-        self.logger.debug("Loading message list for %s[%s]"% (
-                self.getnicename(repos),
-                folder))
+        self.logger.debug("Loading message list for %s[%s]" % (
+            self.getnicename(repos),
+            folder))
 
     def messagelistloaded(self, repos, folder, count):
         self.logger.debug("Message list for %s[%s] loaded: %d messages" % (
-                self.getnicename(repos), folder, count))
+            self.getnicename(repos), folder, count))
 
     ############################## Message syncing
 
     def syncingmessages(self, sr, srcfolder, dr, dstfolder):
         self.logger.debug("Syncing messages %s[%s] -> %s[%s]" % (
-                self.getnicename(sr), srcfolder,
-                self.getnicename(dr), dstfolder))
+            self.getnicename(sr), srcfolder,
+            self.getnicename(dr), dstfolder))
 
     def ignorecopyingmessage(self, uid, src, destfolder):
         """Output a log line stating which message is ignored."""
 
-        self.logger.info("IGNORED: Copy message UID %s %s:%s -> %s"% (
-                uid, src.repository, src, destfolder.repository))
+        self.logger.info("IGNORED: Copy message UID %s %s:%s -> %s" % (
+            uid, src.repository, src, destfolder.repository))
 
     def copyingmessage(self, uid, num, num_to_copy, src, destfolder):
         """Output a log line stating which message we copy."""
 
-        self.logger.info("Copy message UID %s (%d/%d) %s:%s -> %s:%s"% (
-                uid, num, num_to_copy, src.repository, src,
-                destfolder.repository, destfolder))
+        self.logger.info("Copy message UID %s (%d/%d) %s:%s -> %s:%s" % (
+            uid, num, num_to_copy, src.repository, src,
+            destfolder.repository, destfolder))
 
     def deletingmessages(self, uidlist, destlist):
         ds = self.folderlist(destlist)
@@ -406,41 +409,41 @@ class UIBase(object):
 
     def addingflags(self, uidlist, flags, dest):
         self.logger.info("Adding flag %s to %d messages on %s" % (
-                ", ".join(flags), len(uidlist), dest))
+            ", ".join(flags), len(uidlist), dest))
 
     def deletingflags(self, uidlist, flags, dest):
         self.logger.info("Deleting flag %s from %d messages on %s" % (
-                ", ".join(flags), len(uidlist), dest))
+            ", ".join(flags), len(uidlist), dest))
 
     def addinglabels(self, uidlist, label, dest):
         self.logger.info("Adding label %s to %d messages on %s" % (
-                label, len(uidlist), dest))
+            label, len(uidlist), dest))
 
     def deletinglabels(self, uidlist, label, dest):
         self.logger.info("Deleting label %s from %d messages on %s" % (
-                label, len(uidlist), dest))
+            label, len(uidlist), dest))
 
     def settinglabels(self, uid, num, num_to_set, labels, dest):
         self.logger.info("Setting labels to message %d on %s (%d of %d): %s" % (
-                uid, dest, num, num_to_set, ", ".join(labels)))
+            uid, dest, num, num_to_set, ", ".join(labels)))
 
     def collectingdata(self, uidlist, source):
         if uidlist:
-            self.logger.info("Collecting data from %d messages on %s"% (
+            self.logger.info("Collecting data from %d messages on %s" % (
                 len(uidlist), source))
         else:
-            self.logger.info("Collecting data from messages on %s"% source)
+            self.logger.info("Collecting data from messages on %s" % source)
 
     def serverdiagnostics(self, repository, type):
         """Connect to repository and output useful information for debugging."""
 
         conn = None
         self._msg("%s repository '%s': type '%s'" % (type, repository.name,
-                  self.getnicename(repository)))
+                                                     self.getnicename(repository)))
         try:
-            if hasattr(repository, 'gethost'): # IMAP
-                self._msg("Host: %s Port: %s SSL: %s"% (repository.gethost(),
-                    repository.getport(), repository.getssl()))
+            if hasattr(repository, 'gethost'):  # IMAP
+                self._msg("Host: %s Port: %s SSL: %s" % (repository.gethost(),
+                                                         repository.getport(), repository.getssl()))
                 try:
                     conn = repository.imapserver.acquireconnection()
                 except OfflineImapError as e:
@@ -448,11 +451,11 @@ class UIBase(object):
                 else:
                     if 'ID' in conn.capabilities:
                         self._msg("Server supports ID extension.")
-                        #TODO: Debug and make below working, it hangs Gmail
-                        #res_type, response = conn.id((
+                        # TODO: Debug and make below working, it hangs Gmail
+                        # res_type, response = conn.id((
                         #    'name', offlineimap.__productname__,
                         #    'version', offlineimap.__version__))
-                        #self._msg("Server ID: %s %s" % (res_type, response[0]))
+                        # self._msg("Server ID: %s %s" % (res_type, response[0]))
                     self._msg("Server welcome string: %s" % str(conn.welcome))
                     self._msg("Server capabilities: %s\n" % str(conn.capabilities))
                     repository.imapserver.releaseconnection(conn)
@@ -469,35 +472,37 @@ class UIBase(object):
 
                 folders = repository.getfolders()
                 foldernames = [(f.name, f.getvisiblename(), f.sync_this)
-                    for f in folders]
+                               for f in folders]
                 folders = []
                 for name, visiblename, sync_this in foldernames:
                     syncstr = "" if sync_this else " (disabled)"
-                    if name == visiblename: folders.append("%s%s" % (name,
-                                                                     syncstr))
-                    else: folders.append("%s -> %s%s" % (name,
+                    if name == visiblename:
+                        folders.append("%s%s" % (name,
+                                                 syncstr))
+                    else:
+                        folders.append("%s -> %s%s" % (name,
                                                        visiblename, syncstr))
                 self._msg("Folderlist:\n %s\n" % "\n ".join(folders))
         finally:
-            if conn: #release any existing IMAP connection
+            if conn:  # release any existing IMAP connection
                 repository.imapserver.close()
 
     def savemessage(self, debugtype, uid, flags, folder):
         """Output a log line stating that we save a msg."""
 
-        self.debug(debugtype, "Write mail '%s:%d' with flags %s"%
-            (folder, uid, repr(flags)))
+        self.debug(debugtype, "Write mail '%s:%d' with flags %s" %
+                   (folder, uid, repr(flags)))
 
     ################################################## Threads
 
     def getThreadDebugLog(self, thread):
         if thread in self.debugmessages:
-            message = "\nLast %d debug messages logged for %s prior to exception:\n"\
-                       % (len(self.debugmessages[thread]), thread.getName())
+            message = "\nLast %d debug messages logged for %s prior to exception:\n" \
+                      % (len(self.debugmessages[thread]), thread.getName())
             message += "\n".join(self.debugmessages[thread])
         else:
-            message = "\nNo debug messages were logged for %s."% \
-                thread.getName()
+            message = "\nNo debug messages were logged for %s." % \
+                      thread.getName()
         return message
 
     def delThreadDebugLog(self, thread):
@@ -505,8 +510,8 @@ class UIBase(object):
             del self.debugmessages[thread]
 
     def getThreadExceptionString(self, thread):
-        message = "Thread '%s' terminated with exception:\n%s"% \
-            (thread.getName(), thread.exit_stacktrace)
+        message = "Thread '%s' terminated with exception:\n%s" % \
+                  (thread.getName(), thread.exit_stacktrace)
         message += "\n" + self.getThreadDebugLog(thread)
         return message
 
@@ -518,28 +523,28 @@ class UIBase(object):
         self.delThreadDebugLog(thread)
         self.terminate(100)
 
-    def terminate(self, exitstatus = 0, errortitle = None, errormsg = None):
+    def terminate(self, exitstatus=0, errortitle=None, errormsg=None):
         """Called to terminate the application."""
 
-        #print any exceptions that have occurred over the run
+        # print any exceptions that have occurred over the run
         if not self.exc_queue.empty():
-           self.warn("ERROR: Exceptions occurred during the run!")
-           if exitstatus == 0:
-               exitstatus = 1
+            self.warn("ERROR: Exceptions occurred during the run!")
+            if exitstatus == 0:
+                exitstatus = 1
         while not self.exc_queue.empty():
             msg, exc, exc_traceback = self.exc_queue.get()
             if msg:
-                self.warn("ERROR: %s\n  %s"% (msg, exc))
+                self.warn("ERROR: %s\n  %s" % (msg, exc))
             else:
-                self.warn("ERROR: %s"% (exc))
+                self.warn("ERROR: %s" % (exc))
             if exc_traceback:
-                self.warn("\nTraceback:\n%s"% "".join(
-                        traceback.format_tb(exc_traceback)))
+                self.warn("\nTraceback:\n%s" % "".join(
+                    traceback.format_tb(exc_traceback)))
 
         if errormsg and errortitle:
-            self.warn('ERROR: %s\n\n%s\n'% (errortitle, errormsg))
+            self.warn('ERROR: %s\n\n%s\n' % (errortitle, errormsg))
         elif errormsg:
-                self.warn('%s\n'% errormsg)
+            self.warn('%s\n' % errormsg)
         if self.uidval_problem:
             self.warn('At least one folder skipped due to UID validity problem')
             if exitstatus == 0:
@@ -595,8 +600,8 @@ class UIBase(object):
         """
 
         if sleepsecs > 0:
-            if remainingsecs//60 != (remainingsecs-sleepsecs)//60:
+            if remainingsecs // 60 != (remainingsecs - sleepsecs) // 60:
                 self.logger.debug("Next refresh in %.1f minutes" % (
-                        remainingsecs/60.0))
+                        remainingsecs / 60.0))
             time.sleep(sleepsecs)
         return 0
