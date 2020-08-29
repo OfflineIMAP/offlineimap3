@@ -155,7 +155,7 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
         'readonly' or by using the 'createfolders' setting."""
 
         return (not self._readonly) and \
-            self.getconfboolean('createfolders', True)
+               self.getconfboolean('createfolders', True)
 
     def makefolder(self, foldername):
         """Create a new folder."""
@@ -212,8 +212,8 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
                     local_repo.forgetfolders()
                 except OfflineImapError as e:
                     self.ui.error(e, exc_info()[2],
-                         "Creating folder %s on repository %s"%
-                         (local_name, local_repo))
+                                  "Creating folder %s on repository %s" %
+                                  (local_name, local_repo))
                     raise
                 status_repo.makefolder(local_name.replace(
                     local_repo.getsep(), status_repo.getsep()))
@@ -232,8 +232,8 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
                 # don't create it.
                 if not remote_repo.should_sync_folder(remote_name):
                     self.ui.debug('', "Not creating folder '%s' (repository '%s"
-                        "') as it would be filtered out on that repository."%
-                        (remote_name, self))
+                                      "') as it would be filtered out on that repository." %
+                                  (remote_name, self))
                     continue
 
                 # nametrans sanity check! Does remote nametrans lead to the
@@ -253,18 +253,18 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
                     remote_repo.getsep(), local_repo.getsep())
                 if local_name != loop_name:
                     raise OfflineImapError("INFINITE FOLDER CREATION DETECTED! "
-                        "Folder '%s' (repository '%s') would be created as fold"
-                        "er '%s' (repository '%s'). The latter becomes '%s' in "
-                        "return, leading to infinite folder creation cycles.\n "
-                        "SOLUTION: 1) Do set your nametrans rules on both repos"
-                        "itories so they lead to identical names if applied bac"
-                        "k and forth. 2) Use folderfilter settings on a reposit"
-                        "ory to prevent some folders from being created on the "
-                        "other side."%
-                        (local_folder.getname(), local_repo, remote_name,
-                            remote_repo,
-                            loop_name),
-                        OfflineImapError.ERROR.REPO)
+                                           "Folder '%s' (repository '%s') would be created as fold"
+                                           "er '%s' (repository '%s'). The latter becomes '%s' in "
+                                           "return, leading to infinite folder creation cycles.\n "
+                                           "SOLUTION: 1) Do set your nametrans rules on both repos"
+                                           "itories so they lead to identical names if applied bac"
+                                           "k and forth. 2) Use folderfilter settings on a reposit"
+                                           "ory to prevent some folders from being created on the "
+                                           "other side." %
+                                           (local_folder.getname(), local_repo, remote_name,
+                                            remote_repo,
+                                            loop_name),
+                                           OfflineImapError.ERROR.REPO)
 
                 # End sanity check, actually create the folder.
                 try:
@@ -273,7 +273,7 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
                     self.forgetfolders()
                 except OfflineImapError as e:
                     self.ui.error(e, exc_info()[2], "Creating folder %s on "
-                                  "repository %s"% (remote_name, remote_repo))
+                                                    "repository %s" % (remote_name, remote_repo))
                     raise
                 status_repo.makefolder(local_name.replace(
                     local_repo.getsep(), status_repo.getsep()))
