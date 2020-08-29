@@ -5,7 +5,6 @@
 import platform
 import os
 
-
 # Each dictionary value is either string or some iterable.
 #
 # For the former we will just return the value, for an iterable
@@ -16,10 +15,10 @@ __DEF_OS_LOCATIONS = {
     'openbsd': '/etc/ssl/cert.pem',
     'dragonfly': '/etc/ssl/cert.pem',
     'darwin': [
-      # MacPorts, port curl-ca-bundle
-      '/opt/local/share/curl/curl-ca-bundle.crt',
-      # homebrew, package openssl
-      '/usr/local/etc/openssl/cert.pem',
+        # MacPorts, port curl-ca-bundle
+        '/opt/local/share/curl/curl-ca-bundle.crt',
+        # homebrew, package openssl
+        '/usr/local/etc/openssl/cert.pem',
     ],
     'linux-ubuntu': '/etc/ssl/certs/ca-certificates.crt',
     'linux-debian': '/etc/ssl/certs/ca-certificates.crt',
@@ -54,6 +53,7 @@ def get_os_name():
 
     return OS
 
+
 def get_os_sslcertfile_searchpath():
     """Returns search path for CA bundle for the current OS.
 
@@ -71,7 +71,7 @@ def get_os_sslcertfile_searchpath():
     if OS in __DEF_OS_LOCATIONS:
         l = __DEF_OS_LOCATIONS[OS]
         if not hasattr(l, '__iter__'):
-            l = (l, )
+            l = (l,)
     return l
 
 
@@ -90,9 +90,8 @@ def get_os_sslcertfile():
         return None
 
     for f in l:
-      assert (type(f) == type(""))
-      if os.path.exists(f) and \
-        (os.path.isfile(f) or os.path.islink(f)):
-          return f
+        assert (type(f) == type(""))
+        if os.path.exists(f) and (os.path.isfile(f) or os.path.islink(f)):
+            return f
 
     return None
