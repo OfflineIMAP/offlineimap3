@@ -18,6 +18,7 @@
 import email
 from email.parser import Parser as MailParser
 
+
 def get_message_date(content, header='Date'):
     """Parses mail and returns resulting timestamp.
 
