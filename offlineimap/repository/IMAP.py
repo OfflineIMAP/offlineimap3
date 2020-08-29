@@ -52,7 +52,7 @@ class IMAPRepository(BaseRepository):
 
         if self.getconf('sep', None):
             self.ui.info("The 'sep' setting is being ignored for IMAP "
-                         "repository '%s' (it's autodetected)"% self)
+                         "repository '%s' (it's autodetected)" % self)
 
     def startkeepalive(self):
         keepalivetime = self.getkeepalive()
@@ -67,7 +67,7 @@ class IMAPRepository(BaseRepository):
 
     def stopkeepalive(self):
         if self.kaevent is None:
-            return # Keepalive is not active.
+            return  # Keepalive is not active.
 
         self.kaevent.set()
         self.kathread = None
@@ -85,7 +85,7 @@ class IMAPRepository(BaseRepository):
 
         if self.copy_ignore_eval is None:
             if self.config.has_option(self.getsection(),
-                                     'copy_ignore_eval'):
+                                      'copy_ignore_eval'):
                 self.copy_ignore_eval = self.localeval.eval(
                     self.getconf('copy_ignore_eval'))
             else:
@@ -101,7 +101,7 @@ class IMAPRepository(BaseRepository):
     def getkeepalive(self):
         num = self.getconfint("keepalive", 0)
         if num == 0 and self.getidlefolders():
-            return 29*60
+            return 29 * 60
         return num
 
     def getsep(self):
@@ -110,8 +110,8 @@ class IMAPRepository(BaseRepository):
         This requires that self.imapserver has been initialized with an
         acquireconnection() or it will still be `None`"""
         assert self.imapserver.delim != None, "'%s' " \
-            "repository called getsep() before the folder separator was " \
-            "queried from the server"% self
+                                              "repository called getsep() before the folder separator was " \
+                                              "queried from the server" % self
         return self.imapserver.delim
 
     def gethost(self):
@@ -130,7 +130,7 @@ class IMAPRepository(BaseRepository):
                 six.reraise(OfflineImapError,
                             OfflineImapError(
                                 "remotehosteval option for repository "
-                                "'%s' failed:\n%s"% (self, e),
+                                "'%s' failed:\n%s" % (self, e),
                                 OfflineImapError.ERROR.REPO),
                             exc_info()[2])
             if host:
@@ -144,7 +144,7 @@ class IMAPRepository(BaseRepository):
 
         # No success.
         raise OfflineImapError("No remote host for repository "
-            "'%s' specified."% self, OfflineImapError.ERROR.REPO)
+                               "'%s' specified." % self, OfflineImapError.ERROR.REPO)
 
     def get_remote_identity(self):
         """Remote identity is used for certain SASL mechanisms
@@ -165,13 +165,13 @@ class IMAPRepository(BaseRepository):
         default = ["GSSAPI", "XOAUTH2", "CRAM-MD5", "PLAIN", "LOGIN"]
 
         mechs = self.getconflist('auth_mechanisms', r',\s*',
-          default)
+                                 default)
 
         for m in mechs:
             if m not in supported:
-                raise OfflineImapError("Repository %s: "% self + \
-                  "unknown authentication mechanism '%s'"% m,
-                  OfflineImapError.ERROR.REPO)
+                raise OfflineImapError("Repository %s: " % self + \
+                                       "unknown authentication mechanism '%s'" % m,
+                                       OfflineImapError.ERROR.REPO)
 
         self.ui.debug('imap', "Using authentication mechanisms %s" % mechs)
         return mechs
@@ -260,18 +260,18 @@ class IMAPRepository(BaseRepository):
             if cacertfile == None:
                 searchpath = get_os_sslcertfile_searchpath()
                 if searchpath:
-                    reason = "Default CA bundle was requested, "\
-                             "but no existing locations available.  "\
+                    reason = "Default CA bundle was requested, " \
+                             "but no existing locations available.  " \
                              "Tried %s." % (", ".join(searchpath))
                 else:
-                    reason = "Default CA bundle was requested, "\
-                             "but OfflineIMAP doesn't know any for your "\
+                    reason = "Default CA bundle was requested, " \
+                             "but OfflineIMAP doesn't know any for your " \
                              "current operating system."
                 raise OfflineImapError(reason, OfflineImapError.ERROR.REPO)
         if cacertfile is None:
             return None
         if not os.path.isfile(cacertfile):
-            reason = "CA certfile for repository '%s' couldn't be found.  "\
+            reason = "CA certfile for repository '%s' couldn't be found.  " \
                      "No such file: '%s'" % (self.name, cacertfile)
             raise OfflineImapError(reason, OfflineImapError.ERROR.REPO)
         return cacertfile
@@ -298,7 +298,7 @@ class IMAPRepository(BaseRepository):
         self.oauth2_request_url = url
 
     def getoauth2_request_url(self):
-        if self.oauth2_request_url is not None: # Use cached value if possible.
+        if self.oauth2_request_url is not None:  # Use cached value if possible.
             return self.oauth2_request_url
 
         self.setoauth2_request_url(self.getconf('oauth2_request_url', None))
@@ -458,15 +458,15 @@ class IMAPRepository(BaseRepository):
             result, listresult = listfunction(directory=self.imapserver.reference)
             if result != 'OK':
                 raise OfflineImapError("Could not list the folders for"
-                        " repository %s. Server responded: %s"%
-                        (self.name, self, str(listresult)),
-                    OfflineImapError.ERROR.FOLDER)
+                                       " repository %s. Server responded: %s" %
+                                       (self.name, self, str(listresult)),
+                                       OfflineImapError.ERROR.FOLDER)
         finally:
             self.imapserver.releaseconnection(imapobj)
 
         for s in listresult:
             if s == None or \
-                   (isinstance(s, str) and s == ''):
+                    (isinstance(s, str) and s == ''):
                 # Bug in imaplib: empty strings in results from
                 # literals. TODO: still relevant?
                 continue
@@ -474,7 +474,7 @@ class IMAPRepository(BaseRepository):
                 flags, delim, name = imaputil.imapsplit(s)
             except ValueError:
                 self.ui.error(
-                    "could not correctly parse server response; got: %s"% s)
+                    "could not correctly parse server response; got: %s" % s)
                 raise
             flaglist = [x.lower() for x in imaputil.flagsplit(flags)]
             if '\\noselect' in flaglist:
@@ -509,12 +509,16 @@ class IMAPRepository(BaseRepository):
             def cmp2key(mycmp):
                 """Converts a cmp= function into a key= function
                 We need to keep cmp functions for backward compatibility"""
+
                 class K(object):
                     def __init__(self, obj, *args):
                         self.obj = obj
+
                     def __cmp__(self, other):
                         return mycmp(self.obj.getvisiblename(), other.obj.getvisiblename())
+
                 return K
+
             retval.sort(key=cmp2key(self.foldersort))
 
         self.folders = retval
@@ -530,8 +534,8 @@ class IMAPRepository(BaseRepository):
             result = imapobj.delete(foldername)
             if result[0] != 'OK':
                 raise OfflineImapError("Folder '%s'[%s] could not be deleted. "
-                    "Server responded: %s"% (foldername, self, str(result)),
-                    OfflineImapError.ERROR.FOLDER)
+                                       "Server responded: %s" % (foldername, self, str(result)),
+                                       OfflineImapError.ERROR.FOLDER)
         finally:
             self.imapserver.releaseconnection(imapobj)
 
@@ -549,7 +553,7 @@ class IMAPRepository(BaseRepository):
 
         if self.getreference():
             foldername = self.getreference() + self.getsep() + foldername
-        if not foldername: # Create top level folder as folder separator.
+        if not foldername:  # Create top level folder as folder separator.
             foldername = self.getsep()
             self.makefolder_single(foldername)
             return
@@ -575,10 +579,11 @@ class IMAPRepository(BaseRepository):
             result = imapobj.create(foldername)
             if result[0] != 'OK':
                 raise OfflineImapError("Folder '%s'[%s] could not be created. "
-                    "Server responded: %s"% (foldername, self, str(result)),
-                    OfflineImapError.ERROR.FOLDER)
+                                       "Server responded: %s" % (foldername, self, str(result)),
+                                       OfflineImapError.ERROR.FOLDER)
         finally:
             self.imapserver.releaseconnection(imapobj)
+
 
 class MappedIMAPRepository(IMAPRepository):
     def getfoldertype(self):
