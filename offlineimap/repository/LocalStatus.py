@@ -54,7 +54,7 @@ class LocalStatusRepository(BaseRepository):
         self._folders = {}
 
     def _instanciatefolder(self, foldername):
-        return self.LocalStatusFolderClass(foldername, self) # Instanciate.
+        return self.LocalStatusFolderClass(foldername, self)  # Instantiate.
 
     def setup_backend(self, backend):
         if backend in list(self.backends.keys()):
@@ -69,14 +69,14 @@ class LocalStatusRepository(BaseRepository):
                 continue
 
             repobk = LocalStatusRepository(self.name, self.account)
-            repobk.setup_backend(bk)      # Fake the backend.
+            repobk.setup_backend(bk)  # Fake the backend.
             folderbk = dic['class'](folder.name, repobk)
 
             # If backend contains data, import it to folder.
             if not folderbk.isnewfolder():
                 self.ui._msg("Migrating LocalStatus cache from %s to %s "
-                    "status folder for %s:%s"%
-                    (bk, self._backend, self.name, folder.name))
+                             "status folder for %s:%s" %
+                             (bk, self._backend, self.name, folder.name))
 
                 folderbk.cachemessagelist()
                 folder.messagelist = folderbk.messagelist
@@ -90,7 +90,7 @@ class LocalStatusRepository(BaseRepository):
         """Create a LocalStatus Folder."""
 
         if self.account.dryrun:
-            return # Bail out in dry-run mode.
+            return  # Bail out in dry-run mode.
 
         # Create an empty StatusFolder.
         folder = self._instanciatefolder(foldername)
