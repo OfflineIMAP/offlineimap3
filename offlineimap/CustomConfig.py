@@ -36,7 +36,6 @@ class CustomConfigParser(SafeConfigParser):
         else:
             return default
 
-
     def getdefaultint(self, section, option, default, *args, **kwargs):
         """Same as config.getint, but returns the value of `default`
         if there is no such option specified."""
@@ -45,7 +44,6 @@ class CustomConfigParser(SafeConfigParser):
             return self.getint(*(section, option) + args, **kwargs)
         else:
             return default
-
 
     def getdefaultfloat(self, section, option, default, *args, **kwargs):
         """Same as config.getfloat, but returns the value of `default`
@@ -74,8 +72,8 @@ class CustomConfigParser(SafeConfigParser):
             return re.split(separator_re, val)
         except re.error as e:
             six.reraise(Error,
-                        Error("Bad split regexp '%s': %s"%
-                            (separator_re, e)),
+                        Error("Bad split regexp '%s': %s" %
+                              (separator_re, e)),
                         exc_info()[2])
 
     def getdefaultlist(self, section, option, default, separator_re):
@@ -120,7 +118,7 @@ class CustomConfigParser(SafeConfigParser):
 
         key = key + ' '
         return [x[len(key):] for x in self.sections() \
-             if x.startswith(key)]
+                if x.startswith(key)]
 
     def set_if_not_exists(self, section, option, value):
         """Set a value if it does not exist yet.
@@ -130,7 +128,6 @@ class CustomConfigParser(SafeConfigParser):
 
         if not self.has_option(section, option):
             self.set(section, option, value)
-
 
     def apply_xforms(self, string, transforms):
         """Applies set of transformations to a string.
@@ -150,7 +147,6 @@ class CustomConfigParser(SafeConfigParser):
         return string
 
 
-
 def CustomConfigDefault():
     """Just a constant that won't occur anywhere else.
 
@@ -159,7 +155,6 @@ def CustomConfigDefault():
     derived classes."""
 
     pass
-
 
 
 class ConfigHelperMixin(object):
@@ -206,9 +201,7 @@ class ConfigHelperMixin(object):
         Must be overriden in all classes that use this mix-in."""
 
         raise NotImplementedError("ConfigHelperMixin.getconfig() "
-          "is to be overriden")
-
-
+                                  "is to be overriden")
 
     def getsection(self):
         """Returns name of configuration section in which our
@@ -217,10 +210,9 @@ class ConfigHelperMixin(object):
         Must be overriden in all classes that use this mix-in."""
 
         raise NotImplementedError("ConfigHelperMixin.getsection() "
-          "is to be overriden")
+                                  "is to be overriden")
 
-
-    def getconf(self, option, default = CustomConfigDefault):
+    def getconf(self, option, default=CustomConfigDefault):
         """Retrieves string from the configuration.
 
         Arguments:
@@ -233,8 +225,7 @@ class ConfigHelperMixin(object):
                                          self.getconfig().getdefault,
                                          self.getconfig().get)
 
-
-    def getconf_xform(self, option, xforms, default = CustomConfigDefault):
+    def getconf_xform(self, option, xforms, default=CustomConfigDefault):
         """Retrieves string from the configuration transforming the result.
 
         Arguments:
@@ -249,8 +240,7 @@ class ConfigHelperMixin(object):
         value = self.getconf(option, default)
         return self.getconfig().apply_xforms(value, xforms)
 
-
-    def getconfboolean(self, option, default = CustomConfigDefault):
+    def getconfboolean(self, option, default=CustomConfigDefault):
         """Retrieves boolean value from the configuration.
 
         Arguments:
@@ -263,8 +253,7 @@ class ConfigHelperMixin(object):
                                          self.getconfig().getdefaultboolean,
                                          self.getconfig().getboolean)
 
-
-    def getconfint(self, option, default = CustomConfigDefault):
+    def getconfint(self, option, default=CustomConfigDefault):
         """
         Retrieves integer value from the configuration.
 
@@ -279,8 +268,7 @@ class ConfigHelperMixin(object):
                                          self.getconfig().getdefaultint,
                                          self.getconfig().getint)
 
-
-    def getconffloat(self, option, default = CustomConfigDefault):
+    def getconffloat(self, option, default=CustomConfigDefault):
         """Retrieves floating-point value from the configuration.
 
         Arguments:
@@ -293,9 +281,8 @@ class ConfigHelperMixin(object):
                                          self.getconfig().getdefaultfloat,
                                          self.getconfig().getfloat)
 
-
     def getconflist(self, option, separator_re,
-                    default = CustomConfigDefault):
+                    default=CustomConfigDefault):
         """Retrieves strings from the configuration and splits it
         into the list of strings.
 
