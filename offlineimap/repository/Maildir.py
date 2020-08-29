@@ -16,7 +16,6 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 import os
-from stat import *
 from offlineimap import folder
 from offlineimap.ui import getglobalui
 from offlineimap.error import OfflineImapError

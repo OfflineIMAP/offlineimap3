@@ -13,10 +13,8 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-import random
 import unittest
 import logging
-import os, sys
 from test.OLItest import OLITestLib
 
 # Things need to be setup first, usually setup.py initializes everything.

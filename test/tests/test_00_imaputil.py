@@ -19,7 +19,6 @@ import logging
 from test.OLItest import OLITestLib
 from offlineimap import imaputil
 from offlineimap.ui import UI_LIST, setglobalui
-from offlineimap.CustomConfig import CustomConfigParser
 
 
 # Things need to be setup first, usually setup.py initializes everything.
