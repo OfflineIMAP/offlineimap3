@@ -46,8 +46,8 @@ class UsefulIMAPMixIn(object):
         selected or raises an :exc:`OfflineImapError`."""
 
         if self.__getselectedfolder() == mailbox and \
-            self.is_readonly == readonly and \
-            not force:
+                self.is_readonly == readonly and \
+                not force:
             # No change; return.
             return
         try:
@@ -57,16 +57,16 @@ class UsefulIMAPMixIn(object):
             raise
         except self.abort as e:
             # self.abort is raised when we are supposed to retry
-            errstr = "Server '%s' closed connection, error on SELECT '%s'. Ser"\
-                "ver said: %s" % (self.host, mailbox, e.args[0])
+            errstr = "Server '%s' closed connection, error on SELECT '%s'. Ser" \
+                     "ver said: %s" % (self.host, mailbox, e.args[0])
             severity = OfflineImapError.ERROR.FOLDER_RETRY
             six.reraise(OfflineImapError,
                         OfflineImapError(errstr, severity),
                         exc_info()[2])
         if result[0] != 'OK':
-            #in case of error, bail out with OfflineImapError
-            errstr = "Error SELECTing mailbox '%s', server reply:\n%s" %\
-                (mailbox, result)
+            # in case of error, bail out with OfflineImapError
+            errstr = "Error SELECTing mailbox '%s', server reply:\n%s" % \
+                     (mailbox, result)
             severity = OfflineImapError.ERROR.FOLDER
             raise OfflineImapError(errstr, severity)
         return result
@@ -133,7 +133,7 @@ class IMAP4_Tunnel(UsefulIMAPMixIn, IMAP4):
 
         self.host = host
         self.process = subprocess.Popen(host, shell=True, close_fds=True,
-                        stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+                                        stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         (self.outfd, self.infd) = (self.process.stdin, self.process.stdout)
         # imaplib2 polls on this fd
         self.read_fd = self.infd.fileno()
@@ -176,12 +176,12 @@ class IMAP4_Tunnel(UsefulIMAPMixIn, IMAP4):
 
 
 def new_mesg(self, s, tn=None, secs=None):
-            if secs is None:
-                secs = time.time()
-            if tn is None:
-                tn = threading.currentThread().getName()
-            tm = time.strftime('%M:%S', time.localtime(secs))
-            getglobalui().debug('imap', '  %s.%02d %s %s' % (tm, (secs*100)%100, tn, s))
+    if secs is None:
+        secs = time.time()
+    if tn is None:
+        tn = threading.currentThread().getName()
+    tm = time.strftime('%M:%S', time.localtime(secs))
+    getglobalui().debug('imap', '  %s.%02d %s %s' % (tm, (secs * 100) % 100, tn, s))
 
 
 class WrappedIMAP4_SSL(UsefulIMAPMixIn, IMAP4_SSL):
@@ -204,9 +204,9 @@ class WrappedIMAP4_SSL(UsefulIMAPMixIn, IMAP4_SSL):
     def open(self, host=None, port=None):
         if not self.ca_certs and not self._fingerprint:
             raise OfflineImapError("No CA certificates "
-              "and no server fingerprints configured.  "
-              "You must configure at least something, otherwise "
-              "having SSL helps nothing.", OfflineImapError.ERROR.REPO)
+                                   "and no server fingerprints configured.  "
+                                   "You must configure at least something, otherwise "
+                                   "having SSL helps nothing.", OfflineImapError.ERROR.REPO)
         super(WrappedIMAP4_SSL, self).open(host, port)
         if self._fingerprint:
             server_cert = self.sock.getpeercert(True)
@@ -216,12 +216,13 @@ class WrappedIMAP4_SSL(UsefulIMAPMixIn, IMAP4_SSL):
             matches = [(server_fingerprint in self._fingerprint) for server_fingerprint in server_fingerprints]
             if not any(matches):
                 raise OfflineImapError("Server SSL fingerprint(s) '%s' "
-                      "for hostname '%s' "
-                      "does not match configured fingerprint(s) %s.  "
-                      "Please verify and set 'cert_fingerprint' accordingly "
-                      "if not set yet."%
-                      (list(zip([hash.__name__ for hash in hashes], server_fingerprints)), host, self._fingerprint),
-                      OfflineImapError.ERROR.REPO)
+                                       "for hostname '%s' "
+                                       "does not match configured fingerprint(s) %s.  "
+                                       "Please verify and set 'cert_fingerprint' accordingly "
+                                       "if not set yet." %
+                                       (list(zip([hash.__name__ for hash in hashes], server_fingerprints)), host,
+                                        self._fingerprint),
+                                       OfflineImapError.ERROR.REPO)
 
 
 class WrappedIMAP4(UsefulIMAPMixIn, IMAP4):
@@ -264,7 +265,7 @@ def Internaldate2epoch(resp):
 
     # INTERNALDATE timezone must be subtracted to get UT
 
-    zone = (zoneh*60 + zonem)*60
+    zone = (zoneh * 60 + zonem) * 60
     if zonen == '-':
         zone = -zone
 
