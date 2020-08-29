@@ -814,7 +814,7 @@ class IMAPFolder(BaseFolder):
         # 'data' (the BODY response appears as a tuple).  This should leave
         # exactly one response.
         if res_type == 'OK':
-            data = [res for res in data if not isinstance(res, str)]
+            data = [res for res in data if not isinstance(res, bytes)]
 
         # Could not fetch message.  Note: it is allowed by rfc3501 to return any
         # data for the UID FETCH command.
@@ -829,7 +829,12 @@ class IMAPFolder(BaseFolder):
                     "with UID '%s'"% (self.getrepository(), uids)
             raise OfflineImapError(reason, severity)
 
-        return data
+        # Convert bytes to str
+        ndata0 = data[0][0].decode('utf-8')
+        ndata1 = data[0][1].decode('utf-8')
+        ndata = [ndata0, ndata1]
+
+        return ndata
 
 
     def _store_to_imap(self, imapobj, uid, field, data):
