@@ -1,4 +1,4 @@
-#Constants, that don't rely on anything else in the module
+# Constants, that don't rely on anything else in the module
 # Copyright (C) 2012- Sebastian Spaeth & contributors
 #
 #    This program is free software; you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 from io import StringIO
 
-default_conf=StringIO("""[general]
+default_conf = StringIO("""[general]
 #will be set automatically
 metadata = 
 accounts = test
