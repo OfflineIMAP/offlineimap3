@@ -23,6 +23,7 @@ import shutil
 import subprocess
 import tempfile
 import random
+
 random.seed()
 
 from offlineimap.CustomConfig import CustomConfigParser
@@ -36,7 +37,7 @@ class OLITestLib():
     cmd = None
     """command that will be executed to invoke offlineimap"""
 
-    def __init__(self, cred_file = None, cmd='offlineimap'):
+    def __init__(self, cred_file=None, cmd='offlineimap'):
         """
 
         :param cred_file: file of the configuration
@@ -45,7 +46,7 @@ class OLITestLib():
         OLITestLib.cred_file = cred_file
         if not os.path.isfile(cred_file):
             raise UserWarning("Please copy 'credentials.conf.sample' to '%s' "
-                "and set your credentials there." % cred_file)
+                              "and set your credentials there." % cred_file)
         OLITestLib.cmd = cmd
 
     @classmethod
@@ -59,7 +60,7 @@ class OLITestLib():
         assert cls.cred_file != None
         # creating temporary dir for testing in same dir as credentials.conf
         cls.testdir = os.path.abspath(
-            tempfile.mkdtemp(prefix='tmp_%s_'%suffix,
+            tempfile.mkdtemp(prefix='tmp_%s_' % suffix,
                              dir=os.path.dirname(cls.cred_file)))
         cls.write_config_file()
         return cls.testdir
@@ -70,12 +71,12 @@ class OLITestLib():
 
         The returned config can be manipulated and then saved with
         write_config_file()"""
-        #TODO, only do first time and cache then for subsequent calls?
+        # TODO, only do first time and cache then for subsequent calls?
         assert cls.cred_file != None
         assert cls.testdir != None
         config = CustomConfigParser()
         config.readfp(default_conf)
-        default_conf.seek(0) # rewind config_file to start
+        default_conf.seek(0)  # rewind config_file to start
         config.read(cls.cred_file)
         config.set("general", "metadata", cls.testdir)
         return config
@@ -130,7 +131,7 @@ class OLITestLib():
             sections = ['Repository {0}'.format(reponame)]
         else:
             sections = [r for r in config.sections() \
-                            if r.startswith('Repository')]
+                        if r.startswith('Repository')]
             sections = [s for s in sections if config.get(s, 'Type').lower() == 'imap']
         for sec in sections:
             # Connect to each IMAP repo and delete all folders
@@ -162,14 +163,14 @@ class OLITestLib():
                     folder = bytearray(m.group('dir'))
                     if not m.group('quote'):
                         folder = '"%s"' % folder
-                #folder = folder.replace(br'\"', b'"') # remove quoting
+                # folder = folder.replace(br'\"', b'"') # remove quoting
                 dirs.append(folder)
             # 2) filter out those not starting with INBOX.OLItest and del...
             dirs = [d for d in dirs if d.startswith(b'"INBOX.OLItest') or d.startswith(b'"INBOX/OLItest')]
             for folder in dirs:
                 res_t, data = imapobj.delete(folder)
-                assert res_t == 'OK', "Folder deletion of {0} failed with error"\
-                    ":\n{1} {2}".format(folder.decode('utf-8'), res_t, data)
+                assert res_t == 'OK', "Folder deletion of {0} failed with error" \
+                                      ":\n{1} {2}".format(folder.decode('utf-8'), res_t, data)
             imapobj.logout()
 
     @classmethod
@@ -179,11 +180,11 @@ class OLITestLib():
         Does not fail if it already exists"""
         assert cls.testdir != None
         maildir = os.path.join(cls.testdir, 'mail', folder)
-        for subdir in ('','tmp','cur','new'):
+        for subdir in ('', 'tmp', 'cur', 'new'):
             try:
                 os.makedirs(os.path.join(maildir, subdir))
             except OSError as e:
-                if e.errno != 17: # 'already exists' is ok.
+                if e.errno != 17:  # 'already exists' is ok.
                     raise
 
     @classmethod
@@ -203,13 +204,13 @@ class OLITestLib():
         Use some default content if not given"""
         assert cls.testdir != None
         while True:  # Loop till we found a unique filename
-            mailfile = '{0}:2,'.format(random.randint(0,999999999))
+            mailfile = '{0}:2,'.format(random.randint(0, 999999999))
             mailfilepath = os.path.join(cls.testdir, 'mail',
                                         folder, 'new', mailfile)
             if not os.path.isfile(mailfilepath):
                 break
-        with open(mailfilepath,"wb") as mailf:
-                mailf.write(b'''From: test <test@offlineimap.org>
+        with open(mailfilepath, "wb") as mailf:
+            mailf.write(b'''From: test <test@offlineimap.org>
 Subject: Boo
 Date: 1 Jan 1980
 To: test@offlineimap.org
@@ -229,7 +230,7 @@ Content here.''')
             if set(dirs) == set(['cur', 'new', 'tmp']):
                 # New maildir folder
                 boxes += 1
-                #raise RuntimeError("%s is not Maildir" % maildir)
+                # raise RuntimeError("%s is not Maildir" % maildir)
             if dirpath.endswith(('/cur', '/new')):
                 mails += len(files)
         return boxes, mails
@@ -246,7 +247,7 @@ Content here.''')
         ret = []
         for dirpath, dirs, files in os.walk(mailfilepath):
             if not dirpath.endswith((os.path.sep + 'new', os.path.sep + 'cur')):
-                continue # only /new /cur are interesting
+                continue  # only /new /cur are interesting
             for file in files:
                 m = cls.re_uidmatch.search(file)
                 uid = m.group(1) if m else None
