@@ -30,7 +30,7 @@ class LocalStatusFolder(BaseFolder):
     magicline = "OFFLINEIMAP LocalStatus CACHE DATA - DO NOT MODIFY - FORMAT %d"
 
     def __init__(self, name, repository):
-        self.sep = '.' #needs to be set before super.__init__()
+        self.sep = '.'  # needs to be set before super.__init__()
         super(LocalStatusFolder, self).__init__(name, repository)
         self.root = repository.root
         self.filename = os.path.join(self.getroot(), self.getfolderbasename())
@@ -68,8 +68,8 @@ class LocalStatusFolder(BaseFolder):
                 uid = int(uid)
                 flags = set(flags)
             except ValueError as e:
-                errstr = ("Corrupt line '%s' in cache file '%s'"%
-                    (line, self.filename))
+                errstr = ("Corrupt line '%s' in cache file '%s'" %
+                          (line, self.filename))
                 self.ui.warn(errstr)
                 six.reraise(ValueError, ValueError(errstr), exc_info()[2])
             self.messagelist[uid] = self.msglist_item_initializer(uid)
@@ -91,15 +91,14 @@ class LocalStatusFolder(BaseFolder):
                 mtime = int(mtime)
                 labels = set([lb.strip() for lb in labels.split(',') if len(lb.strip()) > 0])
             except ValueError as e:
-                errstr = "Corrupt line '%s' in cache file '%s'"% \
-                    (line, self.filename)
+                errstr = "Corrupt line '%s' in cache file '%s'" % \
+                         (line, self.filename)
                 self.ui.warn(errstr)
                 six.reraise(ValueError, ValueError(errstr), exc_info()[2])
             self.messagelist[uid] = self.msglist_item_initializer(uid)
             self.messagelist[uid]['flags'] = flags
             self.messagelist[uid]['mtime'] = mtime
             self.messagelist[uid]['labels'] = labels
-
 
     # Interface from BaseFolder
     def cachemessagelist(self):
@@ -120,7 +119,7 @@ class LocalStatusFolder(BaseFolder):
             # Convert from format v1.
             elif line == (self.magicline % 1):
                 self.ui._msg('Upgrading LocalStatus cache from version 1 '
-                    'to version 2 for %s:%s'% (self.repository, self))
+                             'to version 2 for %s:%s' % (self.repository, self))
                 self.readstatus_v1(cachefd)
                 cachefd.close()
                 self.save()
@@ -142,20 +141,20 @@ class LocalStatusFolder(BaseFolder):
         if not line:
             # The status file is empty - should not have happened,
             # but somehow did.
-            errstr = "Cache file '%s' is empty."% self.filename
+            errstr = "Cache file '%s' is empty." % self.filename
             self.ui.warn(errstr)
             cachefd.close()
             return
 
-        assert(line == (self.magicline % self.cur_version))
+        assert (line == (self.magicline % self.cur_version))
         self.readstatus(cachefd)
         cachefd.close()
 
     def openfiles(self):
-        pass # Closing files is done on a per-transaction basis.
+        pass  # Closing files is done on a per-transaction basis.
 
     def closefiles(self):
-        pass # Closing files is done on a per-transaction basis.
+        pass  # Closing files is done on a per-transaction basis.
 
     def purge(self):
         """Remove any pre-existing database."""
@@ -163,8 +162,8 @@ class LocalStatusFolder(BaseFolder):
         try:
             os.unlink(self.filename)
         except OSError as e:
-            self.ui.debug('', "could not remove file %s: %s"%
-                (self.filename, e))
+            self.ui.debug('', "could not remove file %s: %s" %
+                          (self.filename, e))
 
     def save(self):
         """Save changed data to disk. For this backend it is the same as saveall."""
@@ -204,7 +203,7 @@ class LocalStatusFolder(BaseFolder):
             # We cannot assign a uid.
             return uid
 
-        if self.uidexists(uid):     # already have it
+        if self.uidexists(uid):  # already have it
             self.savemessageflags(uid, flags)
             return uid
 
@@ -276,5 +275,5 @@ class LocalStatusFolder(BaseFolder):
             return
 
         for uid in uidlist:
-            del(self.messagelist[uid])
+            del (self.messagelist[uid])
         self.save()
