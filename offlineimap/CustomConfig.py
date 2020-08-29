@@ -17,8 +17,8 @@
 import os
 import re
 from sys import exc_info
-import six
 from configparser import SafeConfigParser, Error
+import six
 from offlineimap.localeval import LocalEval
 
 

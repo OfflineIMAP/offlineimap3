@@ -19,9 +19,9 @@ import socket
 import time
 import re
 import os
-import six
 from sys import exc_info
 from threading import Lock
+import six
 
 try:
     from hashlib import md5

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # Copyright 2013 Eygene A. Ryabinkin
 
-from offlineimap import globals
 import unittest
+from offlineimap import globals
 
 
 class Opt:

@@ -17,13 +17,13 @@
 
 
 import os
-import six
 from sys import exc_info
+import six
 
-from .Maildir import MaildirFolder
 import offlineimap.accounts
 from offlineimap import OfflineImapError
 from offlineimap import imaputil
+from .Maildir import MaildirFolder
 
 
 class GmailMaildirFolder(MaildirFolder):

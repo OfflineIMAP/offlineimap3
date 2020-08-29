@@ -19,14 +19,13 @@ import fcntl
 import time
 import subprocess
 import threading
-import rfc6555
 import socket
 import errno
 import zlib
 from sys import exc_info
 from hashlib import sha512, sha384, sha256, sha224, sha1
-
 import six
+import rfc6555
 
 from offlineimap import OfflineImapError
 from offlineimap.ui import getglobalui

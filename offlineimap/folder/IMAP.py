@@ -22,10 +22,10 @@ import time
 from sys import exc_info
 import six
 
-from .Base import BaseFolder
 from offlineimap import imaputil, imaplibutil, emailutil, OfflineImapError
 from offlineimap import globals
 from offlineimap.virtual_imaplib2 import MonthNames
+from .Base import BaseFolder
 
 # Globals
 CRLF = '\r\n'

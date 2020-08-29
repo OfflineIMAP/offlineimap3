@@ -18,8 +18,8 @@
 """Folder implementation to support features of the Gmail IMAP server."""
 
 import re
-import six
 from sys import exc_info
+import six
 
 from offlineimap import imaputil, imaplibutil, OfflineImapError
 import offlineimap.accounts
