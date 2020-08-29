@@ -25,6 +25,7 @@ import offlineimap.accounts
 from offlineimap import OfflineImapError
 from offlineimap import imaputil
 
+
 class GmailMaildirFolder(MaildirFolder):
     """Folder implementation to support adding labels to messages in a Maildir."""
 
@@ -49,7 +50,7 @@ class GmailMaildirFolder(MaildirFolder):
 
         if self._utime_from_header is True:
             raise Exception("GmailMaildir does not support quick mode"
-                " when 'utime_from_header' is enabled.")
+                            " when 'utime_from_header' is enabled.")
 
         self.cachemessagelist()
         # Folder has different uids than statusfolder => TRUE.
@@ -66,12 +67,10 @@ class GmailMaildirFolder(MaildirFolder):
                 return True
         return False  # Nope, nothing changed.
 
-
     # Interface from BaseFolder
     def msglist_item_initializer(self, uid):
         return {'flags': set(), 'labels': set(), 'labels_cached': False,
                 'filename': '/no-dir/no-such-file/', 'mtime': 0}
-
 
     def cachemessagelist(self, min_date=None, min_uid=None):
         if self.ismessagelistempty():
@@ -83,7 +82,6 @@ class GmailMaildirFolder(MaildirFolder):
             for uid, msg in list(self.messagelist.items()):
                 filepath = os.path.join(self.getfullname(), msg['filename'])
                 msg['mtime'] = int(os.stat(filepath).st_mtime)
-
 
     def getmessagelabels(self, uid):
         # Labels are not cached in cachemessagelist because it is too slow.
@@ -105,7 +103,6 @@ class GmailMaildirFolder(MaildirFolder):
             self.messagelist[uid]['labels_cached'] = True
 
         return self.messagelist[uid]['labels']
-
 
     def getmessagemtime(self, uid):
         if not 'mtime' in self.messagelist[uid]:
@@ -166,7 +163,7 @@ class GmailMaildirFolder(MaildirFolder):
 
         # Change labels into content.
         labels_str = imaputil.format_labels_string(self.labelsheader,
-          sorted(labels | ignoredlabels))
+                                                   sorted(labels | ignoredlabels))
 
         # First remove old labels header, and then add the new one.
         content = self.deletemessageheaders(content, self.labelsheader)
@@ -185,10 +182,10 @@ class GmailMaildirFolder(MaildirFolder):
             os.rename(tmppath, filepath)
         except OSError as e:
             six.reraise(OfflineImapError,
-                    OfflineImapError("Can't rename file '%s' to '%s': %s"%
-                        (tmppath, filepath, e[1]),
-                        OfflineImapError.ERROR.FOLDER),
-                    exc_info()[2])
+                        OfflineImapError("Can't rename file '%s' to '%s': %s" %
+                                         (tmppath, filepath, e[1]),
+                                         OfflineImapError.ERROR.FOLDER),
+                        exc_info()[2])
 
         # If utime_from_header=true, we don't want to change the mtime.
         if self._utime_from_header and mtime:
@@ -216,7 +213,7 @@ class GmailMaildirFolder(MaildirFolder):
 
         # First copy the message.
         super(GmailMaildirFolder, self).copymessageto(uid, dstfolder,
-              statusfolder, register)
+                                                      statusfolder, register)
 
         # Sync labels and mtime now when the message is new (the embedded labels
         # are up to date, and have already propagated to the remote server.  For
@@ -226,7 +223,7 @@ class GmailMaildirFolder(MaildirFolder):
             try:
                 labels = dstfolder.getmessagelabels(uid)
                 statusfolder.savemessagelabels(uid, labels,
-                    mtime=self.getmessagemtime(uid))
+                                               mtime=self.getmessagemtime(uid))
 
             # dstfolder is not GmailMaildir.
             except NotImplementedError:
@@ -274,7 +271,6 @@ class GmailMaildirFolder(MaildirFolder):
                 if selfmtime > statusmtime:
                     uidlist.append(uid)
 
-
             self.ui.collectingdata(uidlist, self)
             # This can be slow if there is a lot of modified files.
             for uid in uidlist:
@@ -309,7 +305,7 @@ class GmailMaildirFolder(MaildirFolder):
 
                 self.ui.addinglabels(uids, lb, dstfolder)
                 if self.repository.account.dryrun:
-                    continue # Don't actually add in a dryrun.
+                    continue  # Don't actually add in a dryrun.
                 dstfolder.addmessageslabels(uids, set([lb]))
                 statusfolder.addmessageslabels(uids, set([lb]))
 
@@ -320,7 +316,7 @@ class GmailMaildirFolder(MaildirFolder):
 
                 self.ui.deletinglabels(uids, lb, dstfolder)
                 if self.repository.account.dryrun:
-                    continue # Don't actually remove in a dryrun.
+                    continue  # Don't actually remove in a dryrun.
                 dstfolder.deletemessageslabels(uids, set([lb]))
                 statusfolder.deletemessageslabels(uids, set([lb]))
 
@@ -334,7 +330,7 @@ class GmailMaildirFolder(MaildirFolder):
                     break
 
                 if self.repository.account.dryrun:
-                    continue # Don't actually update statusfolder.
+                    continue  # Don't actually update statusfolder.
 
                 filename = self.messagelist[uid]['filename']
                 filepath = os.path.join(self.getfullname(), filename)
