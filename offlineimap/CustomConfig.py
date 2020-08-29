@@ -18,12 +18,9 @@ import os
 import re
 from sys import exc_info
 import six
-
-try:
-    from configparser import SafeConfigParser, Error
-except ImportError: # Python3.
-    from configparser import SafeConfigParser, Error
+from configparser import SafeConfigParser, Error
 from offlineimap.localeval import LocalEval
+
 
 class CustomConfigParser(SafeConfigParser):
     def __init__(self):
