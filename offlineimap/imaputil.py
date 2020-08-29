@@ -21,7 +21,6 @@ import binascii
 import codecs
 from offlineimap.ui import getglobalui
 
-
 ## Globals
 
 # Message headers that use space as the separator (for label storage)
@@ -37,6 +36,7 @@ def __debug(*args):
         msg.append(str(arg))
     getglobalui().debug('imap', " ".join(msg))
 
+
 def dequote(s):
     """Takes string which may or may not be quoted and unquotes it.
 
@@ -49,6 +49,7 @@ def dequote(s):
         s = s.replace('\\\\', '\\')
     return s
 
+
 def quote(s):
     """Takes an unquoted string and quotes it.
 
@@ -57,7 +58,8 @@ def quote(s):
 
     s = s.replace('"', '\\"')
     s = s.replace('\\', '\\\\')
-    return '"%s"'% s
+    return '"%s"' % s
+
 
 def flagsplit(s):
     """Converts a string of IMAP flags to a list
@@ -68,8 +70,9 @@ def flagsplit(s):
     """
 
     if s[0] != '(' or s[-1] != ')':
-        raise ValueError("Passed s '%s' is not a flag list"% s)
+        raise ValueError("Passed s '%s' is not a flag list" % s)
     return imapsplit(s[1:-1])
+
 
 def __options2hash(list):
     """convert list [1,2,3,4,5,6] to {1:2, 3:4, 5:6}"""
@@ -85,6 +88,7 @@ def __options2hash(list):
     __debug("__options2hash returning:", retval)
     return retval
 
+
 def flags2hash(flags):
     """Converts IMAP response string from eg IMAP4.fetch() to a hash.
 
@@ -92,6 +96,7 @@ def flags2hash(flags):
     {'FLAGS': '(\\Seen Old)', 'UID': '4807'}"""
 
     return __options2hash(flagsplit(flags))
+
 
 def imapsplit(imapstring):
     """Takes a string from an IMAP conversation and returns a list containing
@@ -111,9 +116,9 @@ def imapsplit(imapstring):
     while len(workstr):
         # handle parenthized fragments (...()...)
         if workstr[0] == '(':
-            rparenc = 1 # count of right parenthesis to match
-            rpareni = 1 # position to examine
-            while rparenc: # Find the end of the group.
+            rparenc = 1  # count of right parenthesis to match
+            rpareni = 1  # position to examine
+            while rparenc:  # Find the end of the group.
                 if workstr[rpareni] == ')':  # end of a group
                     rparenc -= 1
                 elif workstr[rpareni] == '(':  # start of a group
@@ -134,7 +139,7 @@ def imapsplit(imapstring):
             if splitslen == 2:
                 # There's an unquoted word, and more string follows.
                 retval.append(splits[0])
-                workstr = splits[1]    # split will have already lstripped it
+                workstr = splits[1]  # split will have already lstripped it
                 continue
             elif splitslen == 1:
                 # We got a last unquoted word, but nothing else
@@ -146,11 +151,13 @@ def imapsplit(imapstring):
                 break
     return retval
 
+
 flagmap = [('\\Seen', 'S'),
            ('\\Answered', 'R'),
            ('\\Flagged', 'F'),
            ('\\Deleted', 'T'),
            ('\\Draft', 'D')]
+
 
 def flagsimap2maildir(flagstring):
     """Convert string '(\\Draft \\Deleted)' into a flags set(DR)."""
@@ -162,6 +169,7 @@ def flagsimap2maildir(flagstring):
             retval.add(maildirflag)
     return retval
 
+
 def flagsimap2keywords(flagstring):
     """Convert string '(\\Draft \\Deleted somekeyword otherkeyword)' into a
     keyword set (somekeyword otherkeyword)."""
@@ -169,6 +177,7 @@ def flagsimap2keywords(flagstring):
     imapflagset = set(flagstring[1:-1].split())
     serverflagset = set([flag for (flag, c) in flagmap])
     return imapflagset - serverflagset
+
 
 def flagsmaildir2imap(maildirflaglist):
     """Convert set of flags ([DR]) into a string '(\\Deleted \\Draft)'."""
@@ -179,6 +188,7 @@ def flagsmaildir2imap(maildirflaglist):
             retval.append(imapflag)
     return '(' + ' '.join(sorted(retval)) + ')'
 
+
 def uid_sequence(uidlist):
     """Collapse UID lists into shorter sequence sets
 
@@ -188,10 +198,10 @@ def uid_sequence(uidlist):
 
     def getrange(start, end):
         if start == end:
-            return(str(start))
-        return "%s:%s"% (start, end)
+            return (str(start))
+        return "%s:%s" % (start, end)
 
-    if not len(uidlist): return '' # Empty list, return
+    if not len(uidlist): return ''  # Empty list, return
     start, end = None, None
     retval = []
     # Force items to be longs and sort them
@@ -199,15 +209,15 @@ def uid_sequence(uidlist):
 
     for item in iter(sorted_uids):
         item = int(item)
-        if start == None:     # First item
+        if start == None:  # First item
             start, end = item, item
-        elif item == end + 1: # Next item in a range
+        elif item == end + 1:  # Next item in a range
             end = item
-        else:                 # Starting a new range
+        else:  # Starting a new range
             retval.append(getrange(start, end))
             start, end = item, item
 
-    retval.append(getrange(start, end)) # Add final range/item
+    retval.append(getrange(start, end))  # Add final range/item
     return ",".join(retval)
 
 
@@ -232,7 +242,7 @@ def __split_quoted(s):
     while True:
         next_q = rest.find(q)
         if next_q == -1:
-            raise ValueError("can't find ending quote '%s' in '%s'"% (q, s))
+            raise ValueError("can't find ending quote '%s' in '%s'" % (q, s))
         # If quote is preceeded by even number of backslashes,
         # then it is the ending quote, otherwise the quote
         # character is escaped by backslash, so we should
@@ -319,6 +329,7 @@ def decode_mailbox_name(name):
 
     Returns: decoded UTF-8 string.
     """
+
     def demodify(m):
         s = m.group()
         if s == '+':
@@ -332,6 +343,7 @@ def decode_mailbox_name(name):
     except (UnicodeDecodeError, UnicodeEncodeError):
         return name
 
+
 # Functionality to convert folder names encoded in IMAP_utf_7 to utf_8.
 # This is achieved by defining 'imap4_utf_7' as a proper encoding scheme.
 
@@ -341,9 +353,11 @@ def IMAP_utf8(foldername):
     """Convert IMAP4_utf_7 encoded string to utf-8"""
     return foldername.decode('imap4-utf-7').encode('utf-8')
 
+
 def utf8_IMAP(foldername):
     """Convert utf-8 encoded string to IMAP4_utf_7"""
     return foldername.decode('utf-8').encode('imap4-utf-7')
+
 
 # Codec definition
 
@@ -351,10 +365,12 @@ def modified_base64(s):
     s = s.encode('utf-16be')
     return binascii.b2a_base64(s).rstrip('\n=').replace('/', ',')
 
+
 def doB64(_in, r):
     if _in:
         r.append('&%s-' % modified_base64(''.join(_in)))
         del _in[:]
+
 
 def encoder(s):
     r = []
@@ -372,10 +388,12 @@ def encoder(s):
     doB64(_in, r)
     return (str(''.join(r)), len(s))
 
+
 # decoding
 def modified_unbase64(s):
     b = binascii.a2b_base64(s.replace(',', '/') + '===')
     return str(b, 'utf-16be')
+
 
 def decoder(s):
     r = []
@@ -399,13 +417,16 @@ def decoder(s):
     bin_str = ''.join(r)
     return (bin_str, len(s))
 
+
 class StreamReader(codecs.StreamReader):
     def decode(self, s, errors='strict'):
         return decoder(s)
 
+
 class StreamWriter(codecs.StreamWriter):
     def decode(self, s, errors='strict'):
         return encoder(s)
+
 
 def imap4_utf_7(name):
     if name == 'imap4-utf-7':
