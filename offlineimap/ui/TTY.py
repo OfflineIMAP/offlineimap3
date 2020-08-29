@@ -28,26 +28,26 @@ class TTYFormatter(logging.Formatter):
     """Specific Formatter that adds thread information to the log output."""
 
     def __init__(self, *args, **kwargs):
-        #super() doesn't work in py2.6 as 'logging' uses old-style class
+        # super() doesn't work in py2.6 as 'logging' uses old-style class
         logging.Formatter.__init__(self, *args, **kwargs)
         self._last_log_thread = None
 
     def format(self, record):
         """Override format to add thread information."""
 
-        #super() doesn't work in py2.6 as 'logging' uses old-style class
+        # super() doesn't work in py2.6 as 'logging' uses old-style class
         log_str = logging.Formatter.format(self, record)
         # If msg comes from a different thread than our last, prepend
         # thread info.  Most look like 'Account sync foo' or 'Folder
         # sync foo'.
         t_name = record.threadName
         if t_name == 'MainThread':
-            return log_str # main thread doesn't get things prepended
+            return log_str  # main thread doesn't get things prepended
         if t_name != self._last_log_thread:
             self._last_log_thread = t_name
             log_str = "%s:\n %s" % (t_name, log_str)
         else:
-            log_str = " %s"% log_str
+            log_str = " %s" % log_str
         return log_str
 
 
@@ -60,7 +60,7 @@ class TTYUI(UIBase):
 
         # create console handler with a higher log level
         ch = logging.StreamHandler()
-        #ch.setLevel(logging.DEBUG)
+        # ch.setLevel(logging.DEBUG)
         # create formatter and add it to the handlers
         self.formatter = TTYFormatter("%(message)s")
         ch.setFormatter(self.formatter)
@@ -80,8 +80,8 @@ class TTYUI(UIBase):
         """TTYUI backend is capable of querying the password."""
 
         if errmsg:
-            self.warn("%s: %s"% (username, errmsg))
-        self._log_con_handler.acquire() # lock the console output
+            self.warn("%s: %s" % (username, errmsg))
+        self._log_con_handler.acquire()  # lock the console output
         try:
             return getpass("Enter password for user '%s': " % username)
         finally:
@@ -90,7 +90,7 @@ class TTYUI(UIBase):
     def mainException(self):
         if isinstance(sys.exc_info()[1], KeyboardInterrupt):
             self.logger.warn("Timer interrupted at user request; program "
-                "terminating.\n")
+                             "terminating.\n")
             self.terminate()
         else:
             UIBase.mainException(self)
@@ -106,8 +106,8 @@ class TTYUI(UIBase):
         'abort', ie a request to sync immediately."""
 
         if sleepsecs > 0:
-            if remainingsecs//60 != (remainingsecs-sleepsecs)//60:
+            if remainingsecs // 60 != (remainingsecs - sleepsecs) // 60:
                 self.logger.info("Next refresh in %.1f minutes" % (
-                    remainingsecs/60.0))
+                        remainingsecs / 60.0))
             time.sleep(sleepsecs)
         return 0
