@@ -60,7 +60,6 @@ class GmailFolder(IMAPFolder):
         ignorelabels = self.repository.account.getconf('ignorelabels', '')
         self.ignorelabels = set([l for l in re.split(r'\s*,\s*', ignorelabels) if len(l)])
 
-
     def getmessage(self, uid):
         """Retrieve message with UID from the IMAP server (incl body).  Also
            gets Gmail labels and embeds them into the message.
@@ -72,7 +71,7 @@ class GmailFolder(IMAPFolder):
         data = self._fetch_from_imap(str(uid), self.retrycount)
 
         # data looks now e.g.
-        #[('320 (X-GM-LABELS (...) UID 17061 BODY[] {2565}','msgbody....')]
+        # [('320 (X-GM-LABELS (...) UID 17061 BODY[] {2565}','msgbody....')]
         # we only asked for one message, and that msg is in data[0].
         # msbody is in [0][1].
         body = data[0][1].replace("\r\n", "\n")
@@ -92,12 +91,12 @@ class GmailFolder(IMAPFolder):
             body = self.deletemessageheaders(body, self.labelsheader)
             body = self.addmessageheader(body, '\n', self.labelsheader, labels_str)
 
-        if len(body)>200:
-            dbg_output = "%s...%s"% (str(body)[:150], str(body)[-50:])
+        if len(body) > 200:
+            dbg_output = "%s...%s" % (str(body)[:150], str(body)[-50:])
         else:
             dbg_output = body
 
-        self.ui.debug('imap', "Returned object from fetching %d: '%s'"%
+        self.ui.debug('imap', "Returned object from fetching %d: '%s'" %
                       (uid, dbg_output))
         return body
 
@@ -110,7 +109,6 @@ class GmailFolder(IMAPFolder):
     # Interface from BaseFolder
     def msglist_item_initializer(self, uid):
         return {'uid': uid, 'flags': set(), 'labels': set(), 'time': 0}
-
 
     # TODO: merge this code with the parent's cachemessagelist:
     # TODO: they have too much common logics.
@@ -127,20 +125,20 @@ class GmailFolder(IMAPFolder):
             msgsToFetch = self._msgs_to_fetch(
                 imapobj, min_date=min_date, min_uid=min_uid)
             if not msgsToFetch:
-                return # No messages to sync
+                return  # No messages to sync
 
             # Get the flags and UIDs for these. single-quotes prevent
             # imaplib2 from quoting the sequence.
             #
             # NB: msgsToFetch are sequential numbers, not UID's
-            res_type, response = imapobj.fetch("'%s'"% msgsToFetch,
-              '(FLAGS X-GM-LABELS UID)')
+            res_type, response = imapobj.fetch("'%s'" % msgsToFetch,
+                                               '(FLAGS X-GM-LABELS UID)')
             if res_type != 'OK':
                 six.reraise(OfflineImapError,
                             OfflineImapError(
-                                "FETCHING UIDs in folder [%s]%s failed. "%
+                                "FETCHING UIDs in folder [%s]%s failed. " %
                                 (self.getrepository(), self) +
-                                "Server responded '[%s] %s'"%
+                                "Server responded '[%s] %s'" %
                                 (res_type, response),
                                 OfflineImapError.ERROR.FOLDER),
                             exc_info()[2])
@@ -156,9 +154,9 @@ class GmailFolder(IMAPFolder):
             # e.g.: {'X-GM-LABELS': '("Webserver (RW.net)" "\\Inbox" GInbox)', 'FLAGS': '(\\Seen)', 'UID': '275440'}
             options = imaputil.flags2hash(messagestr)
             if not 'UID' in options:
-                self.ui.warn('No UID in message with options %s' %\
-                                          str(options),
-                                          minor = 1)
+                self.ui.warn('No UID in message with options %s' % \
+                             str(options),
+                             minor=1)
             else:
                 uid = int(options['UID'])
                 self.messagelist[uid] = self.msglist_item_initializer(uid)
@@ -269,7 +267,7 @@ class GmailFolder(IMAPFolder):
             for uid in uidlist:
                 self.messagelist[uid]['labels'] = self.messagelist[uid]['labels'] - labels
 
-    def copymessageto(self, uid, dstfolder, statusfolder, register = 1):
+    def copymessageto(self, uid, dstfolder, statusfolder, register=1):
         """Copies a message from self to dst if needed, updating the status
 
         Note that this function does not check against dryrun settings,
@@ -353,10 +351,10 @@ class GmailFolder(IMAPFolder):
                     statuslabels = set()
 
                 if selflabels != statuslabels:
-                    self.ui.settinglabels(uid, i+1, len(uidlist), sorted(selflabels), dstfolder)
+                    self.ui.settinglabels(uid, i + 1, len(uidlist), sorted(selflabels), dstfolder)
                     if self.repository.account.dryrun:
-                        continue #don't actually add in a dryrun
-                    dstfolder.savemessagelabels(uid, selflabels, ignorelabels = self.ignorelabels)
+                        continue  # don't actually add in a dryrun
+                    dstfolder.savemessagelabels(uid, selflabels, ignorelabels=self.ignorelabels)
                     mtime = dstfolder.getmessagemtime(uid)
                     mtimes[uid] = mtime
                     labels[uid] = selflabels
