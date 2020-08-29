@@ -14,29 +14,27 @@ from helpers import (
     MAILING_LIST, CACHEDIR, EDITOR, Testers, Git, OfflineimapInfo, User
 )
 
-
-
 UPCOMING_FILE = "{}/upcoming.txt".format(CACHEDIR)
 UPCOMING_HEADER = "{}/upcoming-header.txt".format(CACHEDIR)
 
 # Header is like:
 #
-#Message-Id: <{messageId}>
-#Date: {date}
-#From: {name} <{email}>
-#To: {mailinglist}
-#Cc: {ccList}
-#Subject: [ANNOUNCE] upcoming offlineimap v{expectedVersion}
+# Message-Id: <{messageId}>
+# Date: {date}
+# From: {name} <{email}>
+# To: {mailinglist}
+# Cc: {ccList}
+# Subject: [ANNOUNCE] upcoming offlineimap v{expectedVersion}
 #
 ## Notes
 #
-#I think it's time for a new release.
+# I think it's time for a new release.
 #
-#I aim to make the new release in one week, approximately. If you'd like more
-#time, please let me know. ,-)
+# I aim to make the new release in one week, approximately. If you'd like more
+# time, please let me know. ,-)
 #
-#Please, send me a mail to confirm it works for you. This will be written in the
-#release notes and the git logs.
+# Please, send me a mail to confirm it works for you. This will be written in the
+# release notes and the git logs.
 #
 #
 ## Authors
@@ -57,7 +55,7 @@ if __name__ == '__main__':
             ccList.append(email)
 
     with open(UPCOMING_FILE, 'w') as upcoming, \
-         open(UPCOMING_HEADER, 'r') as fd_header:
+            open(UPCOMING_HEADER, 'r') as fd_header:
         header = {}
 
         header['messageId'] = Git.buildMessageId()

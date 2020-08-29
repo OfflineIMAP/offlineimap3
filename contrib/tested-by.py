@@ -20,7 +20,6 @@ class App(object):
         self.testers = Testers()
         self.feedbacks = None
 
-
     def _getTestersByFeedback(self):
         if self.feedbacks is not None:
             return self.feedbacks
@@ -43,16 +42,16 @@ class App(object):
         parser = argparse.ArgumentParser(description='Manage the feedbacks.')
 
         parser.add_argument('--add', '-a', dest='add_tester',
-                help='Add tester')
+                            help='Add tester')
         parser.add_argument('--delete', '-d', dest='delete_tester',
-                type=int,
-                help='Delete tester NUMBER')
+                            type=int,
+                            help='Delete tester NUMBER')
         parser.add_argument('--list', '-l', dest='list_all_testers',
-                action='store_true',
-                help='List the testers')
+                            action='store_true',
+                            help='List the testers')
         parser.add_argument('--switchFeedback', '-s', dest='switch_feedback',
-                action='store_true',
-                help='Switch the feedback of a tester')
+                            action='store_true',
+                            help='Switch the feedback of a tester')
 
         self.args = parser.parse_args()
 
@@ -91,7 +90,6 @@ class App(object):
         if ans in ['s']:
             self.testers.write()
 
-
     def listTesters(self):
         self._getTestersByFeedback()
 
@@ -101,8 +99,8 @@ class App(object):
             if tester.getFeedback() is not True:
                 feedback = "no"
             print(("{:02d} - {} {}: {}".format(
-                    count, tester.getName(), tester.getEmail(), feedback
-                )
+                count, tester.getName(), tester.getEmail(), feedback
+            )
             ))
             count += 1
 
@@ -132,7 +130,8 @@ class App(object):
         self.testers.reset()
         self.testers.write()
 
-    #def updateMailaliases(self):
+    # def updateMailaliases(self):
+
 
 if __name__ == '__main__':
     Git.chdirToRepositoryTopLevel()

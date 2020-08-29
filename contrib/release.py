@@ -8,10 +8,10 @@ Make a new release.
 
 """
 
-#TODO: announce: cc list on announce includes all testers
-#TODO: announce: remove empty sections
-#TODO: websitedoc up
-#TODO: website branch not including all changes!
+# TODO: announce: cc list on announce includes all testers
+# TODO: announce: remove empty sections
+# TODO: websitedoc up
+# TODO: website branch not including all changes!
 
 
 from os import system, path, rename
@@ -24,7 +24,6 @@ from email import utils
 from helpers import (
     MAILING_LIST, CACHEDIR, EDITOR, Git, OfflineimapInfo, Testers, User, run, goTo
 )
-
 
 __VERSION__ = "0.2"
 
@@ -140,8 +139,8 @@ class Changelog(object):
     def update(self):
         # Insert excerpt to CHANGELOG.
         system("sed -i -e '/{}/ r {}' '{}'".format(
-                CHANGELOG_MAGIC, CHANGELOG_EXCERPT, CHANGELOG
-            )
+            CHANGELOG_MAGIC, CHANGELOG_EXCERPT, CHANGELOG
+        )
         )
         # Remove trailing whitespaces.
         system("sed -i -r -e 's, +$,,' '{}'".format(CHANGELOG))
@@ -157,7 +156,7 @@ class Changelog(object):
     def showPrevious(self):
         output = run(shlex.split("cat '{}'".format(CHANGELOG_EXCERPT_OLD)))
         for line in output.splitlines():
-            print((line.decode('utf-8'))) # Weird to have to decode bytes here.
+            print((line.decode('utf-8')))  # Weird to have to decode bytes here.
 
     def usePrevious(self):
         rename(CHANGELOG_EXCERPT_OLD, CHANGELOG_EXCERPT)
@@ -167,7 +166,7 @@ class Changelog(object):
         return self.shouldUsePrevious
 
     def writeExcerpt(self, version, date,
-            testersList, authorsList, commitsList):
+                     testersList, authorsList, commitsList):
 
         with open(CHANGELOG_EXCERPT, 'w+') as fd:
             fd.write(CHANGELOG_SKEL.format(
@@ -188,30 +187,30 @@ class Changelog(object):
                 if line == "#### Notes":
                     currentSection = 'Notes'
                     dict_Content['Notes'] = ""
-                    continue # Don't keep this title.
+                    continue  # Don't keep this title.
                 elif line == "#### Authors":
                     currentSection = 'Authors'
                     dict_Content['Authors'] = ""
-                    continue # Don't keep this title.
+                    continue  # Don't keep this title.
                 elif line == "#### Features":
                     currentSection = 'Features'
                     dict_Content['Features'] = ""
-                    continue # Don't keep this title.
+                    continue  # Don't keep this title.
                 elif line == "#### Fixes":
                     currentSection = 'Fixes'
                     dict_Content['Fixes'] = ""
-                    continue # Don't keep this title.
+                    continue  # Don't keep this title.
                 elif line == "#### Changes":
                     currentSection = 'Changes'
                     dict_Content['Changes'] = ""
-                    continue # Don't keep this title.
+                    continue  # Don't keep this title.
                 elif line == "-- ":
-                    break # Stop extraction.
+                    break  # Stop extraction.
 
                 if currentSection is not None:
                     dict_Content[currentSection] += "{}\n".format(line)
 
-        #TODO: cleanup empty sections.
+        # TODO: cleanup empty sections.
         return dict_Content
 
 
@@ -241,7 +240,7 @@ Pip:
   pip install -r ./requirements.txt --user git+https://github.com/OfflineIMAP/offlineimap.git@v{version}
 
 """.format(version=self.version)
-        )
+                      )
 
     def setContent(self, dict_Content):
         self.fd.write("\n")
@@ -262,7 +261,7 @@ Pip:
 class Website(object):
     def updateUploads(self):
         req = ("add new archive to uploads/ on the website? "
-            "(warning: checksums will change if it already exists)")
+               "(warning: checksums will change if it already exists)")
         if User.yesNo(req, defaultToYes=True) is False:
             return False
         if check_call(shlex.split("./docs/build-uploads.sh")) != 0:
@@ -341,7 +340,6 @@ class Release(object):
         self.testers = Testers()
         self.changelog = Changelog()
         self.websiteBranch = "NO_BRANCH_NAME_ERROR"
-
 
     def getVersion(self):
         return self.offlineimapInfo.getVersion()
@@ -468,9 +466,9 @@ if __name__ == '__main__':
 
         websiteBranch = release.getWebsiteBranch()
         print((END_MESSAGE.format(
-                announce=ANNOUNCE_FILE,
-                new_version=newVersion,
-                website_branch=websiteBranch)
+            announce=ANNOUNCE_FILE,
+            new_version=newVersion,
+            website_branch=websiteBranch)
         ))
     except Exception as e:
         release.restore()
