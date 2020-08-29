@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 # Startup from single-user installation
 # Copyright (C) 2002-2018 John Goerzen & contributors
 #
