@@ -157,7 +157,7 @@ def CustomConfigDefault():
     pass
 
 
-class ConfigHelperMixin(object):
+class ConfigHelperMixin():
     """Allow comfortable retrieving of config values pertaining
     to a section.
 

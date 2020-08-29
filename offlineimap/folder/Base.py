@@ -26,7 +26,7 @@ from offlineimap.error import OfflineImapError
 import offlineimap.accounts
 
 
-class BaseFolder(object):
+class BaseFolder():
     __hash__ = None
 
     def __init__(self, name, repository):

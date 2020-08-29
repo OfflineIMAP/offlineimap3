@@ -42,7 +42,7 @@ except ImportError:
     have_gss = False
 
 
-class IMAPServer(object):
+class IMAPServer():
     """Initializes all variables from an IMAPRepository() instance
 
     Various functions, such as acquireconnection() return an IMAP4
@@ -770,7 +770,7 @@ class IMAPServer(object):
         self.semaphore.release()
 
 
-class IdleThread(object):
+class IdleThread():
     def __init__(self, parent, folder=None):
         """If invoked without 'folder', perform a NOOP and wait for
         self.stop() to be called. If invoked with folder, switch to IDLE

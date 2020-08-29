@@ -89,7 +89,7 @@ Have fun! ,-)
 """
 
 
-class State(object):
+class State():
     def __init__(self):
         self.master = None
         self.next = None
@@ -129,7 +129,7 @@ class State(object):
                 goTo('..')
 
 
-class Changelog(object):
+class Changelog():
     def __init__(self):
         self.shouldUsePrevious = False
 
@@ -214,7 +214,7 @@ class Changelog(object):
         return dict_Content
 
 
-class Announce(object):
+class Announce():
     def __init__(self, version):
         self.fd = open(ANNOUNCE_FILE, 'w')
         self.version = version
@@ -258,7 +258,7 @@ Pip:
         self.fd.close()
 
 
-class Website(object):
+class Website():
     def updateUploads(self):
         req = ("add new archive to uploads/ on the website? "
                "(warning: checksums will change if it already exists)")
@@ -333,7 +333,7 @@ Then, commit and push changes of the website.""".format(SPHINXBUILD, DOCSDIR)))
         return branchName
 
 
-class Release(object):
+class Release():
     def __init__(self):
         self.state = State()
         self.offlineimapInfo = OfflineimapInfo()

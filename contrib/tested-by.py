@@ -14,7 +14,7 @@ import argparse
 from helpers import CACHEDIR, EDITOR, Testers, User, Git
 
 
-class App(object):
+class App():
     def __init__(self):
         self.args = None
         self.testers = Testers()

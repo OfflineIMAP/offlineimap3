@@ -50,7 +50,7 @@ def getglobalui():
     return globalui
 
 
-class UIBase(object):
+class UIBase():
     def __init__(self, config, loglevel=logging.INFO):
         self.config = config
         # Is this a 'dryrun'?

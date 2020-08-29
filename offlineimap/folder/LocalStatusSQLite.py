@@ -25,7 +25,7 @@ import six
 from .Base import BaseFolder
 
 
-class DatabaseFileLock(object):
+class DatabaseFileLock():
     """Lock at database file level."""
 
     def __init__(self):

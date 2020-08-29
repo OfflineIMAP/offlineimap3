@@ -510,7 +510,7 @@ class IMAPRepository(BaseRepository):
                 """Converts a cmp= function into a key= function
                 We need to keep cmp functions for backward compatibility"""
 
-                class K(object):
+                class K():
                     def __init__(self, obj, *args):
                         self.obj = obj
 

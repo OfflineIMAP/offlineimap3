@@ -62,7 +62,7 @@ def syncitall(list_accounts, config):
     threads.wait()  # Blocks until all accounts are processed.
 
 
-class OfflineImap(object):
+class OfflineImap():
     """The main class that encapsulates the high level use of OfflineImap.
 
     To invoke OfflineImap you would call it with::

@@ -39,7 +39,7 @@ def goTo(path):
     return False
 
 
-class Author(object):
+class Author():
     def __init__(self, name, count, email):
         self.name = name
         self.count = count
@@ -55,7 +55,7 @@ class Author(object):
         return self.email
 
 
-class Git(object):
+class Git():
     @staticmethod
     def getShortlog(ref):
         shortlog = ""
@@ -199,7 +199,7 @@ class Git(object):
         chdir(topLevel)
 
 
-class OfflineimapInfo(object):
+class OfflineimapInfo():
     def getVersion(self):
         cmd = shlex.split("./offlineimap.py --version")
         return run(cmd).rstrip().decode(FS_ENCODING)
@@ -209,7 +209,7 @@ class OfflineimapInfo(object):
 
 
 
-class User(object):
+class User():
     """Interact with the user."""
 
     @staticmethod
@@ -235,7 +235,7 @@ class User(object):
         return False
 
 
-class Tester(object):
+class Tester():
     def __init__(self, name, email, feedback):
         self.name = name
         self.email = email
@@ -264,7 +264,7 @@ class Tester(object):
         self.feedback = not self.feedback
 
 
-class Testers(object):
+class Testers():
     def __init__(self):
         self.testers = None
         self._read()

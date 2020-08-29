@@ -30,7 +30,7 @@ from offlineimap.repository.LocalStatus import LocalStatusRepository
 from offlineimap.error import OfflineImapError
 
 
-class Repository(object):
+class Repository():
     """Abstract class that returns the correct Repository type
     instance based on 'account' and 'reqtype', e.g.  a
     class:`ImapRepository` instance."""

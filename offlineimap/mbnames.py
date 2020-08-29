@@ -78,7 +78,7 @@ def writeIntermediateFile(accountname):
         _mbnames.write()
 
 
-class _IntermediateMbnames(object):
+class _IntermediateMbnames():
     """mbnames data for one account."""
 
     def __init__(self, accountname, folder_root, mbnamesdir, folderfilter,
@@ -120,7 +120,7 @@ class _IntermediateMbnames(object):
                 json.dump(itemlist, intermediateFD)
 
 
-class _Mbnames(object):
+class _Mbnames():
     def __init__(self, config, ui, dry_run):
 
         self._config = config

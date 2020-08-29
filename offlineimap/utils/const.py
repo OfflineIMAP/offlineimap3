@@ -6,7 +6,7 @@
 import copy
 
 
-class ConstProxy(object):
+class ConstProxy():
     """Implements read-only access to a given object
     that can be attached to each instance only once."""
 
