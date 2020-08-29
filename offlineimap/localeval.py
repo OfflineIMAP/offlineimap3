@@ -17,10 +17,12 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 import imp
+
 try:
     import errno
 except:
     pass
+
 
 class LocalEval(object):
     """Here is a powerfull but very dangerous option, of course."""
