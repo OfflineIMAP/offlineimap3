@@ -57,17 +57,17 @@ class MappedIMAPFolder(IMAPFolder):
 
     def _loadmaps(self):
         mapfilename = self._getmapfilename()
-        mapfilenametmp = "%s.tmp"% mapfilename
-        mapfilenamelock = "%s.lock"% mapfilename
+        mapfilenametmp = "%s.tmp" % mapfilename
+        mapfilenamelock = "%s.lock" % mapfilename
         with self.maplock and open(mapfilenamelock, 'w') as mapfilelock:
             try:
-                fnctl.lockf(mapfilelock, fnctl.LOCK_EX) # Blocks until acquired.
+                fnctl.lockf(mapfilelock, fnctl.LOCK_EX)  # Blocks until acquired.
             except NameError:
-                pass # Windows...
+                pass  # Windows...
             if os.path.exists(mapfilenametmp):
                 self.ui.warn("a previous run might have leave the UIDMaps file"
-                    " in incorrect state; some sync operations might be done"
-                    " again and some emails might become duplicated.")
+                             " in incorrect state; some sync operations might be done"
+                             " again and some emails might become duplicated.")
                 unlink(mapfilenametmp)
             if not os.path.exists(mapfilename):
                 return ({}, {})
@@ -82,10 +82,10 @@ class MappedIMAPFolder(IMAPFolder):
                     line = line.strip()
                 except ValueError:
                     six.reraise(Exception,
-                            Exception(
-                                "Corrupt line '%s' in UID mapping file '%s'"%
-                                (line, mapfilename)),
-                            exc_info()[2])
+                                Exception(
+                                    "Corrupt line '%s' in UID mapping file '%s'" %
+                                    (line, mapfilename)),
+                                exc_info()[2])
                 (str1, str2) = line.split(':')
                 loc = int(str1)
                 rem = int(str2)
@@ -99,19 +99,19 @@ class MappedIMAPFolder(IMAPFolder):
 
         mapfilename = self._getmapfilename()
         # Do not use the map file directly to prevent from leaving it truncated.
-        mapfilenametmp = "%s.tmp"% mapfilename
-        mapfilenamelock = "%s.lock"% mapfilename
+        mapfilenametmp = "%s.tmp" % mapfilename
+        mapfilenamelock = "%s.lock" % mapfilename
         with self.maplock and open(mapfilenamelock, 'w') as mapfilelock:
             # The "account" lock already prevents from multiple access by
             # different processes. However, we still need to protect for
             # multiple access from different threads.
             try:
-                fnctl.lockf(mapfilelock, fnctl.LOCK_EX) # Blocks until acquired.
+                fnctl.lockf(mapfilelock, fnctl.LOCK_EX)  # Blocks until acquired.
             except NameError:
-                pass # Windows...
+                pass  # Windows...
             with open(mapfilenametmp, 'wt') as mapfilefd:
                 for (key, value) in list(self.diskl2r.items()):
-                    mapfilefd.write("%d:%d\n"% (key, value))
+                    mapfilefd.write("%d:%d\n" % (key, value))
                 if self.dofsync():
                     fsync(mapfilefd)
             # The lock is released when the file descriptor ends.
@@ -142,14 +142,14 @@ class MappedIMAPFolder(IMAPFolder):
             for luid in list(self.diskl2r.keys()):
                 if not luid in reallist:
                     ruid = self.diskl2r[luid]
-                    #XXX: the following KeyError are sightly unexpected. This
+                    # XXX: the following KeyError are sightly unexpected. This
                     # would require more digging to understand how it's
                     # possible.
                     errorMessage = ("unexpected error: key {} was not found "
-                        "in memory, see "
-                        "https://github.com/OfflineIMAP/offlineimap/issues/445"
-                        " to know more."
-                    )
+                                    "in memory, see "
+                                    "https://github.com/OfflineIMAP/offlineimap/issues/445"
+                                    " to know more."
+                                    )
                     try:
                         del self.diskr2l[ruid]
                     except KeyError as e:
@@ -268,11 +268,11 @@ class MappedIMAPFolder(IMAPFolder):
         newluid = self._mb.savemessage(-1, content, flags, rtime)
         if newluid < 1:
             raise OfflineImapError("server of repository '%s' did not return "
-                "a valid UID (got '%s') for UID '%s' from '%s'"% (
-                    self._mb.getname(), newluid, uid, self.getname()
-                ),
-                OfflineImapError.ERROR.MESSAGE
-            )
+                                   "a valid UID (got '%s') for UID '%s' from '%s'" % (
+                                       self._mb.getname(), newluid, uid, self.getname()
+                                   ),
+                                   OfflineImapError.ERROR.MESSAGE
+                                   )
         with self.maplock:
             self.diskl2r[newluid] = uid
             self.diskr2l[uid] = newluid
@@ -315,8 +315,8 @@ class MappedIMAPFolder(IMAPFolder):
             changing the mappings file."""
 
         if ruid not in self.r2l:
-            raise OfflineImapError("Cannot change unknown Maildir UID %s"%
-                ruid, OfflineImapError.ERROR.MESSAGE)
+            raise OfflineImapError("Cannot change unknown Maildir UID %s" %
+                                   ruid, OfflineImapError.ERROR.MESSAGE)
         if ruid == new_ruid: return  # sanity check shortcut
         with self.maplock:
             luid = self.r2l[ruid]
@@ -351,7 +351,7 @@ class MappedIMAPFolder(IMAPFolder):
     # Interface from BaseFolder
     def deletemessagesflags(self, uidlist, flags):
         self._mb.deletemessagesflags(self._uidlist(self.r2l, uidlist),
-            flags)
+                                     flags)
 
     # Interface from BaseFolder
     def deletemessage(self, uid):
