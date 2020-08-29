@@ -22,6 +22,7 @@ from offlineimap.repository.Base import BaseRepository
 import os
 from stat import *
 
+
 class MaildirRepository(BaseRepository):
     def __init__(self, reposname, account):
         """Initialize a MaildirRepository object.  Takes a path name
@@ -32,7 +33,7 @@ class MaildirRepository(BaseRepository):
         self.root = self.getlocalroot()
         self.folders = None
         self.ui = getglobalui()
-        self.debug("MaildirRepository initialized, sep is %s"% repr(self.getsep()))
+        self.debug("MaildirRepository initialized, sep is %s" % repr(self.getsep()))
         self.folder_atimes = []
 
         # Create the top-level folder if it doesn't exist
@@ -62,7 +63,7 @@ class MaildirRepository(BaseRepository):
         Controlled by the 'restoreatime' config parameter."""
 
         if not self.getconfboolean('restoreatime', False):
-            return # not configured to restore
+            return  # not configured to restore
 
         for (dirpath, new_atime, cur_atime) in self.folder_atimes:
             new_dir = os.path.join(dirpath, 'new')
@@ -104,20 +105,20 @@ class MaildirRepository(BaseRepository):
         # sanity tests
         if self.getsep() == '/':
             for component in foldername.split('/'):
-                assert not component in ['new', 'cur', 'tmp'],\
-                    "When using nested folders (/ as a Maildir separator), "\
+                assert not component in ['new', 'cur', 'tmp'], \
+                    "When using nested folders (/ as a Maildir separator), " \
                     "folder names may not contain 'new', 'cur', 'tmp'."
         assert foldername.find('../') == -1, "Folder names may not contain ../"
         assert not foldername.startswith('/'), "Folder names may not begin with /"
 
         # If we're using hierarchical folders, it's possible that
         # sub-folders may be created before higher-up ones.
-        self.debug("makefolder: calling makedirs '%s'"% full_path)
+        self.debug("makefolder: calling makedirs '%s'" % full_path)
         try:
             os.makedirs(full_path, 0o700)
         except OSError as e:
             if e.errno == 17 and os.path.isdir(full_path):
-                self.debug("makefolder: '%s' already a directory"% foldername)
+                self.debug("makefolder: '%s' already a directory" % foldername)
             else:
                 raise
         for subdir in ['cur', 'new', 'tmp']:
@@ -125,13 +126,13 @@ class MaildirRepository(BaseRepository):
                 os.mkdir(os.path.join(full_path, subdir), 0o700)
             except OSError as e:
                 if e.errno == 17 and os.path.isdir(full_path):
-                    self.debug("makefolder: '%s' already has subdir %s"%
-                        (foldername, subdir))
+                    self.debug("makefolder: '%s' already has subdir %s" %
+                               (foldername, subdir))
                 else:
                     raise
 
     def deletefolder(self, foldername):
-        self.ui.warn("NOT YET IMPLEMENTED: DELETE FOLDER %s"% foldername)
+        self.ui.warn("NOT YET IMPLEMENTED: DELETE FOLDER %s" % foldername)
 
     def getfolder(self, foldername):
         """Return a Folder instance of this Maildir
@@ -146,7 +147,7 @@ class MaildirRepository(BaseRepository):
             if foldername == f.name:
                 return f
         raise OfflineImapError("getfolder() asked for a nonexisting "
-            "folder '%s'."% foldername, OfflineImapError.ERROR.FOLDER)
+                               "folder '%s'." % foldername, OfflineImapError.ERROR.FOLDER)
 
     def _getfolders_scandir(self, root, extension=None):
         """Recursively scan folder 'root'; return a list of MailDirFolder
@@ -154,7 +155,7 @@ class MaildirRepository(BaseRepository):
         :param root: (absolute) path to Maildir root
         :param extension: (relative) subfolder to examine within root"""
 
-        self.debug("_GETFOLDERS_SCANDIR STARTING. root = %s, extension = %s"%
+        self.debug("_GETFOLDERS_SCANDIR STARTING. root = %s, extension = %s" %
                    (root, extension))
         retval = []
 
@@ -163,11 +164,11 @@ class MaildirRepository(BaseRepository):
             toppath = os.path.join(root, extension)
         else:
             toppath = root
-        self.debug("  toppath = %s"% toppath)
+        self.debug("  toppath = %s" % toppath)
 
         # Iterate over directories in top & top itself.
         for dirname in os.listdir(toppath) + ['']:
-            self.debug("  dirname = %s"% dirname)
+            self.debug("  dirname = %s" % dirname)
             if dirname == '' and extension is not None:
                 self.debug('  skip this entry (already scanned)')
                 continue
@@ -187,10 +188,10 @@ class MaildirRepository(BaseRepository):
                 foldername = dirname
 
             if (os.path.isdir(os.path.join(fullname, 'cur')) and
-                os.path.isdir(os.path.join(fullname, 'new')) and
-                os.path.isdir(os.path.join(fullname, 'tmp'))):
+                    os.path.isdir(os.path.join(fullname, 'new')) and
+                    os.path.isdir(os.path.join(fullname, 'tmp'))):
                 # This directory has maildir stuff -- process
-                self.debug("  This is maildir folder '%s'."% foldername)
+                self.debug("  This is maildir folder '%s'." % foldername)
                 if self.getconfboolean('restoreatime', False):
                     self._append_folder_atimes(foldername)
                 fd = self.getfoldertype()(self.root, foldername,
@@ -200,7 +201,7 @@ class MaildirRepository(BaseRepository):
             if self.getsep() == '/' and dirname != '':
                 # Recursively check sub-directories for folders too.
                 retval.extend(self._getfolders_scandir(root, foldername))
-        self.debug("_GETFOLDERS_SCANDIR RETURNING %s"% \
+        self.debug("_GETFOLDERS_SCANDIR RETURNING %s" % \
                    repr([x.getname() for x in retval]))
         return retval
 
