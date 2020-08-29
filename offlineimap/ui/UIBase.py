@@ -22,10 +22,7 @@ import time
 import sys
 import traceback
 import threading
-try:
-    from queue import Queue
-except ImportError: # python3
-    from queue import Queue
+from queue import Queue
 from collections import deque
 
 import offlineimap
