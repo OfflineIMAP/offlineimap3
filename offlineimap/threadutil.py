@@ -16,10 +16,7 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 from threading import Lock, Thread, BoundedSemaphore, currentThread
-try:
-    from queue import Queue, Empty
-except ImportError: # python3
-    from queue import Queue, Empty
+from queue import Queue, Empty
 import traceback
 import os.path
 from offlineimap.ui import getglobalui
