@@ -140,7 +140,7 @@ class CustomConfigParser(SafeConfigParser):
 
         Returns transformed string."""
 
-        if string == None:
+        if string is None:
             return None
         for f in transforms:
             string = f(string)

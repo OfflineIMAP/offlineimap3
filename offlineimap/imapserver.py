@@ -171,10 +171,10 @@ class IMAPServer():
     def __getpassword(self):
         """Returns the server password or None"""
 
-        if self.goodpassword != None:  # use cached good one first
+        if self.goodpassword is not None:  # use cached good one first
             return self.goodpassword
 
-        if self.password != None and self.passworderror == None:
+        if self.password is not None and self.passworderror is None:
             return self.password  # non-failed preconfigured one
 
         # get 1) configured password first 2) fall back to asking via UI
@@ -211,7 +211,7 @@ class IMAPServer():
         passwd = self.__getpassword()
         authz = ''
         NULL = '\x00'
-        if self.user_identity != None:
+        if self.user_identity is not None:
             authz = self.user_identity
 
         retval = NULL.join((authz, authc, passwd))
@@ -598,13 +598,13 @@ class IMAPServer():
             if dat != [None]:
                 imapobj.capabilities = tuple(dat[-1].upper().split())
 
-            if self.delim == None:
+            if self.delim is None:
                 listres = imapobj.list(self.reference, '')[1]
-                if listres == [None] or listres == None:
+                if listres == [None] or listres is None:
                     # Some buggy IMAP servers do not respond well to LIST "" ""
                     # Work around them.
                     listres = imapobj.list(self.reference, '"*"')[1]
-                if listres == [None] or listres == None:
+                if listres == [None] or listres is None:
                     # No Folders were returned. This occurs, e.g. if the
                     # 'reference' prefix does not exist on the mail
                     # server. Raise exception.

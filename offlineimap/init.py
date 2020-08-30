@@ -245,7 +245,7 @@ class OfflineImap():
 
         # Which ui to use? CLI option overrides config file.
         ui_type = config.getdefault('general', 'ui', 'ttyui')
-        if options.interface != None:
+        if options.interface is not None:
             ui_type = options.interface
         if '.' in ui_type:
             # Transform Curses.Blinkenlights -> Blinkenlights.

@@ -561,7 +561,7 @@ def syncfolder(account, remotefolder, quick):
 
         new.cachemessagelist()
         min_uid = partial.retrieve_min_uid()
-        if min_uid == None:  # min_uid file didn't exist
+        if min_uid is None:  # min_uid file didn't exist
             if len(new.getmessageuidlist()) > 0:
                 raise OfflineImapError("To use startdate on Repository %s, "
                                        "Repository %s must be empty" %
@@ -612,27 +612,27 @@ def syncfolder(account, remotefolder, quick):
         maxage = localfolder.getmaxage()
         localstart = localfolder.getstartdate()
         remotestart = remotefolder.getstartdate()
-        if (maxage != None) + (localstart != None) + (remotestart != None) > 1:
+        if (maxage is not None) + (localstart is not None) + (remotestart is not None) > 1:
             six.reraise(OfflineImapError,
                         OfflineImapError("You can set at most one of the "
                                          "following: maxage, startdate (for the local "
                                          "folder), startdate (for the remote folder)",
                                          OfflineImapError.ERROR.REPO),
                         exc_info()[2])
-        if (maxage != None or localstart or remotestart) and quick:
+        if (maxage is not None or localstart or remotestart) and quick:
             # IMAP quickchanged isn't compatible with options that
             # involve restricting the messagelist, since the "quick"
             # check can only retrieve a full list of UIDs in the folder.
             ui.warn("Quick syncs (-q) not supported in conjunction "
                     "with maxage or startdate; ignoring -q.")
-        if maxage != None:
+        if maxage is not None:
             cachemessagelists_upto_date(maxage)
             check_uid_validity()
-        elif localstart != None:
+        elif localstart is not None:
             cachemessagelists_startdate(remotefolder, localfolder,
                                         localstart)
             check_uid_validity()
-        elif remotestart != None:
+        elif remotestart is not None:
             cachemessagelists_startdate(localfolder, remotefolder,
                                         remotestart)
             check_uid_validity()

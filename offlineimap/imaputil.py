@@ -208,7 +208,7 @@ def uid_sequence(uidlist):
 
     for item in iter(sorted_uids):
         item = int(item)
-        if start == None:  # First item
+        if start is None:  # First item
             start, end = item, item
         elif item == end + 1:  # Next item in a range
             end = item
