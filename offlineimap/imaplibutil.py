@@ -210,7 +210,7 @@ class WrappedIMAP4_SSL(UsefulIMAPMixIn, IMAP4_SSL):
         if self._fingerprint:
             server_cert = self.sock.getpeercert(True)
             hashes = sha512, sha384, sha256, sha224, sha1
-            server_fingerprints = [hash(server_cert).hexdigest() for hash in hashes]
+            server_fingerprints = [my_hash(server_cert).hexdigest() for my_hash in hashes]
             # compare fingerprints
             matches = [(server_fingerprint in self._fingerprint) for server_fingerprint in server_fingerprints]
             if not any(matches):
@@ -219,7 +219,7 @@ class WrappedIMAP4_SSL(UsefulIMAPMixIn, IMAP4_SSL):
                                        "does not match configured fingerprint(s) %s.  "
                                        "Please verify and set 'cert_fingerprint' accordingly "
                                        "if not set yet." %
-                                       (list(zip([hash.__name__ for hash in hashes], server_fingerprints)), host,
+                                       (list(zip([my_hash.__name__ for my_hash in hashes], server_fingerprints)), host,
                                         self._fingerprint),
                                        OfflineImapError.ERROR.REPO)
 
@@ -257,7 +257,7 @@ def Internaldate2epoch(resp):
     day = int(mo.group('day'))
     year = int(mo.group('year'))
     hour = int(mo.group('hour'))
-    min = int(mo.group('min'))
+    minu = int(mo.group('min'))
     sec = int(mo.group('sec'))
     zoneh = int(mo.group('zoneh'))
     zonem = int(mo.group('zonem'))
@@ -268,6 +268,6 @@ def Internaldate2epoch(resp):
     if zonen == '-':
         zone = -zone
 
-    tt = (year, mon, day, hour, min, sec, -1, -1, -1)
+    tt = (year, mon, day, hour, minu, sec, -1, -1, -1)
 
     return timegm(tt) - zone
