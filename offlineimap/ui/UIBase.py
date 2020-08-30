@@ -50,7 +50,7 @@ def getglobalui():
     return globalui
 
 
-class UIBase():
+class UIBase:
     def __init__(self, config, loglevel=logging.INFO):
         self.config = config
         # Is this a 'dryrun'?
@@ -75,7 +75,7 @@ class UIBase():
         self._log_con_handler = self.setup_consolehandler()
         """The console handler (we need access to be able to lock it)."""
 
-    ################################################## UTILS
+    # UTILS
     def setup_consolehandler(self):
         """Backend specific console handler.
 
@@ -163,7 +163,7 @@ class UIBase():
         if msg:
             self.logger.error("ERROR: %s\n  %s" % (msg, exc))
         else:
-            self.logger.error("ERROR: %s" % (exc))
+            self.logger.error("ERROR: %s" % exc)
 
         instant_traceback = exc_traceback
         if not self.debuglist:
@@ -255,17 +255,17 @@ class UIBase():
 
         return True
 
-    ################################################## INPUT
+    # INPUT
 
     def getpass(self, username, config, errmsg=None):
         raise NotImplementedError("Prompting for a password is not supported"
                                   " in this UI backend.")
 
     def folderlist(self, folder_list):
-        return ', '.join(["%s[%s]" % \
+        return ', '.join(["%s[%s]" %
                           (self.getnicename(x), x.getname()) for x in folder_list])
 
-    ################################################## WARNINGS
+    # WARNINGS
     def msgtoreadonly(self, destfolder, uid, content, flags):
         if self.config.has_option('general', 'ignore-readonly') and \
                 self.config.getboolean('general', 'ignore-readonly'):
@@ -302,7 +302,7 @@ class UIBase():
                   "folder." % (str(uidlist), self.getnicename(destfolder),
                                destfolder))
 
-    ################################################## MESSAGES
+    # MESSAGES
 
     def init_banner(self):
         """Called when the UI starts.  Must be called before any other UI
@@ -341,10 +341,10 @@ class UIBase():
         """Log 'Copying folder structure...'."""
 
         if self.logger.isEnabledFor(logging.DEBUG):
-            self.debug('', "Copying folder structure from %s to %s" % \
+            self.debug('', "Copying folder structure from %s to %s" %
                        (src_repo, dst_repo))
 
-    ############################## Folder syncing
+    # Folder syncing
     def makefolder(self, repo, foldername):
         """Called when a folder is created."""
 
@@ -367,7 +367,7 @@ class UIBase():
         self.uidval_problem = True
         self.logger.warning("UID validity problem for folder %s (repo %s) "
                             "(saved %d; got %d); skipping it. Please see FAQ "
-                            "and manual on how to handle this." % \
+                            "and manual on how to handle this." %
                             (folder, folder.getrepository(),
                              folder.get_saveduidvalidity(), folder.get_uidvalidity()))
 
@@ -380,7 +380,7 @@ class UIBase():
         self.logger.debug("Message list for %s[%s] loaded: %d messages" % (
             self.getnicename(repos), folder, count))
 
-    ############################## Message syncing
+    # Message syncing
 
     def syncingmessages(self, sr, srcfolder, dr, dstfolder):
         self.logger.debug("Syncing messages %s[%s] -> %s[%s]" % (
@@ -493,7 +493,7 @@ class UIBase():
         self.debug(debugtype, "Write mail '%s:%d' with flags %s" %
                    (folder, uid, repr(flags)))
 
-    ################################################## Threads
+    # Threads
 
     def getThreadDebugLog(self, thread):
         if thread in self.debugmessages:
@@ -536,7 +536,7 @@ class UIBase():
             if msg:
                 self.warn("ERROR: %s\n  %s" % (msg, exc))
             else:
-                self.warn("ERROR: %s" % (exc))
+                self.warn("ERROR: %s" % exc)
             if exc_traceback:
                 self.warn("\nTraceback:\n%s" % "".join(
                     traceback.format_tb(exc_traceback)))
@@ -559,7 +559,7 @@ class UIBase():
         self.delThreadDebugLog(thread)
         self.unregisterthread(thread)
 
-    ################################################## Hooks
+    # Hooks
 
     def callhook(self, msg):
         if self.dryrun:
@@ -567,7 +567,7 @@ class UIBase():
         else:
             self.info(msg)
 
-    ################################################## Other
+    # Other
 
     def sleep(self, sleepsecs, account):
         """This function does not actually output anything, but handles
