@@ -104,7 +104,7 @@ class MaildirRepository(BaseRepository):
         # sanity tests
         if self.getsep() == '/':
             for component in foldername.split('/'):
-                assert not component in ['new', 'cur', 'tmp'], \
+                assert component not in ['new', 'cur', 'tmp'], \
                     "When using nested folders (/ as a Maildir separator), " \
                     "folder names may not contain 'new', 'cur', 'tmp'."
         assert foldername.find('../') == -1, "Folder names may not contain ../"
