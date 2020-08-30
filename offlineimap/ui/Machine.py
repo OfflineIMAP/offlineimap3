@@ -28,13 +28,13 @@ protocol = '7.2.0'
 class MachineLogFormatter(logging.Formatter):
     """urlencodes any outputted line, to avoid multi-line output"""
 
-    def format(s, record):
+    def format(self, record):
         # Mapping of log levels to historic tag names
         severity_map = {
             'info': 'msg',
             'warning': 'warn',
         }
-        line = super(MachineLogFormatter, s).format(record)
+        line = super(MachineLogFormatter, self).format(record)
         severity = record.levelname.lower()
         if severity in severity_map:
             severity = severity_map[severity]
@@ -50,19 +50,19 @@ class MachineLogFormatter(logging.Formatter):
 
 
 class MachineUI(UIBase):
-    def __init__(s, config, loglevel=logging.INFO):
-        super(MachineUI, s).__init__(config, loglevel)
-        s._log_con_handler.createLock()
+    def __init__(self, config, loglevel=logging.INFO):
+        super(MachineUI, self).__init__(config, loglevel)
+        self._log_con_handler.createLock()
         """lock needed to block on password input"""
         # Set up the formatter that urlencodes the strings...
-        s._log_con_handler.setFormatter(MachineLogFormatter())
+        self._log_con_handler.setFormatter(MachineLogFormatter())
 
     # Arguments:
-    # - handler: must be method from s.logger that reflects
+    # - handler: must be method from self.logger that reflects
     #   the severity of the passed message
     # - command: command that produced this message
     # - msg: the message itself
-    def _printData(s, handler, command, msg):
+    def _printData(self, handler, command, msg):
         handler(msg,
                 extra={
                     'machineui': {
@@ -71,130 +71,130 @@ class MachineUI(UIBase):
                     }
                 })
 
-    def _msg(s, msg):
-        s._printData(s.logger.info, '_display', msg)
+    def _msg(self, msg):
+        self._printData(self.logger.info, '_display', msg)
 
-    def warn(s, msg, minor=0):
+    def warn(self, msg, minor=0):
         # TODO, remove and cleanup the unused minor stuff
-        s._printData(s.logger.warning, '', msg)
+        self._printData(self.logger.warning, '', msg)
 
-    def registerthread(s, account):
-        super(MachineUI, s).registerthread(account)
-        s._printData(s.logger.info, 'registerthread', account)
+    def registerthread(self, account):
+        super(MachineUI, self).registerthread(account)
+        self._printData(self.logger.info, 'registerthread', account)
 
-    def unregisterthread(s, thread):
-        UIBase.unregisterthread(s, thread)
-        s._printData(s.logger.info, 'unregisterthread', thread.getName())
+    def unregisterthread(self, thread):
+        UIBase.unregisterthread(self, thread)
+        self._printData(self.logger.info, 'unregisterthread', thread.getName())
 
-    def debugging(s, debugtype):
-        s._printData(s.logger.debug, 'debugging', debugtype)
+    def debugging(self, debugtype):
+        self._printData(self.logger.debug, 'debugging', debugtype)
 
-    def acct(s, accountname):
-        s._printData(s.logger.info, 'acct', accountname)
+    def acct(self, accountname):
+        self._printData(self.logger.info, 'acct', accountname)
 
-    def acctdone(s, accountname):
-        s._printData(s.logger.info, 'acctdone', accountname)
+    def acctdone(self, accountname):
+        self._printData(self.logger.info, 'acctdone', accountname)
 
-    def validityproblem(s, folder):
-        s._printData(s.logger.warning, 'validityproblem', "%s\n%s\n%s\n%s" %
-                     (folder.getname(), folder.getrepository().getname(),
-                      folder.get_saveduidvalidity(), folder.get_uidvalidity()))
+    def validityproblem(self, folder):
+        self._printData(self.logger.warning, 'validityproblem', "%s\n%s\n%s\n%s" %
+                        (folder.getname(), folder.getrepository().getname(),
+                         folder.get_saveduidvalidity(), folder.get_uidvalidity()))
 
-    def connecting(s, reposname, hostname, port):
-        s._printData(s.logger.info, 'connecting', "%s\n%s\n%s" % (hostname,
-                                                                  str(port), reposname))
+    def connecting(self, reposname, hostname, port):
+        self._printData(self.logger.info, 'connecting', "%s\n%s\n%s" % (hostname,
+                                                                        str(port), reposname))
 
-    def syncfolders(s, srcrepos, destrepos):
-        s._printData(s.logger.info, 'syncfolders', "%s\n%s" % (s.getnicename(srcrepos),
-                                                               s.getnicename(destrepos)))
+    def syncfolders(self, srcrepos, destrepos):
+        self._printData(self.logger.info, 'syncfolders', "%s\n%s" % (self.getnicename(srcrepos),
+                                                                     self.getnicename(destrepos)))
 
-    def syncingfolder(s, srcrepos, srcfolder, destrepos, destfolder):
-        s._printData(s.logger.info, 'syncingfolder', "%s\n%s\n%s\n%s\n" %
-                     (s.getnicename(srcrepos), srcfolder.getname(),
-                      s.getnicename(destrepos), destfolder.getname()))
+    def syncingfolder(self, srcrepos, srcfolder, destrepos, destfolder):
+        self._printData(self.logger.info, 'syncingfolder', "%s\n%s\n%s\n%s\n" %
+                        (self.getnicename(srcrepos), srcfolder.getname(),
+                         self.getnicename(destrepos), destfolder.getname()))
 
-    def loadmessagelist(s, repos, folder):
-        s._printData(s.logger.info, 'loadmessagelist', "%s\n%s" % (s.getnicename(repos),
-                                                                   folder.getvisiblename()))
+    def loadmessagelist(self, repos, folder):
+        self._printData(self.logger.info, 'loadmessagelist', "%s\n%s" % (self.getnicename(repos),
+                                                                         folder.getvisiblename()))
 
-    def messagelistloaded(s, repos, folder, count):
-        s._printData(s.logger.info, 'messagelistloaded', "%s\n%s\n%d" %
-                     (s.getnicename(repos), folder.getname(), count))
+    def messagelistloaded(self, repos, folder, count):
+        self._printData(self.logger.info, 'messagelistloaded', "%s\n%s\n%d" %
+                        (self.getnicename(repos), folder.getname(), count))
 
-    def syncingmessages(s, sr, sf, dr, df):
-        s._printData(s.logger.info, 'syncingmessages', "%s\n%s\n%s\n%s\n" %
-                     (s.getnicename(sr), sf.getname(), s.getnicename(dr),
-                      df.getname()))
+    def syncingmessages(self, sr, sf, dr, df):
+        self._printData(self.logger.info, 'syncingmessages', "%s\n%s\n%s\n%s\n" %
+                        (self.getnicename(sr), sf.getname(), self.getnicename(dr),
+                         df.getname()))
 
-    def ignorecopyingmessage(s, uid, srcfolder, destfolder):
-        s._printData(s.logger.info, 'ignorecopyingmessage', "%d\n%s\n%s\n%s[%s]" %
-                     (uid, s.getnicename(srcfolder), srcfolder.getname(),
-                      s.getnicename(destfolder), destfolder))
+    def ignorecopyingmessage(self, uid, srcfolder, destfolder):
+        self._printData(self.logger.info, 'ignorecopyingmessage', "%d\n%s\n%s\n%s[%s]" %
+                        (uid, self.getnicename(srcfolder), srcfolder.getname(),
+                         self.getnicename(destfolder), destfolder))
 
-    def copyingmessage(s, uid, num, num_to_copy, srcfolder, destfolder):
-        s._printData(s.logger.info, 'copyingmessage', "%d\n%s\n%s\n%s[%s]" %
-                     (uid, s.getnicename(srcfolder), srcfolder.getname(),
-                      s.getnicename(destfolder), destfolder))
+    def copyingmessage(self, uid, num, num_to_copy, srcfolder, destfolder):
+        self._printData(self.logger.info, 'copyingmessage', "%d\n%s\n%s\n%s[%s]" %
+                        (uid, self.getnicename(srcfolder), srcfolder.getname(),
+                         self.getnicename(destfolder), destfolder))
 
-    def folderlist(s, list):
-        return ("\f".join(["%s\t%s" % (s.getnicename(x), x.getname()) for x in list]))
+    def folderlist(self, list):
+        return ("\f".join(["%s\t%s" % (self.getnicename(x), x.getname()) for x in list]))
 
-    def uidlist(s, list):
+    def uidlist(self, list):
         return ("\f".join([str(u) for u in list]))
 
-    def deletingmessages(s, uidlist, destlist):
-        ds = s.folderlist(destlist)
-        s._printData(s.logger.info, 'deletingmessages', "%s\n%s" % (s.uidlist(uidlist), ds))
+    def deletingmessages(self, uidlist, destlist):
+        ds = self.folderlist(destlist)
+        self._printData(self.logger.info, 'deletingmessages', "%s\n%s" % (self.uidlist(uidlist), ds))
 
-    def addingflags(s, uidlist, flags, dest):
-        s._printData(s.logger.info, "addingflags", "%s\n%s\n%s" % (s.uidlist(uidlist),
-                                                                   "\f".join(flags),
-                                                                   dest))
+    def addingflags(self, uidlist, flags, dest):
+        self._printData(self.logger.info, "addingflags", "%s\n%s\n%s" % (self.uidlist(uidlist),
+                                                                         "\f".join(flags),
+                                                                         dest))
 
-    def deletingflags(s, uidlist, flags, dest):
-        s._printData(s.logger.info, 'deletingflags', "%s\n%s\n%s" % (s.uidlist(uidlist),
-                                                                     "\f".join(flags),
-                                                                     dest))
+    def deletingflags(self, uidlist, flags, dest):
+        self._printData(self.logger.info, 'deletingflags', "%s\n%s\n%s" % (self.uidlist(uidlist),
+                                                                           "\f".join(flags),
+                                                                           dest))
 
-    def threadException(s, thread):
-        s._printData(s.logger.warning, 'threadException', "%s\n%s" %
-                     (thread.getName(), s.getThreadExceptionString(thread)))
-        s.delThreadDebugLog(thread)
-        s.terminate(100)
+    def threadException(self, thread):
+        self._printData(self.logger.warning, 'threadException', "%s\n%s" %
+                        (thread.getName(), self.getThreadExceptionString(thread)))
+        self.delThreadDebugLog(thread)
+        self.terminate(100)
 
-    def terminate(s, exitstatus=0, errortitle='', errormsg=''):
-        s._printData(s.logger.info, 'terminate', "%d\n%s\n%s" % (exitstatus, errortitle, errormsg))
+    def terminate(self, exitstatus=0, errortitle='', errormsg=''):
+        self._printData(self.logger.info, 'terminate', "%d\n%s\n%s" % (exitstatus, errortitle, errormsg))
         sys.exit(exitstatus)
 
-    def mainException(s):
-        s._printData(s.logger.warning, 'mainException', s.getMainExceptionString())
+    def mainException(self):
+        self._printData(self.logger.warning, 'mainException', self.getMainExceptionString())
 
-    def threadExited(s, thread):
-        s._printData(s.logger.info, 'threadExited', thread.getName())
-        UIBase.threadExited(s, thread)
+    def threadExited(self, thread):
+        self._printData(self.logger.info, 'threadExited', thread.getName())
+        UIBase.threadExited(self, thread)
 
-    def sleeping(s, sleepsecs, remainingsecs):
-        s._printData(s.logger.info, 'sleeping', "%d\n%d" % (sleepsecs, remainingsecs))
+    def sleeping(self, sleepsecs, remainingsecs):
+        self._printData(self.logger.info, 'sleeping', "%d\n%d" % (sleepsecs, remainingsecs))
         if sleepsecs > 0:
             time.sleep(sleepsecs)
         return 0
 
-    def getpass(s, username, config, errmsg=None):
+    def getpass(self, username, config, errmsg=None):
         if errmsg:
-            s._printData(s.logger.warning,
-                         'getpasserror', "%s\n%s" % (username, errmsg),
-                         False)
+            self._printData(self.logger.warning,
+                            'getpasserror', "%s\n%s" % (username, errmsg),
+                            False)
 
-        s._log_con_handler.acquire()  # lock the console output
+        self._log_con_handler.acquire()  # lock the console output
         try:
-            s._printData(s.logger.info, 'getpass', username)
+            self._printData(self.logger.info, 'getpass', username)
             return (sys.stdin.readline()[:-1])
         finally:
-            s._log_con_handler.release()
+            self._log_con_handler.release()
 
-    def init_banner(s):
-        s._printData(s.logger.info, 'protocol', protocol)
-        s._printData(s.logger.info, 'initbanner', offlineimap.banner)
+    def init_banner(self):
+        self._printData(self.logger.info, 'protocol', protocol)
+        self._printData(self.logger.info, 'initbanner', offlineimap.banner)
 
-    def callhook(s, msg):
-        s._printData(s.logger.info, 'callhook', msg)
+    def callhook(self, msg):
+        self._printData(self.logger.info, 'callhook', msg)
