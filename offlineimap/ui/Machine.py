@@ -136,11 +136,11 @@ class MachineUI(UIBase):
                         (uid, self.getnicename(srcfolder), srcfolder.getname(),
                          self.getnicename(destfolder), destfolder))
 
-    def folderlist(self, list):
-        return ("\f".join(["%s\t%s" % (self.getnicename(x), x.getname()) for x in list]))
+    def folderlist(self, ulist):
+        return ("\f".join(["%s\t%s" % (self.getnicename(x), x.getname()) for x in ulist]))
 
-    def uidlist(self, list):
-        return ("\f".join([str(u) for u in list]))
+    def uidlist(self, ulist):
+        return ("\f".join([str(u) for u in ulist]))
 
     def deletingmessages(self, uidlist, destlist):
         ds = self.folderlist(destlist)
