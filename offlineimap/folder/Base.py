@@ -26,7 +26,7 @@ from offlineimap.error import OfflineImapError
 import offlineimap.accounts
 
 
-class BaseFolder():
+class BaseFolder:
     __hash__ = None
 
     def __init__(self, name, repository):
@@ -751,7 +751,7 @@ class BaseFolder():
 
         if type(header_list) != type([]):
             header_list = [header_list]
-        self.ui.debug('', 'deletemessageheaders: called to delete %s' % (header_list))
+        self.ui.debug('', 'deletemessageheaders: called to delete %s' % header_list)
 
         if not len(header_list):
             return content
@@ -857,7 +857,7 @@ class BaseFolder():
                 raise OfflineImapError("Trying to save msg (uid %d) on folder "
                                        "%s returned invalid uid %d" % (uid, dstfolder.getvisiblename(),
                                                                        new_uid), OfflineImapError.ERROR.MESSAGE)
-        except (KeyboardInterrupt):  # Bubble up CTRL-C.
+        except KeyboardInterrupt:  # Bubble up CTRL-C.
             raise
         except OfflineImapError as e:
             if e.severity > OfflineImapError.ERROR.MESSAGE:
@@ -998,7 +998,7 @@ class BaseFolder():
                 selfkeywords &= knownkeywords
                 self.ui.warn("Unknown keywords skipped: %s\n"
                              "You may want to change your configuration to include "
-                             "those\n" % (skipped_keywords))
+                             "those\n" % skipped_keywords)
 
             keywordletterset = set([keywordmap[keyw] for keyw in selfkeywords])
 
