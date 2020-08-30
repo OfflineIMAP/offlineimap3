@@ -358,7 +358,7 @@ class IMAPServer():
         try:
             imapobj.authenticate('GSSAPI', self.__gsshandler)
             return True
-        except imapobj.error as e:
+        except imapobj.error:
             self.gssapi = False
             raise
         finally:
@@ -815,9 +815,7 @@ class IdleThread:
     def __dosync(self):
         remoterepos = self.parent.repos
         account = remoterepos.account
-        localrepos = account.localrepos
         remoterepos = account.remoterepos
-        statusrepos = account.statusrepos
         remotefolder = remoterepos.getfolder(self.folder, decode=False)
 
         hook = account.getconf('presynchook', '')
