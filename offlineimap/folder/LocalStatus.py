@@ -230,7 +230,8 @@ class LocalStatusFolder(BaseFolder):
 
     def savemessagelabels(self, uid, labels, mtime=None):
         self.messagelist[uid]['labels'] = labels
-        if mtime: self.messagelist[uid]['mtime'] = mtime
+        if mtime:
+            self.messagelist[uid]['mtime'] = mtime
         self.save()
 
     def savemessageslabelsbulk(self, labels):
