@@ -1042,12 +1042,12 @@ class BaseFolder:
             delflags = statusflags - selfflags
 
             for flag in addflags:
-                if not flag in addflaglist:
+                if flag not in addflaglist:
                     addflaglist[flag] = []
                 addflaglist[flag].append(uid)
 
             for flag in delflags:
-                if not flag in delflaglist:
+                if flag not in delflaglist:
                     delflaglist[flag] = []
                 delflaglist[flag].append(uid)
 
