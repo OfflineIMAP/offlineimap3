@@ -86,7 +86,7 @@ def get_os_sslcertfile():
     """
 
     l = get_os_sslcertfile_searchpath()
-    if l == None:
+    if l is None:
         return None
 
     for f in l:

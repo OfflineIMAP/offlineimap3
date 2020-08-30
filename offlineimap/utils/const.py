@@ -15,7 +15,7 @@ class ConstProxy():
 
     def __getattr__(self, name):
         src = self.__dict__['__source']
-        if src == None:
+        if src is None:
             raise ValueError("using non-initialized ConstProxy() object")
         return copy.deepcopy(getattr(src, name))
 
@@ -29,6 +29,6 @@ class ConstProxy():
 
     def set_source(self, source):
         """ Sets source object for this instance. """
-        if (self.__dict__['__source'] != None):
+        if (self.__dict__['__source'] is not None):
             raise ValueError("source object is already set")
         self.__dict__['__source'] = source
