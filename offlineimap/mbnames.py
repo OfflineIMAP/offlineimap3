@@ -120,7 +120,7 @@ class _IntermediateMbnames():
                 json.dump(itemlist, intermediateFD)
 
 
-class _Mbnames():
+class _Mbnames:
     def __init__(self, config, ui, dry_run):
 
         self._config = config
