@@ -169,7 +169,7 @@ class IMAPRepository(BaseRepository):
 
         for m in mechs:
             if m not in supported:
-                raise OfflineImapError("Repository %s: " % self + \
+                raise OfflineImapError("Repository %s: " % self +
                                        "unknown authentication mechanism '%s'" % m,
                                        OfflineImapError.ERROR.REPO)
 
@@ -509,7 +509,7 @@ class IMAPRepository(BaseRepository):
                 """Converts a cmp= function into a key= function
                 We need to keep cmp functions for backward compatibility"""
 
-                class K():
+                class K:
                     def __init__(self, obj, *args):
                         self.obj = obj
 
