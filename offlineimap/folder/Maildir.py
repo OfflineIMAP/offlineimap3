@@ -193,7 +193,6 @@ class MaildirFolder(BaseFolder):
                 nouidcounter -= 1
             else:  # It comes from our folder.
                 uidmatch = re_uidmatch.search(filename)
-                uid = None
                 if not uidmatch:
                     uid = nouidcounter
                     nouidcounter -= 1
@@ -357,10 +356,6 @@ class MaildirFolder(BaseFolder):
             # We already have it, just update flags.
             self.savemessageflags(uid, flags)
             return uid
-
-        # Otherwise, save the message in tmp/ and then call savemessageflags()
-        # to give it a permanent home.
-        tmpdir = os.path.join(self.getfullname(), 'tmp')
 
         # Use the mail timestamp given by either Date or Delivery-date mail
         # headers.
