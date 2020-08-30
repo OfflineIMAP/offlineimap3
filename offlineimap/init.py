@@ -258,7 +258,7 @@ class OfflineImap:
 
         # dry-run? Set [general]dry-run=True.
         if options.dryrun:
-            dryrun = config.set('general', 'dry-run', 'True')
+            config.set('general', 'dry-run', 'True')
         config.set_if_not_exists('general', 'dry-run', 'False')
 
         try:
