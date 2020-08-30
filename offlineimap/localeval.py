@@ -19,7 +19,7 @@
 import imp
 
 
-class LocalEval():
+class LocalEval:
     """Here is a powerfull but very dangerous option, of course."""
 
     def __init__(self, path=None):
