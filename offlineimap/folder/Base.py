@@ -307,7 +307,9 @@ class BaseFolder:
 
         This function must initialize all fields of messagelist item
         and must be called every time when one creates new messagelist
-        entry to ensure that all fields that must be present are present."""
+        entry to ensure that all fields that must be present are present.
+
+        :param uid: Message UID"""
 
         raise NotImplementedError
 
@@ -480,6 +482,7 @@ class BaseFolder:
         so you need to ensure that it is never called in a
         dryrun mode.
 
+        :param uid: Message UID
         :param flags: A set() of flags"""
 
         newflags = self.getmessageflags(uid) | flags
@@ -538,6 +541,7 @@ class BaseFolder:
         so you need to ensure that it is never called in a
         dryrun mode.
 
+        :param uid: Message UID
         :param labels: A set() of labels"""
 
         newlabels = self.getmessagelabels(uid) | labels
@@ -546,7 +550,10 @@ class BaseFolder:
     def addmessageslabels(self, uidlist, labels):
         """Note that this function does not check against dryrun settings,
         so you need to ensure that it is never called in a
-        dryrun mode."""
+        dryrun mode.
+
+        :param uidlist: Message UID
+        :param labels: Labels to add"""
 
         for uid in uidlist:
             self.addmessagelabels(uid, labels)
@@ -559,7 +566,10 @@ class BaseFolder:
 
         Note that this function does not check against dryrun settings,
         so you need to ensure that it is never called in a
-        dryrun mode."""
+        dryrun mode.
+
+        :param uid: Message uid
+        :param labels: Labels to delete"""
 
         newlabels = self.getmessagelabels(uid) - labels
         self.savemessagelabels(uid, newlabels)
@@ -778,6 +788,7 @@ class BaseFolder:
 
         If the backend supports it (IMAP does not).
 
+        :param uid: Message UID
         :param new_uid: (optional) If given, the old UID will be changed
             to a new UID. This allows backends efficient renaming of
             messages if the UID has changed."""
