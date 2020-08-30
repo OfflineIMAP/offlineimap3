@@ -153,7 +153,7 @@ class GmailFolder(IMAPFolder):
             messagestr = messagestr.split(' ', 1)[1]
             # e.g.: {'X-GM-LABELS': '("Webserver (RW.net)" "\\Inbox" GInbox)', 'FLAGS': '(\\Seen)', 'UID': '275440'}
             options = imaputil.flags2hash(messagestr)
-            if not 'UID' in options:
+            if 'UID' not in options:
                 self.ui.warn('No UID in message with options %s' %
                              str(options), minor=1)
             else:
