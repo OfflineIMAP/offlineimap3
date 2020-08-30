@@ -204,7 +204,7 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
             # Apply remote nametrans and fix serparator.
             local_name = remote_folder.getvisiblename().replace(
                 remote_repo.getsep(), local_repo.getsep())
-            if remote_folder.sync_this and not local_name in list(local_hash.keys()):
+            if remote_folder.sync_this and local_name not in list(local_hash.keys()):
                 try:
                     local_repo.makefolder(local_name)
                     # Need to refresh list.
@@ -226,7 +226,7 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
             # Apply reverse nametrans and fix serparator.
             remote_name = local_folder.getvisiblename().replace(
                 local_repo.getsep(), remote_repo.getsep())
-            if local_folder.sync_this and not remote_name in list(remote_hash.keys()):
+            if local_folder.sync_this and remote_name not in list(remote_hash.keys()):
                 # Would the remote filter out the new folder name? In this case
                 # don't create it.
                 if not remote_repo.should_sync_folder(remote_name):
