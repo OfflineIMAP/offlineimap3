@@ -105,7 +105,7 @@ class GmailMaildirFolder(MaildirFolder):
         return self.messagelist[uid]['labels']
 
     def getmessagemtime(self, uid):
-        if not 'mtime' in self.messagelist[uid]:
+        if 'mtime' not in self.messagelist[uid]:
             return 0
         else:
             return self.messagelist[uid]['mtime']
@@ -289,12 +289,12 @@ class GmailMaildirFolder(MaildirFolder):
                 dellabels = statuslabels - selflabels
 
                 for lb in addlabels:
-                    if not lb in addlabellist:
+                    if lb not in addlabellist:
                         addlabellist[lb] = []
                     addlabellist[lb].append(uid)
 
                 for lb in dellabels:
-                    if not lb in dellabellist:
+                    if lb not in dellabellist:
                         dellabellist[lb] = []
                     dellabellist[lb].append(uid)
 
