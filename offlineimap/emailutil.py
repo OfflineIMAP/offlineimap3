@@ -22,6 +22,7 @@ from email.parser import Parser as MailParser
 def get_message_date(content, header='Date'):
     """Parses mail and returns resulting timestamp.
 
+    :param content: Mail content
     :param header: the header to extract date from;
     :returns: timestamp or `None` in the case of failure.
     """
