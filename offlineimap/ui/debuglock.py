@@ -44,6 +44,6 @@ class DebuggingLock:
         loglock.release()
 
     def print_tb(self, msg):
-        self.logmsg(".... %s: Thread %s attempting to %s\n" % \
-                    (self.name, currentThread().getName(), msg) + \
+        self.logmsg(".... %s: Thread %s attempting to %s\n" %
+                    (self.name, currentThread().getName(), msg) +
                     "\n".join(traceback.format_list(traceback.extract_stack())))
