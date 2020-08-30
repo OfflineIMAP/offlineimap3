@@ -200,7 +200,9 @@ def uid_sequence(uidlist):
             return str(start)
         return "%s:%s" % (start, end)
 
-    if not len(uidlist): return ''  # Empty list, return
+    if not len(uidlist):
+        return ''  # Empty list, return
+
     start, end = None, None
     retval = []
     # Force items to be longs and sort them
