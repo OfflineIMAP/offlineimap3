@@ -199,7 +199,7 @@ def initInstanceLimit(limitNamespace, instancemax):
 
     global limitedNamespaces
 
-    if not limitNamespace in limitedNamespaces:
+    if limitNamespace not in limitedNamespaces:
         limitedNamespaces[limitNamespace] = BoundedSemaphore(instancemax)
 
 
