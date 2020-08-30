@@ -314,7 +314,9 @@ class UIBase:
     def connecting(self, reposname, hostname, port):
         """Log 'Establishing connection to'."""
 
-        if not self.logger.isEnabledFor(logging.INFO): return
+        if not self.logger.isEnabledFor(logging.INFO):
+            return
+
         displaystr = ''
         hostname = hostname if hostname else ''
         port = "%s" % port if port else ''
