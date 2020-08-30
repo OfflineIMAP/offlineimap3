@@ -722,9 +722,9 @@ class IMAPFolder(BaseFolder):
                     return 0
                 try:
                     uid = int(resp[-1].split(' ')[1])
-                except ValueError as e:
+                except ValueError:
                     uid = 0  # Definetly not what we should have.
-                except Exception as e:
+                except Exception:
                     raise OfflineImapError("Unexpected response: %s" % str(resp),
                                            OfflineImapError.ERROR.MESSAGE)
                 if uid == 0:
@@ -791,7 +791,6 @@ class IMAPFolder(BaseFolder):
                         message = ("%s, while fetching msg %r in folder %r."
                                    " Max retry reached (%d)" %
                                    (e, uids, self.name, retry_num))
-                        severity = OfflineImapError.ERROR.MESSAGE
                         raise OfflineImapError(message,
                                                OfflineImapError.ERROR.MESSAGE)
                     self.ui.error("%s. While fetching msg %r in folder %r."
