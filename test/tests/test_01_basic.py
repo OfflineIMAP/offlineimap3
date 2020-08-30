@@ -25,7 +25,7 @@ if not OLITestLib.cred_file:
 
 def setUpModule():
     logging.info("Set Up test module %s" % __name__)
-    tdir = OLITestLib.create_test_dir(suffix=__name__)
+    OLITestLib.create_test_dir(suffix=__name__)
 
 
 def tearDownModule():
