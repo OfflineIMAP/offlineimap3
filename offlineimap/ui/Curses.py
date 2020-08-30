@@ -141,7 +141,7 @@ class CursesAccountFrame:
         def addstr():
             try:
                 self.window.addstr(0, 0, accstr)
-            except curses.error as e:  # Occurs when the terminal is very small
+            except curses.error:  # Occurs when the terminal is very small
                 pass
 
         self.ui.exec_locked(addstr)
