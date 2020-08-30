@@ -20,11 +20,10 @@ import subprocess
 import tempfile
 import random
 import offlineimap.virtual_imaplib2 as imaplib
-
-random.seed()
-
 from offlineimap.CustomConfig import CustomConfigParser
 from . import default_conf
+
+random.seed()
 
 
 class OLITestLib():
