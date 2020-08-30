@@ -95,7 +95,7 @@ class GmailRepository(IMAPRepository):
     def getfoldertype(self):
         return folder.Gmail.GmailFolder
 
-    def gettrashfolder(self, foldername):
+    def gettrashfolder(self):
         # Where deleted mail should be moved
         return self.getconf('trashfolder', '[Gmail]/Trash')
 
