@@ -22,6 +22,14 @@ from sys import exc_info
 from threading import Lock
 import six
 
+try:
+    import portalocker
+except:
+    try:
+        import fcntl
+    except:
+        pass  # Ok if this fails, we can do without.
+
 from offlineimap import OfflineImapError
 from .IMAP import IMAPFolder
 
@@ -61,7 +69,7 @@ class MappedIMAPFolder(IMAPFolder):
         mapfilenamelock = "%s.lock" % mapfilename
         with self.maplock and open(mapfilenamelock, 'w') as mapfilelock:
             try:
-                fnctl.lockf(mapfilelock, fnctl.LOCK_EX)  # Blocks until acquired.
+                fcntl.lockf(mapfilelock, fcntl.LOCK_EX)  # Blocks until acquired.
             except NameError:
                 pass  # Windows...
             if os.path.exists(mapfilenametmp):
@@ -106,7 +114,7 @@ class MappedIMAPFolder(IMAPFolder):
             # different processes. However, we still need to protect for
             # multiple access from different threads.
             try:
-                fnctl.lockf(mapfilelock, fnctl.LOCK_EX)  # Blocks until acquired.
+                fcntl.lockf(mapfilelock, fcntl.LOCK_EX)  # Blocks until acquired.
             except NameError:
                 pass  # Windows...
             with open(mapfilenametmp, 'wt') as mapfilefd:
