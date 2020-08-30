@@ -32,7 +32,7 @@ from offlineimap.ui import getglobalui
 from offlineimap.virtual_imaplib2 import IMAP4, IMAP4_SSL, InternalDate
 
 
-class UsefulIMAPMixIn():
+class UsefulIMAPMixIn:
     def __getselectedfolder(self):
         if self.state == 'SELECTED':
             return self.mailbox
