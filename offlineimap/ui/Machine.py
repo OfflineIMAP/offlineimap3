@@ -137,10 +137,10 @@ class MachineUI(UIBase):
                          self.getnicename(destfolder), destfolder))
 
     def folderlist(self, ulist):
-        return ("\f".join(["%s\t%s" % (self.getnicename(x), x.getname()) for x in ulist]))
+        return "\f".join(["%s\t%s" % (self.getnicename(x), x.getname()) for x in ulist])
 
     def uidlist(self, ulist):
-        return ("\f".join([str(u) for u in ulist]))
+        return "\f".join([str(u) for u in ulist])
 
     def deletingmessages(self, uidlist, destlist):
         ds = self.folderlist(destlist)
@@ -188,7 +188,7 @@ class MachineUI(UIBase):
         self._log_con_handler.acquire()  # lock the console output
         try:
             self._printData(self.logger.info, 'getpass', username)
-            return (sys.stdin.readline()[:-1])
+            return sys.stdin.readline()[:-1]
         finally:
             self._log_con_handler.release()
 
