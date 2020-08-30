@@ -154,9 +154,8 @@ class GmailFolder(IMAPFolder):
             # e.g.: {'X-GM-LABELS': '("Webserver (RW.net)" "\\Inbox" GInbox)', 'FLAGS': '(\\Seen)', 'UID': '275440'}
             options = imaputil.flags2hash(messagestr)
             if not 'UID' in options:
-                self.ui.warn('No UID in message with options %s' % \
-                             str(options),
-                             minor=1)
+                self.ui.warn('No UID in message with options %s' %
+                             str(options), minor=1)
             else:
                 uid = int(options['UID'])
                 self.messagelist[uid] = self.msglist_item_initializer(uid)
