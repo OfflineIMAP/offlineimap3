@@ -128,7 +128,7 @@ class TestBasicFunctions(unittest.TestCase):
         uids = OLITestLib.get_maildir_uids('INBOX.OLItest')
         self.assertFalse(None in uids, msg="All mails should have been " + \
                                            "assigned the IMAP's UID number, but {0} messages had no valid ID " \
-                         .format(len([None for x in uids if x == None])))
+                         .format(len([None for x in uids if x is None])))
 
     def test_06_createfolders(self):
         """Test if createfolders works as expected

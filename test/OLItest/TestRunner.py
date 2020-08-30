@@ -54,7 +54,7 @@ class OLITestLib():
         directory at a time. OLITestLib is not suited for running
         several tests in parallel.  The user is responsible for
         cleaning that up herself."""
-        assert cls.cred_file != None
+        assert cls.cred_file is not None
         # creating temporary dir for testing in same dir as credentials.conf
         cls.testdir = os.path.abspath(
             tempfile.mkdtemp(prefix='tmp_%s_' % suffix,
@@ -69,8 +69,8 @@ class OLITestLib():
         The returned config can be manipulated and then saved with
         write_config_file()"""
         # TODO, only do first time and cache then for subsequent calls?
-        assert cls.cred_file != None
-        assert cls.testdir != None
+        assert cls.cred_file is not None
+        assert cls.testdir is not None
         config = CustomConfigParser()
         config.readfp(default_conf)
         default_conf.seek(0)  # rewind config_file to start
@@ -175,7 +175,7 @@ class OLITestLib():
         """Create empty maildir 'folder' in our test maildir
 
         Does not fail if it already exists"""
-        assert cls.testdir != None
+        assert cls.testdir is not None
         maildir = os.path.join(cls.testdir, 'mail', folder)
         for subdir in ('', 'tmp', 'cur', 'new'):
             try:
@@ -189,7 +189,7 @@ class OLITestLib():
         """Delete maildir 'folder' in our test maildir
 
         Does not fail if not existing"""
-        assert cls.testdir != None
+        assert cls.testdir is not None
         maildir = os.path.join(cls.testdir, 'mail', folder)
         shutil.rmtree(maildir, ignore_errors=True)
 
@@ -199,7 +199,7 @@ class OLITestLib():
 
         Use default mailfilename if not given.
         Use some default content if not given"""
-        assert cls.testdir != None
+        assert cls.testdir is not None
         while True:  # Loop till we found a unique filename
             mailfile = '{0}:2,'.format(random.randint(0, 999999999))
             mailfilepath = os.path.join(cls.testdir, 'mail',
@@ -219,7 +219,7 @@ Content here.''')
         """Returns the number of mails in maildir 'folder'
 
         Counting only those in cur&new (ignoring tmp)."""
-        assert cls.testdir != None
+        assert cls.testdir is not None
         maildir = os.path.join(cls.testdir, 'mail', folder)
 
         boxes, mails = 0, 0
@@ -238,7 +238,7 @@ Content here.''')
     @classmethod
     def get_maildir_uids(cls, folder):
         """Returns a list of maildir mail uids, 'None' if no valid uid"""
-        assert cls.testdir != None
+        assert cls.testdir is not None
         mailfilepath = os.path.join(cls.testdir, 'mail', folder)
         assert os.path.isdir(mailfilepath)
         ret = []
