@@ -208,7 +208,7 @@ class UIBase:
 
     def debug(self, debugtype, msg):
         cur_thread = threading.currentThread()
-        if not cur_thread in self.debugmessages:
+        if cur_thread not in self.debugmessages:
             # deque(..., self.debugmsglen) would be handy but was
             # introduced in p2.6 only, so we'll need to work around and
             # shorten our debugmsg list manually :-(
@@ -225,7 +225,7 @@ class UIBase:
     def add_debug(self, debugtype):
         global debugtypes
         if debugtype in debugtypes:
-            if not debugtype in self.debuglist:
+            if debugtype not in self.debuglist:
                 self.debuglist.append(debugtype)
                 self.debugging(debugtype)
         else:
