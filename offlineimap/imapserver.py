@@ -750,6 +750,7 @@ class IMAPServer():
     def releaseconnection(self, connection, drop_conn=False):
         """Releases a connection, returning it to the pool.
 
+        :param connection: Connection object
         :param drop_conn: If True, the connection will be released and
            not be reused. This can be used to indicate broken connections."""
 
