@@ -37,7 +37,7 @@ def semaphorereset(semaphore, originalstate):
         semaphore.release()
 
 
-class accountThreads():
+class accountThreads:
     """Store the list of all threads in the software so it can be used to find out
     what's running and what's not."""
 
