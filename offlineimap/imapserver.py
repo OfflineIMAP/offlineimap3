@@ -474,7 +474,7 @@ class IMAPServer():
 
         errstr = "CA Cert verifying failed: "
         if not cert:
-            return ('%s no certificate received' % errstr)
+            return '%s no certificate received' % errstr
         dnsname = hostname.lower()
         certnames = []
 
@@ -490,7 +490,7 @@ class IMAPServer():
             if key == 'commonName':
                 certnames.append(value.lower())
         if len(certnames) == 0:
-            return ('%s no commonName found in certificate' % errstr)
+            return '%s no commonName found in certificate' % errstr
 
         # Then read subjectAltName
         for key, value in cert.get('subjectAltName', []):
@@ -503,7 +503,7 @@ class IMAPServer():
                     '.' in dnsname and certname == '*.' + dnsname.split('.', 1)[1]):
                 return None
 
-        return ('%s no matching domain name found in certificate' % errstr)
+        return '%s no matching domain name found in certificate' % errstr
 
     def acquireconnection(self):
         """Fetches a connection from the pool, making sure to create a new one
@@ -770,7 +770,7 @@ class IMAPServer():
         self.semaphore.release()
 
 
-class IdleThread():
+class IdleThread:
     def __init__(self, parent, folder=None):
         """If invoked without 'folder', perform a NOOP and wait for
         self.stop() to be called. If invoked with folder, switch to IDLE
