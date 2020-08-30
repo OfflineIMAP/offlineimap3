@@ -199,9 +199,9 @@ class MaildirFolder(BaseFolder):
                     nouidcounter -= 1
                 else:
                     uid = int(uidmatch.group(1))
-            if min_uid != None and uid > 0 and uid < min_uid:
+            if min_uid is not None and uid > 0 and uid < min_uid:
                 continue
-            if min_date != None and not self._iswithintime(filename, min_date):
+            if min_date is not None and not self._iswithintime(filename, min_date):
                 # Keep track of messages outside of the time limit, because they
                 # still might have UID > min(UIDs of within-min_date). We hit
                 # this case for maxage if any message had a known/valid datetime
@@ -218,7 +218,7 @@ class MaildirFolder(BaseFolder):
                 retval[uid] = self.msglist_item_initializer(uid)
                 retval[uid]['flags'] = flags
                 retval[uid]['filename'] = filepath
-        if min_date != None:
+        if min_date is not None:
             # Re-include messages with high enough uid's.
             positive_uids = [uid for uid in retval if uid > 0]
             if positive_uids:

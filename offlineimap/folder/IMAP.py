@@ -140,7 +140,7 @@ class IMAPFolder(BaseFolder):
             # SELECT (if not already done) and get current UIDVALIDITY.
             self.__selectro(imapobj)
             typ, uidval = imapobj.response('UIDVALIDITY')
-            assert uidval != [None] and uidval != None, \
+            assert uidval != [None] and uidval is not None, \
                 "response('UIDVALIDITY') returned [None]!"
             self._uidvalidity = int(uidval[-1])
             return self._uidvalidity
@@ -237,16 +237,16 @@ class IMAPFolder(BaseFolder):
 
         conditions = []
         # 1. min_uid condition.
-        if min_uid != None:
+        if min_uid is not None:
             conditions.append("UID %d:*" % min_uid)
         # 2. date condition.
-        elif min_date != None:
+        elif min_date is not None:
             # Find out what the oldest message is that we should look at.
             conditions.append("SINCE %02d-%s-%d" % (
                 min_date[2], MonthNames[min_date[1]], min_date[0]))
         # 3. maxsize condition.
         maxsize = self.getmaxsize()
-        if maxsize != None:
+        if maxsize is not None:
             conditions.append("SMALLER %d" % maxsize)
 
         if len(conditions) >= 1:
@@ -535,7 +535,7 @@ class IMAPFolder(BaseFolder):
 
         if rtime is None:
             rtime = emailutil.get_message_date(content)
-            if rtime == None:
+            if rtime is None:
                 return None
         datetuple = time.localtime(rtime)
 

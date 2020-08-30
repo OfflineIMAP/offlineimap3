@@ -148,7 +148,7 @@ class GmailFolder(IMAPFolder):
         for messagestr in response:
             # looks like: '1 (FLAGS (\\Seen Old) X-GM-LABELS (\\Inbox \\Favorites) UID 4807)' or None if no msg
             # Discard initial message number.
-            if messagestr == None:
+            if messagestr is None:
                 continue
             messagestr = messagestr.split(' ', 1)[1]
             # e.g.: {'X-GM-LABELS': '("Webserver (RW.net)" "\\Inbox" GInbox)', 'FLAGS': '(\\Seen)', 'UID': '275440'}

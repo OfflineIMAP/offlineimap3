@@ -223,7 +223,7 @@ class BaseFolder():
         :returns: Boolean indicating the match. Returns True in case it
             implicitely saved the UIDVALIDITY."""
 
-        if self.get_saveduidvalidity() != None:
+        if self.get_saveduidvalidity() is not None:
             return self.get_saveduidvalidity() == self.get_uidvalidity()
         else:
             self.save_uidvalidity()
@@ -939,7 +939,7 @@ class BaseFolder():
 
         # Execute new mail hook if we have new mail.
         if self.have_newmail:
-            if self.newmail_hook != None:
+            if self.newmail_hook is not None:
                 self.newmail_hook()
 
     def __syncmessagesto_delete(self, dstfolder, statusfolder):
