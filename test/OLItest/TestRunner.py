@@ -26,7 +26,7 @@ from . import default_conf
 random.seed()
 
 
-class OLITestLib():
+class OLITestLib:
     cred_file = None
     testdir = None
     """Absolute path of the current temporary test directory"""
@@ -114,8 +114,8 @@ class OLITestLib():
                  "-c%s" % os.path.join(cls.testdir, 'offlineimap.conf')],
                 shell=False)
         except subprocess.CalledProcessError as e:
-            return (e.returncode, e.output.decode('utf-8'))
-        return (0, output.decode('utf-8'))
+            return e.returncode, e.output.decode('utf-8')
+        return 0, output.decode('utf-8')
 
     @classmethod
     def delete_remote_testfolders(cls, reponame=None):
@@ -126,7 +126,7 @@ class OLITestLib():
         if reponame:
             sections = ['Repository {0}'.format(reponame)]
         else:
-            sections = [r for r in config.sections() \
+            sections = [r for r in config.sections()
                         if r.startswith('Repository')]
             sections = [s for s in sections if config.get(s, 'Type').lower() == 'imap']
         for sec in sections:
