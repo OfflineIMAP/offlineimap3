@@ -65,7 +65,7 @@ class Repository:
         config = account.getconfig()
         try:
             repostype = config.get('Repository ' + name, 'type').strip()
-        except NoSectionError as e:
+        except NoSectionError:
             errstr = ("Could not find section '%s' in configuration. Required "
                       "for account '%s'." % ('Repository %s' % name, account))
             six.reraise(OfflineImapError,
