@@ -608,7 +608,9 @@ class Blinkenlights(UIBase, CursesUtil):
         self.logwin.idlok(True)  # needed for scrollok below
         self.logwin.scrollok(True)  # scroll window when too many lines added
         self.draw_logwin()
-        self.accounts = reversed(sorted(self.accframes.keys()))
+
+        # TODO: Sort the accounts using their name
+        self.accounts = self.accframes.keys()
         pos = self.height - 1
         index = 0
         self.hotkeys = []
