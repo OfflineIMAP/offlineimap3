@@ -466,7 +466,7 @@ class MaildirFolder(BaseFolder):
                         an efficient rename.
         """
 
-        if not uid in self.messagelist:
+        if uid not in self.messagelist:
             raise OfflineImapError("Cannot change unknown Maildir UID %s" % uid,
                                    OfflineImapError.ERROR.MESSAGE)
         if uid == new_uid: return
