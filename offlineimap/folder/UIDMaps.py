@@ -78,7 +78,7 @@ class MappedIMAPFolder(IMAPFolder):
                              " again and some emails might become duplicated.")
                 unlink(mapfilenametmp)
             if not os.path.exists(mapfilename):
-                return ({}, {})
+                return {}, {}
             file = open(mapfilename, 'rt')
             r2l = {}
             l2r = {}
@@ -99,7 +99,7 @@ class MappedIMAPFolder(IMAPFolder):
                 rem = int(str2)
                 r2l[rem] = loc
                 l2r[loc] = rem
-            return (r2l, l2r)
+            return r2l, l2r
 
     def _savemaps(self):
         if self.dryrun is True:
