@@ -361,9 +361,6 @@ class IMAPServer():
         except imapobj.error as e:
             self.gssapi = False
             raise
-        else:
-            self.gssapi = True
-            self.gss_vc = None
         finally:
             self.connectionlock.release()
 
