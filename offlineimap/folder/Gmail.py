@@ -183,6 +183,9 @@ class GmailFolder(IMAPFolder):
         check against dryrun settings, so you need to ensure that
         savemessage is never called in a dryrun mode.
 
+        :param uid: Message UID
+        :param content: Message content
+        :param flags: Message flags
         :param rtime: A timestamp to be used as the mail date
         :returns: the UID of the new message as assigned by the server. If the
                   message is saved, but it's UID can not be found, it will
