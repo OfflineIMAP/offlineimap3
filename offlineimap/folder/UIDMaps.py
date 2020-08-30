@@ -317,7 +317,9 @@ class MappedIMAPFolder(IMAPFolder):
         if ruid not in self.r2l:
             raise OfflineImapError("Cannot change unknown Maildir UID %s" %
                                    ruid, OfflineImapError.ERROR.MESSAGE)
-        if ruid == new_ruid: return  # sanity check shortcut
+        if ruid == new_ruid:
+            return  # sanity check shortcut
+
         with self.maplock:
             luid = self.r2l[ruid]
             self.l2r[luid] = new_ruid
@@ -325,9 +327,12 @@ class MappedIMAPFolder(IMAPFolder):
             self.r2l[new_ruid] = luid
             # TODO: diskl2r|r2l are a pain to sync and should be done away with
             # diskl2r only contains positive UIDs, so wrap in ifs.
-            if luid > 0: self.diskl2r[luid] = new_ruid
-            if ruid > 0: del self.diskr2l[ruid]
-            if new_ruid > 0: self.diskr2l[new_ruid] = luid
+            if luid > 0:
+                self.diskl2r[luid] = new_ruid
+            if ruid > 0:
+                del self.diskr2l[ruid]
+            if new_ruid > 0:
+                self.diskr2l[new_ruid] = luid
             self._savemaps()
 
     def _mapped_delete(self, uidlist):
