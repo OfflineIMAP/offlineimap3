@@ -391,6 +391,10 @@ class IMAPFolder(BaseFolder):
         try:
             matchinguids = imapobj.uid('search', 'HEADER',
                                        headername, headervalue)[1][0]
+
+            # Returned value is type bytes
+            matchinguids = matchinguids.decode('utf-8')
+
         except imapobj.error as err:
             # IMAP server doesn't implement search or had a problem.
             self.ui.debug('imap', "__savemessage_searchforheader: got IMAP "
@@ -456,11 +460,7 @@ class IMAPFolder(BaseFolder):
             # Folder was empty - start from 1.
             start = 1
 
-        # Imaplib quotes all parameters of a string type. That must not happen
-        # with the range X:*. So we use bytearray to stop imaplib from getting
-        # in our way.
-
-        result = imapobj.uid('FETCH', bytearray('%d:*' % start), 'rfc822.header')
+        result = imapobj.uid('FETCH', '%d:*' % start, 'rfc822.header')
         if result[0] != 'OK':
             raise OfflineImapError('Error fetching mail headers: %s' %
                                    '. '.join(result[1]), OfflineImapError.ERROR.MESSAGE)
