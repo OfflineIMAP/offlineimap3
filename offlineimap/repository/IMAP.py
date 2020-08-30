@@ -177,7 +177,6 @@ class IMAPRepository(BaseRepository):
         return mechs
 
     def getuser(self):
-        user = None
         localeval = self.localeval
 
         if self.config.has_option(self.getsection(), 'remoteusereval'):
