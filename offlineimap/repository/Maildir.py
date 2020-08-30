@@ -204,7 +204,7 @@ class MaildirRepository(BaseRepository):
         return retval
 
     def getfolders(self):
-        if self.folders == None:
+        if self.folders is None:
             self.folders = self._getfolders_scandir(self.root)
         return self.folders
 

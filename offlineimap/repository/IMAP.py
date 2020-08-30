@@ -109,9 +109,9 @@ class IMAPRepository(BaseRepository):
 
         This requires that self.imapserver has been initialized with an
         acquireconnection() or it will still be `None`"""
-        assert self.imapserver.delim != None, "'%s' " \
-                                              "repository called getsep() before the folder separator was " \
-                                              "queried from the server" % self
+        assert self.imapserver.delim is not None, "'%s' " \
+                                                  "repository called getsep() before the folder separator was " \
+                                                  "queried from the server" % self
         return self.imapserver.delim
 
     def gethost(self):
@@ -138,7 +138,7 @@ class IMAPRepository(BaseRepository):
                 return self._host
         # 2) Check for plain remotehost setting.
         host = self.getconf('remotehost', None)
-        if host != None:
+        if host is not None:
             self._host = host
             return self._host
 
@@ -152,7 +152,7 @@ class IMAPRepository(BaseRepository):
         we want to authorize as instead of our login name."""
 
         identity = self.getconf('remote_identity', default=None)
-        if identity != None:
+        if identity is not None:
             identity = identity.encode('UTF-8')
         return identity
 
@@ -182,14 +182,14 @@ class IMAPRepository(BaseRepository):
 
         if self.config.has_option(self.getsection(), 'remoteusereval'):
             user = self.getconf('remoteusereval')
-            if user != None:
+            if user is not None:
                 return localeval.eval(user).encode('UTF-8')
 
         if self.config.has_option(self.getsection(), 'remoteuser'):
             # Assume the configuration file to be UTF-8 encoded so we must not
             # encode this string again.
             user = self.getconf('remoteuser')
-            if user != None:
+            if user is not None:
                 return user
 
         try:
@@ -215,7 +215,7 @@ class IMAPRepository(BaseRepository):
 
         if self.config.has_option(self.getsection(), 'remoteporteval'):
             port = self.getconf('remoteporteval')
-        if port != None:
+        if port is not None:
             return self.localeval.eval(port)
 
         return self.getconfint('remoteport', None)
@@ -257,7 +257,7 @@ class IMAPRepository(BaseRepository):
         # Can't use above cacertfile because of abspath.
         if self.getconf('sslcacertfile', None) == "OS-DEFAULT":
             cacertfile = get_os_sslcertfile()
-            if cacertfile == None:
+            if cacertfile is None:
                 searchpath = get_os_sslcertfile_searchpath()
                 if searchpath:
                     reason = "Default CA bundle was requested, " \
@@ -465,8 +465,7 @@ class IMAPRepository(BaseRepository):
             self.imapserver.releaseconnection(imapobj)
 
         for s in listresult:
-            if s == None or \
-                    (isinstance(s, str) and s == ''):
+            if s is None or (isinstance(s, str) and s == ''):
                 # Bug in imaplib: empty strings in results from
                 # literals. TODO: still relevant?
                 continue
