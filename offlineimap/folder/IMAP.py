@@ -24,7 +24,7 @@ import six
 
 from offlineimap import imaputil, imaplibutil, emailutil, OfflineImapError
 from offlineimap import globals
-from offlineimap.virtual_imaplib2 import MonthNames
+from imaplib2 import MonthNames
 from .Base import BaseFolder
 
 # Globals

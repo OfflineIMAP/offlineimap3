@@ -26,7 +26,7 @@ import collections
 from optparse import OptionParser
 
 import offlineimap
-import offlineimap.virtual_imaplib2 as imaplib
+import imaplib2 as imaplib
 
 # Ensure that `ui` gets loaded before `threadutil` in order to
 # break the circular dependency between `threadutil` and `Curses`.
@@ -72,7 +72,7 @@ class OfflineImap:
     """
 
     def get_env_info(self):
-        info = "imaplib2 v%s (%s), Python v%s" % (imaplib.__version__, imaplib.DESC, PYTHON_VERSION)
+        info = "imaplib2 v%s, Python v%s" % (imaplib.__version__, PYTHON_VERSION)
         try:
             import ssl
             info = "%s, %s" % (info, ssl.OPENSSL_VERSION)
@@ -512,7 +512,7 @@ class OfflineImap:
                     profiledir, "%s_%s.prof" % (dt, account.getname())))
 
     def __serverdiagnostics(self, options):
-        self.ui.info("  imaplib2: %s (%s)" % (imaplib.__version__, imaplib.DESC))
+        self.ui.info("  imaplib2: %s" % imaplib.__version__)
         for accountname in self._get_activeaccounts(options):
             account = accounts.Account(self.config, accountname)
             account.serverdiagnostics()

@@ -29,7 +29,7 @@ import rfc6555
 
 from offlineimap import OfflineImapError
 from offlineimap.ui import getglobalui
-from offlineimap.virtual_imaplib2 import IMAP4, IMAP4_SSL, InternalDate
+from imaplib2 import IMAP4, IMAP4_SSL, InternalDate
 
 
 class UsefulIMAPMixIn:
