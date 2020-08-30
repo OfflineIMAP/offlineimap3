@@ -270,7 +270,8 @@ class InputHandler(ExitNotifyThread):
         while self.enabled.is_set():
             with self.inputlock:
                 char = self.ui.stdscr.getch()
-            if char != -1: yield char
+            if char != -1:
+                yield char
 
     def run(self):
         while True:
@@ -327,7 +328,9 @@ class CursesLogHandler(logging.StreamHandler):
         self.ui.lock()
         try:
             y, x = self.ui.logwin.getyx()
-            if y or x: self.ui.logwin.addch(10)  # no \n before 1st item
+            if y or x:
+                self.ui.logwin.addch(10)  # no \n before 1st item
+
             self.ui.logwin.addstr(log_str, color)
             self.ui.logwin.noutrefresh()
             self.ui.stdscr.refresh()
@@ -653,7 +656,9 @@ class Blinkenlights(UIBase, CursesUtil):
 
         with self.aflock:
             # 1) Return existing or 2) create a new CursesAccountFrame.
-            if acc_name in self.accframes: return self.accframes[acc_name]
+            if acc_name in self.accframes:
+                return self.accframes[acc_name]
+
             self.accframes[acc_name] = CursesAccountFrame(self, acc_name)
             # update the window layout
             self.setupwindows(resize=True)
