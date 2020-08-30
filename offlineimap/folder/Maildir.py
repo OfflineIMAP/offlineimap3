@@ -50,7 +50,7 @@ def _gettimeseq(date=None):
             timehash[date] += 1
         else:
             timehash[date] = 0
-        return (date, timehash[date])
+        return date, timehash[date]
     finally:
         timelock.release()
 
@@ -106,7 +106,7 @@ class MaildirFolder(BaseFolder):
             return True
         timestampstr = timestampmatch.group()
         timestamplong = int(timestampstr)
-        if (timestamplong < time.mktime(date)):
+        if timestamplong < time.mktime(date):
             return False
         else:
             return True
@@ -441,7 +441,7 @@ class MaildirFolder(BaseFolder):
             filename += infostr
 
         newfilename = os.path.join(dir_prefix, filename)
-        if (newfilename != oldfilename):
+        if newfilename != oldfilename:
             try:
                 os.rename(os.path.join(self.getfullname(), oldfilename),
                           os.path.join(self.getfullname(), newfilename))
