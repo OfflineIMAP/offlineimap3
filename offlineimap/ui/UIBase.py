@@ -200,7 +200,7 @@ class UIBase():
 
         If no account has been registered with this thread, return 'None'."""
 
-        if thr == None:
+        if thr is None:
             thr = threading.currentThread()
         if thr in self.threadaccounts:
             return self.threadaccounts[thr]
