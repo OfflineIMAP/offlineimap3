@@ -373,7 +373,7 @@ class IMAPFolder(BaseFolder):
 
         # Compute unsigned crc32 of 'content' as unique hash.
         # NB: crc32 returns unsigned only starting with python 3.0.
-        headervalue = str(binascii.crc32(content) & 0xffffffff) + '-'
+        headervalue = str(binascii.crc32(str.encode(content)) & 0xffffffff) + '-'
         headervalue += str(self.randomgenerator.randint(0, 9999999999))
         return headername, headervalue
 
