@@ -6,7 +6,7 @@
 import copy
 
 
-class ConstProxy():
+class ConstProxy:
     """Implements read-only access to a given object
     that can be attached to each instance only once."""
 
@@ -20,15 +20,15 @@ class ConstProxy():
         return copy.deepcopy(getattr(src, name))
 
     def __setattr__(self, name, value):
-        raise AttributeError("tried to set '%s' to '%s' for constant object" % \
+        raise AttributeError("tried to set '%s' to '%s' for constant object" %
                              (name, value))
 
     def __delattr__(self, name):
-        raise RuntimeError("tried to delete field '%s' from constant object" % \
-                           (name))
+        raise RuntimeError("tried to delete field '%s' from constant object" %
+                           name)
 
     def set_source(self, source):
         """ Sets source object for this instance. """
-        if (self.__dict__['__source'] is not None):
+        if self.__dict__['__source'] is not None:
             raise ValueError("source object is already set")
         self.__dict__['__source'] = source
