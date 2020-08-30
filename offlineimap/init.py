@@ -197,7 +197,7 @@ class OfflineImap:
         if not options.configfile:
             # Try XDG location, then fall back to ~/.offlineimaprc
             xdg_var = 'XDG_CONFIG_HOME'
-            if not xdg_var in os.environ or not os.environ[xdg_var]:
+            if xdg_var not in os.environ or not os.environ[xdg_var]:
                 xdg_home = os.path.expanduser('~/.config')
             else:
                 xdg_home = os.environ[xdg_var]
