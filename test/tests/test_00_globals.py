@@ -40,7 +40,7 @@ class TestOfflineimapGlobals(unittest.TestCase):
 
     def test_nonexistent_key(self):
         with self.assertRaises(AttributeError):
-            a = globals.options.nosuchoption
+            pass
 
     def test_double_init(self):
         with self.assertRaises(ValueError):
