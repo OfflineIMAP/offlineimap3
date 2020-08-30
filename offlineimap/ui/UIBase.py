@@ -436,11 +436,11 @@ class UIBase:
         else:
             self.logger.info("Collecting data from messages on %s" % source)
 
-    def serverdiagnostics(self, repository, type):
+    def serverdiagnostics(self, repository, rtype):
         """Connect to repository and output useful information for debugging."""
 
         conn = None
-        self._msg("%s repository '%s': type '%s'" % (type, repository.name,
+        self._msg("%s repository '%s': type '%s'" % (rtype, repository.name,
                                                      self.getnicename(repository)))
         try:
             if hasattr(repository, 'gethost'):  # IMAP
@@ -461,7 +461,7 @@ class UIBase:
                     self._msg("Server welcome string: %s" % str(conn.welcome))
                     self._msg("Server capabilities: %s\n" % str(conn.capabilities))
                     repository.imapserver.releaseconnection(conn)
-            if type != 'Status':
+            if rtype != 'Status':
                 folderfilter = repository.getconf('folderfilter', None)
                 if folderfilter:
                     self._msg("folderfilter= %s\n" % folderfilter)
