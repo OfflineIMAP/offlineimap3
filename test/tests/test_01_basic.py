@@ -56,9 +56,10 @@ class TestBasicFunctions(unittest.TestCase):
         code, res = OLITestLib.run_OLI()
         self.assertEqual(res, "")
         boxes, mails = OLITestLib.count_maildir_mails('')
-        self.assertTrue((boxes, mails) == (0, 0), msg="Expected 0 folders and 0 "
-                                                      "mails, but sync led to {0} folders and {1} mails".format(
-            boxes, mails))
+        self.assertTrue((boxes, mails) == (0, 0),
+                        msg="Expected 0 folders and 0 "
+                            "mails, but sync led to {0} folders and {1} mails"
+                        .format(boxes, mails))
 
     def test_02_createdir(self):
         """Create local 'OLItest 1', sync"""
@@ -67,9 +68,10 @@ class TestBasicFunctions(unittest.TestCase):
         code, res = OLITestLib.run_OLI()
         self.assertEqual(res, "")
         boxes, mails = OLITestLib.count_maildir_mails('')
-        self.assertTrue((boxes, mails) == (1, 0), msg="Expected 1 folders and 0 "
-                                                      "mails, but sync led to {0} folders and {1} mails".format(
-            boxes, mails))
+        self.assertTrue((boxes, mails) == (1, 0),
+                        msg="Expected 1 folders and 0 "
+                            "mails, but sync led to {0} folders and {1} mails"
+                        .format(boxes, mails))
 
     def test_03_createdir_quote(self):
         """Create local 'OLItest "1"' maildir, sync
@@ -83,9 +85,10 @@ class TestBasicFunctions(unittest.TestCase):
             raise unittest.SkipTest("remote server doesn't handle quote")
         self.assertEqual(res, "")
         boxes, mails = OLITestLib.count_maildir_mails('')
-        self.assertTrue((boxes, mails) == (1, 0), msg="Expected 1 folders and 0 "
-                                                      "mails, but sync led to {0} folders and {1} mails".format(
-            boxes, mails))
+        self.assertTrue((boxes, mails) == (1, 0),
+                        msg="Expected 1 folders and 0 "
+                            "mails, but sync led to {0} folders and {1} mails"
+                        .format(boxes, mails))
 
     def test_04_nametransmismatch(self):
         """Create mismatching remote and local nametrans rules
@@ -101,9 +104,10 @@ class TestBasicFunctions(unittest.TestCase):
         # logging.warn("%s %s "% (code, res))
         # We expect an INFINITE FOLDER CREATION WARNING HERE....
         mismatch = "ERROR: INFINITE FOLDER CREATION DETECTED!" in res
-        self.assertEqual(mismatch, True, msg="Mismatching nametrans rules did "
-                                             "NOT trigger an 'infinite folder generation' error. Output was:\n"
-                                             "{0}".format(res))
+        self.assertEqual(mismatch, True,
+                         msg="Mismatching nametrans rules did "
+                             "NOT trigger an 'infinite folder generation' error. Output was:\n"
+                             "{0}".format(res))
         # Write out default config file again
         OLITestLib.write_config_file()
 
@@ -121,13 +125,15 @@ class TestBasicFunctions(unittest.TestCase):
         # logging.warn("%s %s "% (code, res))
         self.assertEqual(res, "")
         boxes, mails = OLITestLib.count_maildir_mails('')
-        self.assertTrue((boxes, mails) == (1, 1), msg="Expected 1 folders and 1 "
-                                                      "mails, but sync led to {0} folders and {1} mails".format(
-            boxes, mails))
+        self.assertTrue((boxes, mails) == (1, 1),
+                        msg="Expected 1 folders and 1 "
+                            "mails, but sync led to {0} folders and {1} mails"
+                        .format(boxes, mails))
         # The local Mail should have been assigned a proper UID now, check!
         uids = OLITestLib.get_maildir_uids('INBOX.OLItest')
-        self.assertFalse(None in uids, msg="All mails should have been " + \
-                                           "assigned the IMAP's UID number, but {0} messages had no valid ID " \
+        self.assertFalse(None in uids,
+                         msg="All mails should have been "
+                             "assigned the IMAP's UID number, but {0} messages had no valid ID "
                          .format(len([None for x in uids if x is None])))
 
     def test_06_createfolders(self):
@@ -154,6 +160,7 @@ class TestBasicFunctions(unittest.TestCase):
         code, res = OLITestLib.run_OLI()
         self.assertEqual(res, "")
         boxes, mails = OLITestLib.count_maildir_mails('')
-        self.assertTrue((boxes, mails) == (0, 0), msg="Expected 0 folders and 0 "
-                                                      "mails, but sync led to {} folders and {} mails".format(
-            boxes, mails))
+        self.assertTrue((boxes, mails) == (0, 0),
+                        msg="Expected 0 folders and 0 "
+                            "mails, but sync led to {} folders and {} mails"
+                        .format(boxes, mails))
