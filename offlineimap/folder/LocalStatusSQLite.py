@@ -421,7 +421,7 @@ class LocalStatusSQLiteFolder(BaseFolder):
 
     # Interface from BaseFolder
     def deletemessage(self, uid):
-        if not uid in self.messagelist:
+        if uid not in self.messagelist:
             return
         self.__sql_write('DELETE FROM status WHERE id=?', (uid,))
         del (self.messagelist[uid])
