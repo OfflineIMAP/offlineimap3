@@ -144,7 +144,7 @@ class CursesAccountFrame:
             except curses.error as e:  # Occurs when the terminal is very small
                 pass
 
-        self.ui.exec_locked(addstr);
+        self.ui.exec_locked(addstr)
 
         self.location = len(accstr)
 
@@ -352,7 +352,7 @@ class Blinkenlights(UIBase, CursesUtil):
         super(Blinkenlights, self).__init__(*args, **kwargs)
         CursesUtil.__init__(self)
 
-    ################################################## UTILS
+    # UTILS
     def setup_consolehandler(self):
         """Backend specific console handler.
 
@@ -572,7 +572,7 @@ class Blinkenlights(UIBase, CursesUtil):
         try:
             # s.gettf().setcolor('white')
             self.warn(" *** Input Required")
-            self.warn(" *** Please enter password for user '%s': " % \
+            self.warn(" *** Please enter password for user '%s': " %
                       username)
             self.logwin.refresh()
             password = self.logwin.getstr()
@@ -659,8 +659,8 @@ class Blinkenlights(UIBase, CursesUtil):
         return self.accframes[acc_name]
 
     def terminate(self, *args, **kwargs):
-        curses.nocbreak();
-        self.stdscr.keypad(0);
+        curses.nocbreak()
+        self.stdscr.keypad(0)
         curses.echo()
         curses.endwin()
         # need to remove the Curses console handler now and replace with
