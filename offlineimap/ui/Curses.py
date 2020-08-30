@@ -211,6 +211,7 @@ class CursesThreadFrame:
     def setcolor(self, color, modifier=0):
         """Draw the thread symbol '@' in the specified color
 
+        :param color: Curses colorname
         :param modifier: Curses modified, such as curses.A_BOLD
         """
 
