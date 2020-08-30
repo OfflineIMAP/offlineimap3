@@ -220,17 +220,17 @@ class OfflineImap:
         if options.profiledir:
             if not options.singlethreading:
                 # TODO, make use of chosen ui for logging
-                logging.warn("Profile mode: Forcing to singlethreaded.")
+                logging.warning("Profile mode: Forcing to singlethreaded.")
                 options.singlethreading = True
             if os.path.exists(options.profiledir):
                 # TODO, make use of chosen ui for logging
-                logging.warn("Profile mode: Directory '%s' already exists!" %
-                             options.profiledir)
+                logging.warning("Profile mode: Directory '%s' already exists!" %
+                                options.profiledir)
             else:
                 os.mkdir(options.profiledir)
             # TODO, make use of chosen ui for logging
-            logging.warn("Profile mode: Potentially large data will be "
-                         "created in '%s'" % options.profiledir)
+            logging.warning("Profile mode: Potentially large data will be "
+                            "created in '%s'" % options.profiledir)
 
         # Override a config value.
         if options.configoverride:
