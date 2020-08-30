@@ -152,11 +152,11 @@ class MappedIMAPFolder(IMAPFolder):
                                     )
                     try:
                         del self.diskr2l[ruid]
-                    except KeyError as e:
+                    except KeyError:
                         self.ui.warn(errorMessage.format(ruid))
                     try:
                         del self.diskl2r[luid]
-                    except KeyError as e:
+                    except KeyError:
                         self.ui.warn(errorMessage.format(ruid))
 
             # Now, assign negative UIDs to local items.
