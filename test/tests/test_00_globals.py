@@ -15,9 +15,9 @@ class Opt:
 class TestOfflineimapGlobals(unittest.TestCase):
 
     @classmethod
-    def setUpClass(klass):
-        klass.o = Opt()
-        globals.set_options(klass.o)
+    def setUpClass(cls):
+        cls.o = Opt()
+        globals.set_options(cls.o)
 
     def test_initial_state(self):
         for k in self.o.__dict__.keys():
