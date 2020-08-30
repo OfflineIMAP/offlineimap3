@@ -62,7 +62,7 @@ def syncitall(list_accounts, config):
     threads.wait()  # Blocks until all accounts are processed.
 
 
-class OfflineImap():
+class OfflineImap:
     """The main class that encapsulates the high level use of OfflineImap.
 
     To invoke OfflineImap you would call it with::
@@ -287,7 +287,7 @@ class OfflineImap():
             if options.debugtype.lower() == 'all':
                 options.debugtype = 'imap,maildir,thread'
             # Force single threading?
-            if not ('thread' in options.debugtype.split(',') \
+            if not ('thread' in options.debugtype.split(',')
                     and not options.singlethreading):
                 self.ui._msg("Debug mode: Forcing to singlethreaded.")
                 options.singlethreading = True
@@ -349,7 +349,7 @@ class OfflineImap():
                             'maxconnections', 2)
                     )
         self.config = config
-        return (options, args)
+        return options, args
 
     def __dumpstacks(self, context=1, sighandler_deep=2):
         """ Signal handler: dump a stack trace for each existing thread."""
@@ -428,8 +428,8 @@ class OfflineImap():
                 accounts.Account.set_abort_event(self.config, 2)
             elif sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
                 # tell each account to ABORT ASAP (ctrl-c)
-                getglobalui().warn("Preparing to shutdown after sync (this may " \
-                                   "take some time), press CTRL-C three " \
+                getglobalui().warn("Preparing to shutdown after sync (this may "
+                                   "take some time), press CTRL-C three "
                                    "times to shutdown immediately")
                 accounts.Account.set_abort_event(self.config, 3)
                 if 'thread' in self.ui.debuglist:
@@ -477,7 +477,7 @@ class OfflineImap():
             mbnames.write()
             self.ui.terminate()
             return 0
-        except (SystemExit):
+        except SystemExit:
             raise
         except Exception as e:
             self.ui.error(e)
