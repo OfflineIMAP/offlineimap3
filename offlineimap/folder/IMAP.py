@@ -375,7 +375,7 @@ class IMAPFolder(BaseFolder):
         # NB: crc32 returns unsigned only starting with python 3.0.
         headervalue = str(binascii.crc32(content) & 0xffffffff) + '-'
         headervalue += str(self.randomgenerator.randint(0, 9999999999))
-        return (headername, headervalue)
+        return headername, headervalue
 
     def __savemessage_searchforheader(self, imapobj, headername, headervalue):
         self.ui.debug('imap', '__savemessage_searchforheader called for %s: %s' %
@@ -434,7 +434,7 @@ class IMAPFolder(BaseFolder):
 
         Returns UID when found, 0 when not found."""
 
-        self.ui.debug('imap', '__savemessage_fetchheaders called for %s: %s' % \
+        self.ui.debug('imap', '__savemessage_fetchheaders called for %s: %s' %
                       (headername, headervalue))
 
         # Run "fetch X:* rfc822.header".
@@ -572,7 +572,7 @@ class IMAPFolder(BaseFolder):
         offset_h, offset_m = divmod(zone // 60, 60)
 
         internaldate = '"%02d-%s-%04d %02d:%02d:%02d %+03d%02d"' % \
-                       (datetuple.tm_mday, num2mon[datetuple.tm_mon], datetuple.tm_year, \
+                       (datetuple.tm_mday, num2mon[datetuple.tm_mon], datetuple.tm_year,
                         datetuple.tm_hour, datetuple.tm_min, datetuple.tm_sec, offset_h, offset_m)
 
         return internaldate
