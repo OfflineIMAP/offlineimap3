@@ -150,7 +150,7 @@ def Int2AP(num):
     return val
 
 
-class Request(object):
+class Request():
     """Private class to represent a request awaiting response."""
 
     def __init__(self, parent, name=None, callback=None, cb_arg=None, cb_self=False):
@@ -197,7 +197,7 @@ class Request(object):
         if __debug__: self.parent._log(3, '%s:%s.ready.set' % (self.name, self.tag))
 
 
-class IMAP4(object):
+class IMAP4():
     """Threaded IMAP4 client class.
 
     Instantiate with:
@@ -2123,7 +2123,7 @@ class IMAP4_stream(IMAP4):
         self._P.wait()
 
 
-class _Authenticator(object):
+class _Authenticator():
     """Private class to provide en/de-coding
     for base64 authentication conversation."""
 
@@ -2166,7 +2166,7 @@ class _Authenticator(object):
         return binascii.a2b_base64(inp)
 
 
-class _IdleCont(object):
+class _IdleCont():
     """When process is called, server is in IDLE state
     and will send asynchronous changes."""
 
