@@ -282,6 +282,7 @@ class MaildirFolder(BaseFolder):
 
         :param uid: The UID`None`, or a set of maildir flags
         :param flags: A set of maildir flags
+        :param flags: (optional) Date
         :returns: String containing unique message filename"""
 
         timeval, timeseq = _gettimeseq(date)
@@ -461,6 +462,7 @@ class MaildirFolder(BaseFolder):
         """Change the message from existing uid to new_uid
 
         This will not update the statusfolder UID, you need to do that yourself.
+        :param uid: Message UID
         :param new_uid: (optional) If given, the old UID will be changed
                         to a new UID. The Maildir backend can implement this as
                         an efficient rename.
@@ -511,7 +513,6 @@ class MaildirFolder(BaseFolder):
         """Migrate FMD5 hashes from versions prior to 6.3.5
 
         :param dryrun: Run in dry run mode
-        :type fix: Boolean
         :return: None
         """
         oldfmd5 = md5(self.name).hexdigest()
