@@ -20,7 +20,7 @@ import binascii
 import codecs
 from offlineimap.ui import getglobalui
 
-## Globals
+# Globals
 
 # Message headers that use space as the separator (for label storage)
 SPACE_SEPARATED_LABEL_HEADERS = ('X-Label', 'Keywords')
@@ -81,7 +81,7 @@ def __options2hash(list):
     # faster for mosly small lists.
     retval = {}
     counter = 0
-    while (counter < len(list)):
+    while counter < len(list):
         retval[list[counter]] = list[counter + 1]
         counter += 2
     __debug("__options2hash returning:", retval)
@@ -197,7 +197,7 @@ def uid_sequence(uidlist):
 
     def getrange(start, end):
         if start == end:
-            return (str(start))
+            return str(start)
         return "%s:%s" % (start, end)
 
     if not len(uidlist): return ''  # Empty list, return
@@ -234,7 +234,7 @@ def __split_quoted(s):
     """
 
     if len(s) == 0:
-        return ('', '')
+        return '', ''
 
     q = quoted = s[0]
     rest = s[1:]
@@ -254,7 +254,7 @@ def __split_quoted(s):
         quoted += rest[0:next_q + 1]
         rest = rest[next_q + 1:]
         if not is_escaped:
-            return (quoted, rest.lstrip())
+            return quoted, rest.lstrip()
 
 
 def format_labels_string(header, labels):
@@ -385,7 +385,7 @@ def encoder(s):
         else:
             _in.append(c)
     doB64(_in, r)
-    return (str(''.join(r)), len(s))
+    return str(''.join(r)), len(s)
 
 
 # decoding
@@ -414,7 +414,7 @@ def decoder(s):
     if decode:
         r.append(modified_unbase64(''.join(decode[1:])))
     bin_str = ''.join(r)
-    return (bin_str, len(s))
+    return bin_str, len(s)
 
 
 class StreamReader(codecs.StreamReader):
@@ -429,7 +429,7 @@ class StreamWriter(codecs.StreamWriter):
 
 def imap4_utf_7(name):
     if name == 'imap4-utf-7':
-        return (encoder, decoder, StreamReader, StreamWriter)
+        return encoder, decoder, StreamReader, StreamWriter
 
 
 codecs.register(imap4_utf_7)
