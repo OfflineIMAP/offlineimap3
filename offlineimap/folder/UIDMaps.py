@@ -148,7 +148,7 @@ class MappedIMAPFolder(IMAPFolder):
             # OK.  Now we've got a nice list.  First, delete things from the
             # summary that have been deleted from the folder.
             for luid in list(self.diskl2r.keys()):
-                if not luid in reallist:
+                if luid not in reallist:
                     ruid = self.diskl2r[luid]
                     # XXX: the following KeyError are sightly unexpected. This
                     # would require more digging to understand how it's
@@ -175,7 +175,7 @@ class MappedIMAPFolder(IMAPFolder):
             self.l2r = self.diskl2r.copy()
 
             for luid in list(reallist.keys()):
-                if not luid in self.l2r:
+                if luid not in self.l2r:
                     ruid = nextneg
                     nextneg -= 1
                     self.l2r[luid] = ruid
