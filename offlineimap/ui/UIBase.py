@@ -239,12 +239,12 @@ class UIBase:
     def invaliddebug(self, debugtype):
         self.warn("Invalid debug type: %s" % debugtype)
 
-    def getnicename(self, object):
+    def getnicename(self, mobject):
         """Return the type of a repository or Folder as string.
 
         (IMAP, Gmail, Maildir, etc...)"""
 
-        prelimname = object.__class__.__name__.split('.')[-1]
+        prelimname = mobject.__class__.__name__.split('.')[-1]
         # Strip off extra stuff.
         return re.sub('(Folder|Repository)', '', prelimname)
 
