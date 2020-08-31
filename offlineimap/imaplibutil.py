@@ -249,7 +249,7 @@ def Internaldate2epoch(resp):
         return None
 
     # Get the month number
-    datetime_object = datetime.datetime.strptime(mo.group('mon'), "%b")
+    datetime_object = datetime.datetime.strptime(mo.group('mon').decode('utf-8'), "%b")
     mon = datetime_object.month
 
     zonen = mo.group('zonen')
