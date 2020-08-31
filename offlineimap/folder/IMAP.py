@@ -304,7 +304,7 @@ class IMAPFolder(BaseFolder):
                 self.messagelist[uid] = self.msglist_item_initializer(uid)
                 flags = imaputil.flagsimap2maildir(options['FLAGS'])
                 keywords = imaputil.flagsimap2keywords(options['FLAGS'])
-                rtime = imaplibutil.Internaldate2epoch(messagestr)
+                rtime = imaplibutil.Internaldate2epoch(messagestr.encode('utf-8'))
                 self.messagelist[uid] = {'uid': uid, 'flags': flags, 'time': rtime,
                                          'keywords': keywords}
         self.ui.messagelistloaded(self.repository, self, self.getmessagecount())
