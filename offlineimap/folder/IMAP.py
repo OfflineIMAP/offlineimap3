@@ -230,7 +230,14 @@ class IMAPFolder(BaseFolder):
                 res_data.remove(0)
             return res_data
 
-        res_type, imapdata = imapobj.select(self.getfullIMAPname(), True, True)
+        a = self.getfullIMAPname()
+        res_type, imapdata = imapobj.select(a, True, True)
+
+        # imaplib2 returns the type as string, like "OK" but
+        # returns imapdata as list of bytes, like [b'0'] so we need decode it
+        # to use the existing code
+        imapdata = [x.decode('utf-8') for x in imapdata]
+
         if imapdata == [None] or imapdata[0] == '0':
             # Empty folder, no need to populate message list.
             return None
