@@ -350,7 +350,7 @@ class IMAPRepository(BaseRepository):
         return self.getconf('transporttunnel', None)
 
     def getreference(self):
-        return self.getconf('reference', '')
+        return self.getconf('reference', '""')
 
     def getdecodefoldernames(self):
         return self.getconfboolean('decodefoldernames', False)
@@ -454,7 +454,7 @@ class IMAPRepository(BaseRepository):
             listfunction = imapobj.lsub
 
         try:
-            result, listresult = listfunction(directory=self.imapserver.reference)
+            result, listresult = listfunction(directory=self.imapserver.reference, pattern='"*"')
             if result != 'OK':
                 raise OfflineImapError("Could not list the folders for"
                                        " repository %s. Server responded: %s" %
