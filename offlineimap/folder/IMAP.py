@@ -323,10 +323,9 @@ class IMAPFolder(BaseFolder):
         data = self._fetch_from_imap(str(uid), self.retrycount)
 
         # Data looks now e.g.
-        # [('320 (UID 17061 BODY[] {2565}','msgbody....')]
-        # We only asked for one message, and that msg is in data[0]. msbody is
-        # in [0][1].
-        data = data[0][1].replace(CRLF, "\n")
+        # ['320 (17061 BODY[] {2565}','msgbody....']
+        # Is a list of two elements. Message is at [1]
+        data = data[1].replace(CRLF, "\n")
 
         if len(data) > 200:
             dbg_output = "%s...%s" % (str(data)[:150], str(data)[-50:])
