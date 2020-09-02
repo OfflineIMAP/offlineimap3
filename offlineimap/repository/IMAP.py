@@ -549,7 +549,7 @@ class IMAPRepository(BaseRepository):
         if foldername == '':
             return
 
-        if self.getreference():
+        if self.getreference() != '""':
             foldername = self.getreference() + self.getsep() + foldername
         if not foldername:  # Create top level folder as folder separator.
             foldername = self.getsep()
