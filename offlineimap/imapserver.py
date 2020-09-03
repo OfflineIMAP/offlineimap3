@@ -27,16 +27,12 @@ from socket import gaierror
 from sys import exc_info
 from ssl import SSLError, cert_time_to_seconds
 from threading import Lock, BoundedSemaphore, Thread, Event, currentThread
-
-import six
-
 import offlineimap.accounts
 from offlineimap import imaplibutil, imaputil, threadutil, OfflineImapError
 from offlineimap.ui import getglobalui
 
 try:
     import gssapi
-
     have_gss = True
 except ImportError:
     have_gss = False
@@ -253,7 +249,8 @@ class IMAPServer():
                     msg = "%s (configuration is: %s)" % (e, str(params))
                 except Exception as eparams:
                     msg = "%s [cannot display configuration: %s]" % (e, eparams)
-                six.reraise(type(e), type(e)(msg), exc_info()[2])
+
+                raise type(e)(msg, exc_info()[2])
             finally:
                 socket.socket = original_socket
 
@@ -633,9 +630,7 @@ class IMAPServer():
                          "'%s'. Make sure you have configured the ser" \
                          "ver name correctly and that you are online." % \
                          (self.hostname, self.repos)
-                six.reraise(OfflineImapError,
-                            OfflineImapError(reason, severity),
-                            exc_info()[2])
+                raise OfflineImapError(reason, severity, exc_info()[2])
 
             elif isinstance(e, SSLError) and e.errno == errno.EPERM:
                 # SSL unknown protocol error
@@ -649,9 +644,7 @@ class IMAPServer():
                     reason = "Unknown SSL protocol connecting to host '%s' for " \
                              "repository '%s'. OpenSSL responded:\n%s" \
                              % (self.hostname, self.repos, e)
-                six.reraise(OfflineImapError,
-                            OfflineImapError(reason, severity),
-                            exc_info()[2])
+                raise OfflineImapError(reason, severity, exc_info()[2])
 
             elif isinstance(e, socket.error) and e.args[0] == errno.ECONNREFUSED:
                 # "Connection refused", can be a non-existing port, or an unauthorized
@@ -660,18 +653,16 @@ class IMAPServer():
                          "refused. Make sure you have the right host and port " \
                          "configured and that you are actually able to access the " \
                          "network." % (self.hostname, self.port, self.repos)
-                six.reraise(OfflineImapError,
-                            OfflineImapError(reason, severity),
-                            exc_info()[2])
+                raise OfflineImapError(reason, severity, exc_info()[2])
+
             # Could not acquire connection to the remote;
             # socket.error(last_error) raised
             if str(e)[:24] == "can't open socket; error":
-                six.reraise(OfflineImapError,
-                            OfflineImapError(
-                                "Could not connect to remote server '%s' "
-                                "for repository '%s'. Remote does not answer." % (self.hostname, self.repos),
-                                OfflineImapError.ERROR.REPO),
-                            exc_info()[2])
+                raise OfflineImapError(
+                    "Could not connect to remote server '%s' "
+                    "for repository '%s'. Remote does not answer." % (self.hostname, self.repos),
+                    OfflineImapError.ERROR.REPO,
+                    exc_info()[2])
             else:
                 # re-raise all other errors
                 raise

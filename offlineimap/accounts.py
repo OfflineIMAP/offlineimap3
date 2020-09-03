@@ -20,7 +20,6 @@ import os
 import time
 from sys import exc_info
 import traceback
-import six
 
 from offlineimap import mbnames, CustomConfig, OfflineImapError
 from offlineimap import globals
@@ -243,14 +242,19 @@ class SyncableAccount(Account):
                 fcntl.lockf(self._lockfd, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except NameError:
                 pass  # fnctl not available, disable file locking... :(
+            except IOError:
+                raise OfflineImapError(
+                    "Could not lock account %s. Is another "
+                    "instance using this account?" % self,
+                    OfflineImapError.ERROR.REPO,
+                    exc_info()[2])
         except IOError:
             self._lockfd.close()
-            six.reraise(OfflineImapError,
-                        OfflineImapError(
-                            "Could not lock account %s. Is another "
-                            "instance using this account?" % self,
-                            OfflineImapError.ERROR.REPO),
-                        exc_info()[2])
+            raise OfflineImapError(
+                "Could not lock account %s. Is another "
+                "instance using this account?" % self,
+                OfflineImapError.ERROR.REPO,
+                exc_info()[2])
 
     def _unlock(self):
         """Unlock the account, deleting the lock file"""
@@ -614,12 +618,11 @@ def syncfolder(account, remotefolder, quick):
         localstart = localfolder.getstartdate()
         remotestart = remotefolder.getstartdate()
         if (maxage is not None) + (localstart is not None) + (remotestart is not None) > 1:
-            six.reraise(OfflineImapError,
-                        OfflineImapError("You can set at most one of the "
-                                         "following: maxage, startdate (for the local "
-                                         "folder), startdate (for the remote folder)",
-                                         OfflineImapError.ERROR.REPO),
-                        exc_info()[2])
+            raise OfflineImapError("You can set at most one of the "
+                                   "following: maxage, startdate (for the local "
+                                   "folder), startdate (for the remote folder)",
+                                   OfflineImapError.ERROR.REPO,
+                                   exc_info()[2])
         if (maxage is not None or localstart or remotestart) and quick:
             # IMAP quickchanged isn't compatible with options that
             # involve restricting the messagelist, since the "quick"

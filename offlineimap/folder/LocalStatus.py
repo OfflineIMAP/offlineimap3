@@ -18,8 +18,6 @@
 from sys import exc_info
 import os
 import threading
-import six
-
 from .Base import BaseFolder
 
 
@@ -71,7 +69,7 @@ class LocalStatusFolder(BaseFolder):
                 errstr = ("Corrupt line '%s' in cache file '%s'" %
                           (line, self.filename))
                 self.ui.warn(errstr)
-                six.reraise(ValueError, ValueError(errstr), exc_info()[2])
+                raise ValueError(errstr, exc_info()[2])
             self.messagelist[uid] = self.msglist_item_initializer(uid)
             self.messagelist[uid]['flags'] = flags
 
@@ -94,7 +92,7 @@ class LocalStatusFolder(BaseFolder):
                 errstr = "Corrupt line '%s' in cache file '%s'" % \
                          (line, self.filename)
                 self.ui.warn(errstr)
-                six.reraise(ValueError, ValueError(errstr), exc_info()[2])
+                raise ValueError(errstr, exc_info()[2])
             self.messagelist[uid] = self.msglist_item_initializer(uid)
             self.messagelist[uid]['flags'] = flags
             self.messagelist[uid]['mtime'] = mtime

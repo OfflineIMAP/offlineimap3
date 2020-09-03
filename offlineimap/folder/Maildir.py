@@ -21,13 +21,7 @@ import re
 import os
 from sys import exc_info
 from threading import Lock
-import six
-
-try:
-    from hashlib import md5
-except ImportError:
-    from md5 import md5
-
+from hashlib import md5
 from offlineimap import OfflineImapError, emailutil
 from .Base import BaseFolder
 
@@ -319,11 +313,10 @@ class MaildirFolder(BaseFolder):
                         time.sleep(0.23)
                         continue
                     severity = OfflineImapError.ERROR.MESSAGE
-                    six.reraise(OfflineImapError,
-                                OfflineImapError(
-                                    "Unique filename %s already exists." %
-                                    filename, severity),
-                                exc_info()[2])
+                    raise OfflineImapError(
+                        "Unique filename %s already exists." %
+                        filename, severity,
+                        exc_info()[2])
                 else:
                     raise
 
@@ -442,12 +435,11 @@ class MaildirFolder(BaseFolder):
                 os.rename(os.path.join(self.getfullname(), oldfilename),
                           os.path.join(self.getfullname(), newfilename))
             except OSError as e:
-                six.reraise(OfflineImapError,
-                            OfflineImapError(
-                                "Can't rename file '%s' to '%s': %s" %
-                                (oldfilename, newfilename, e[1]),
-                                OfflineImapError.ERROR.FOLDER),
-                            exc_info()[2])
+                raise OfflineImapError(
+                    "Can't rename file '%s' to '%s': %s" %
+                    (oldfilename, newfilename, e[1]),
+                    OfflineImapError.ERROR.FOLDER,
+                    exc_info()[2])
 
             self.messagelist[uid]['flags'] = flags
             self.messagelist[uid]['filename'] = newfilename
@@ -529,12 +521,12 @@ class MaildirFolder(BaseFolder):
                     try:
                         os.rename(filename, newfilename)
                     except OSError as e:
-                        six.reraise(OfflineImapError,
-                                    OfflineImapError(
-                                        "Can't rename file '%s' to '%s': %s" %
-                                        (filename, newfilename, e[1]),
-                                        OfflineImapError.ERROR.FOLDER),
-                                    exc_info()[2])
+                        raise OfflineImapError(
+                            "Can't rename file '%s' to '%s': %s" %
+                            (filename, newfilename, e[1]),
+                            OfflineImapError.ERROR.FOLDER,
+                            exc_info()[2])
+
             elif match.group(1) != self._foldermd5:
                 self.ui.warn(("Inconsistent FMD5 for file `%s':"
                               " Neither `%s' nor `%s' found")

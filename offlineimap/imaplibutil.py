@@ -24,9 +24,7 @@ import errno
 import zlib
 from sys import exc_info
 from hashlib import sha512, sha384, sha256, sha224, sha1
-import six
 import rfc6555
-
 from offlineimap import OfflineImapError
 from offlineimap.ui import getglobalui
 from imaplib2 import IMAP4, IMAP4_SSL, InternalDate
@@ -59,9 +57,8 @@ class UsefulIMAPMixIn:
             errstr = "Server '%s' closed connection, error on SELECT '%s'. Ser" \
                      "ver said: %s" % (self.host, mailbox, e.args[0])
             severity = OfflineImapError.ERROR.FOLDER_RETRY
-            six.reraise(OfflineImapError,
-                        OfflineImapError(errstr, severity),
-                        exc_info()[2])
+            raise OfflineImapError(errstr, severity, exc_info()[2])
+
         if result[0] != 'OK':
             # in case of error, bail out with OfflineImapError
             errstr = "Error SELECTing mailbox '%s', server reply:\n%s" % \

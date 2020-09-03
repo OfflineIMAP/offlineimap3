@@ -19,8 +19,6 @@
 
 import re
 from sys import exc_info
-import six
-
 from offlineimap import imaputil, imaplibutil, OfflineImapError
 import offlineimap.accounts
 from .IMAP import IMAPFolder
@@ -71,10 +69,10 @@ class GmailFolder(IMAPFolder):
         data = self._fetch_from_imap(str(uid), self.retrycount)
 
         # data looks now e.g.
-        # [('320 (X-GM-LABELS (...) UID 17061 BODY[] {2565}','msgbody....')]
-        # we only asked for one message, and that msg is in data[0].
-        # msbody is in [0][1].
-        body = data[0][1].replace("\r\n", "\n")
+        # ['320 (X-GM-LABELS (...) UID 17061 BODY[] {2565}','msgbody....']
+        # we only asked for one message, and that msg is in data[1].
+        # msbody is in [1].
+        body = data[1].replace("\r\n", "\n")
 
         # Embed the labels into the message headers
         if self.synclabels:
@@ -134,14 +132,13 @@ class GmailFolder(IMAPFolder):
             res_type, response = imapobj.fetch("'%s'" % msgsToFetch,
                                                '(FLAGS X-GM-LABELS UID)')
             if res_type != 'OK':
-                six.reraise(OfflineImapError,
-                            OfflineImapError(
-                                "FETCHING UIDs in folder [%s]%s failed. " %
-                                (self.getrepository(), self) +
-                                "Server responded '[%s] %s'" %
-                                (res_type, response),
-                                OfflineImapError.ERROR.FOLDER),
-                            exc_info()[2])
+                raise OfflineImapError(
+                    "FETCHING UIDs in folder [%s]%s failed. " %
+                    (self.getrepository(), self) +
+                    "Server responded '[%s] %s'" %
+                    (res_type, response),
+                    OfflineImapError.ERROR.FOLDER,
+                    exc_info()[2])
         finally:
             self.imapserver.releaseconnection(imapobj)
 

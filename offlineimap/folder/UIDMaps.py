@@ -20,7 +20,6 @@ import shutil
 from os import fsync, unlink
 from sys import exc_info
 from threading import Lock
-import six
 
 try:
     import portalocker
@@ -89,11 +88,11 @@ class MappedIMAPFolder(IMAPFolder):
                 try:
                     line = line.strip()
                 except ValueError:
-                    six.reraise(Exception,
-                                Exception(
-                                    "Corrupt line '%s' in UID mapping file '%s'" %
-                                    (line, mapfilename)),
-                                exc_info()[2])
+                    raise Exception(
+                        "Corrupt line '%s' in UID mapping file '%s'" %
+                        (line, mapfilename),
+                        exc_info()[2])
+
                 (str1, str2) = line.split(':')
                 loc = int(str1)
                 rem = int(str2)
@@ -129,14 +128,13 @@ class MappedIMAPFolder(IMAPFolder):
         try:
             return [mapping[x] for x in items]
         except KeyError as e:
-            six.reraise(OfflineImapError,
-                        OfflineImapError(
-                            "Could not find UID for msg '{0}' (f:'{1}'."
-                            " This is usually a bad thing and should be "
-                            "reported on the mailing list.".format(
-                                e.args[0], self),
-                            OfflineImapError.ERROR.MESSAGE),
-                        exc_info()[2])
+            raise OfflineImapError(
+                "Could not find UID for msg '{0}' (f:'{1}'."
+                " This is usually a bad thing and should be "
+                "reported on the mailing list.".format(
+                    e.args[0], self),
+                OfflineImapError.ERROR.MESSAGE,
+                exc_info()[2])
 
     # Interface from BaseFolder
     def cachemessagelist(self, min_date=None, min_uid=None):

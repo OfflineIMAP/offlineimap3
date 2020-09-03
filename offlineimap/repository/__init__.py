@@ -15,13 +15,7 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 from sys import exc_info
-import six
-
-try:
-    from configparser import NoSectionError
-except ImportError:  # python2
-    from configparser import NoSectionError
-
+from configparser import NoSectionError
 from offlineimap.repository.IMAP import IMAPRepository, MappedIMAPRepository
 from offlineimap.repository.Gmail import GmailRepository
 from offlineimap.repository.Maildir import MaildirRepository
@@ -68,18 +62,16 @@ class Repository:
         except NoSectionError:
             errstr = ("Could not find section '%s' in configuration. Required "
                       "for account '%s'." % ('Repository %s' % name, account))
-            six.reraise(OfflineImapError,
-                        OfflineImapError(errstr, OfflineImapError.ERROR.REPO),
-                        exc_info()[2])
+            raise OfflineImapError(errstr, OfflineImapError.ERROR.REPO,
+                                   exc_info()[2])
 
         try:
             repo = typemap[repostype]
         except KeyError:
             errstr = "'%s' repository not supported for '%s' repositories." % \
                      (repostype, reqtype)
-            six.reraise(OfflineImapError,
-                        OfflineImapError(errstr, OfflineImapError.ERROR.REPO),
-                        exc_info()[2])
+            raise OfflineImapError(errstr, OfflineImapError.ERROR.REPO,
+                                   exc_info()[2])
 
         return repo(name, account)
 
