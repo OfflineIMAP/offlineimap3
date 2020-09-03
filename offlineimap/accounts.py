@@ -242,6 +242,12 @@ class SyncableAccount(Account):
                 fcntl.lockf(self._lockfd, fcntl.LOCK_EX | fcntl.LOCK_NB)
             except NameError:
                 pass  # fnctl not available, disable file locking... :(
+            except IOError:
+                raise OfflineImapError(
+                    "Could not lock account %s. Is another "
+                    "instance using this account?" % self,
+                    OfflineImapError.ERROR.REPO,
+                    exc_info()[2])
         except IOError:
             self._lockfd.close()
             raise OfflineImapError(
