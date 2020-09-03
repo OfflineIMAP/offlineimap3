@@ -21,12 +21,7 @@ import re
 import os
 from sys import exc_info
 from threading import Lock
-
-try:
-    from hashlib import md5
-except ImportError:
-    from md5 import md5
-
+from hashlib import md5
 from offlineimap import OfflineImapError, emailutil
 from .Base import BaseFolder
 
