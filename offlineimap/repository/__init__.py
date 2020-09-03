@@ -15,7 +15,6 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 from sys import exc_info
-import six
 
 try:
     from configparser import NoSectionError
@@ -68,18 +67,16 @@ class Repository:
         except NoSectionError:
             errstr = ("Could not find section '%s' in configuration. Required "
                       "for account '%s'." % ('Repository %s' % name, account))
-            six.reraise(OfflineImapError,
-                        OfflineImapError(errstr, OfflineImapError.ERROR.REPO),
-                        exc_info()[2])
+            raise OfflineImapError(errstr, OfflineImapError.ERROR.REPO,
+                                   exc_info()[2])
 
         try:
             repo = typemap[repostype]
         except KeyError:
             errstr = "'%s' repository not supported for '%s' repositories." % \
                      (repostype, reqtype)
-            six.reraise(OfflineImapError,
-                        OfflineImapError(errstr, OfflineImapError.ERROR.REPO),
-                        exc_info()[2])
+            raise OfflineImapError(errstr, OfflineImapError.ERROR.REPO,
+                                   exc_info()[2])
 
         return repo(name, account)
 
