@@ -477,6 +477,9 @@ class IMAPFolder(BaseFolder):
         # ('185 (RFC822.HEADER {1789}', '... mail headers ...'), ' UID 2444)'
         for item in result:
             if found is None and type(item) == tuple:
+                # Decode the value
+                item = [x.decode('utf-8') for x in item]
+
                 # Walk just tuples.
                 if re.search("(?:^|\\r|\\n)%s:\s*%s(?:\\r|\\n)" % (headername, headervalue),
                              item[1], flags=re.IGNORECASE):
