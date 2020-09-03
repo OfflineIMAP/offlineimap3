@@ -21,9 +21,6 @@ import netrc
 import errno
 from sys import exc_info
 from threading import Event
-
-import six
-
 from offlineimap import folder, imaputil, imapserver, OfflineImapError
 from offlineimap.repository.Base import BaseRepository
 from offlineimap.threadutil import ExitNotifyThread
@@ -127,12 +124,11 @@ class IMAPRepository(BaseRepository):
             try:
                 host = self.localeval.eval(host)
             except Exception as e:
-                six.reraise(OfflineImapError,
-                            OfflineImapError(
-                                "remotehosteval option for repository "
-                                "'%s' failed:\n%s" % (self, e),
-                                OfflineImapError.ERROR.REPO),
-                            exc_info()[2])
+                raise OfflineImapError(
+                    "remotehosteval option for repository "
+                    "'%s' failed:\n%s" % (self, e),
+                    OfflineImapError.ERROR.REPO,
+                    exc_info()[2])
             if host:
                 self._host = host
                 return self._host
