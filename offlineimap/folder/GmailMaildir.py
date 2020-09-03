@@ -18,8 +18,6 @@
 
 import os
 from sys import exc_info
-import six
-
 import offlineimap.accounts
 from offlineimap import OfflineImapError
 from offlineimap import imaputil
@@ -181,11 +179,10 @@ class GmailMaildirFolder(MaildirFolder):
         try:
             os.rename(tmppath, filepath)
         except OSError as e:
-            six.reraise(OfflineImapError,
-                        OfflineImapError("Can't rename file '%s' to '%s': %s" %
-                                         (tmppath, filepath, e[1]),
-                                         OfflineImapError.ERROR.FOLDER),
-                        exc_info()[2])
+            raise OfflineImapError("Can't rename file '%s' to '%s': %s" %
+                                   (tmppath, filepath, e[1]),
+                                   OfflineImapError.ERROR.FOLDER,
+                                   exc_info()[2])
 
         # If utime_from_header=true, we don't want to change the mtime.
         if self._utime_from_header and mtime:
