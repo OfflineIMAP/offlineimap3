@@ -15,12 +15,7 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 from sys import exc_info
-
-try:
-    from configparser import NoSectionError
-except ImportError:  # python2
-    from configparser import NoSectionError
-
+from configparser import NoSectionError
 from offlineimap.repository.IMAP import IMAPRepository, MappedIMAPRepository
 from offlineimap.repository.Gmail import GmailRepository
 from offlineimap.repository.Maildir import MaildirRepository
