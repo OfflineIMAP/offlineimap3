@@ -19,9 +19,6 @@ import os
 import sqlite3 as sqlite
 from sys import exc_info
 from threading import Lock
-
-import six
-
 from .Base import BaseFolder
 
 
@@ -117,13 +114,11 @@ class LocalStatusSQLiteFolder(BaseFolder):
                 self._databaseFileLock.registerNewUser()
             except sqlite.OperationalError as e:
                 # Operation had failed.
-                six.reraise(UserWarning,
-                            UserWarning(
-                                "cannot open database file '%s': %s.\nYou might"
-                                " want to check the rights to that file and if "
-                                "it cleanly opens with the 'sqlite<3>' command" %
-                                (self.filename, e)),
-                            exc_info()[2])
+                raise UserWarning(
+                    "cannot open database file '%s': %s.\nYou might"
+                    " want to check the rights to that file and if "
+                    "it cleanly opens with the 'sqlite<3>' command" %
+                    (self.filename, e), exc_info()[2])
 
             # Test if db version is current enough and if db is readable.
             try:
@@ -351,10 +346,9 @@ class LocalStatusSQLiteFolder(BaseFolder):
             self.__sql_write('INSERT INTO status (id,flags,mtime,labels) VALUES (?,?,?,?)',
                              (uid, flags, mtime, labels))
         except Exception as e:
-            six.reraise(UserWarning,
-                        UserWarning("%s while inserting UID %s" %
-                                    (str(e), str(uid))),
-                        exc_info()[2])
+            raise UserWarning("%s while inserting UID %s" %
+                              (str(e), str(uid)),
+                              exc_info()[2])
         return uid
 
     # Interface from BaseFolder
