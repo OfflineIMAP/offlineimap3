@@ -18,7 +18,6 @@ import os
 import re
 from sys import exc_info
 from configparser import SafeConfigParser, Error
-import six
 from offlineimap.localeval import LocalEval
 
 
@@ -71,10 +70,8 @@ class CustomConfigParser(SafeConfigParser):
             val = self.get(section, option).strip()
             return re.split(separator_re, val)
         except re.error as e:
-            six.reraise(Error,
-                        Error("Bad split regexp '%s': %s" %
-                              (separator_re, e)),
-                        exc_info()[2])
+            raise Error("Bad split regexp '%s': %s" %
+                        (separator_re, e), exc_info()[2])
 
     def getdefaultlist(self, section, option, default, separator_re):
         """Same as getlist, but returns the value of `default`
