@@ -19,8 +19,6 @@
 
 import re
 from sys import exc_info
-import six
-
 from offlineimap import imaputil, imaplibutil, OfflineImapError
 import offlineimap.accounts
 from .IMAP import IMAPFolder
@@ -134,14 +132,13 @@ class GmailFolder(IMAPFolder):
             res_type, response = imapobj.fetch("'%s'" % msgsToFetch,
                                                '(FLAGS X-GM-LABELS UID)')
             if res_type != 'OK':
-                six.reraise(OfflineImapError,
-                            OfflineImapError(
-                                "FETCHING UIDs in folder [%s]%s failed. " %
-                                (self.getrepository(), self) +
-                                "Server responded '[%s] %s'" %
-                                (res_type, response),
-                                OfflineImapError.ERROR.FOLDER),
-                            exc_info()[2])
+                raise OfflineImapError(
+                    "FETCHING UIDs in folder [%s]%s failed. " %
+                    (self.getrepository(), self) +
+                    "Server responded '[%s] %s'" %
+                    (res_type, response),
+                    OfflineImapError.ERROR.FOLDER,
+                    exc_info()[2])
         finally:
             self.imapserver.releaseconnection(imapobj)
 
