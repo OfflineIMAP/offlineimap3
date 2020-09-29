@@ -243,7 +243,7 @@ class IMAPServer():
             socket.socket = self.authproxied_socket
             try:
                 response = urllib.request.urlopen(
-                    self.oauth2_request_url, urllib.parse.urlencode(params)).read()
+                    self.oauth2_request_url, urllib.parse.urlencode(params).encode('utf-8')).read()
             except Exception as e:
                 try:
                     msg = "%s (configuration is: %s)" % (e, str(params))
