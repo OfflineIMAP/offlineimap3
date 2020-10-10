@@ -531,8 +531,13 @@ class BaseFolder:
         so you need to ensure that it is never called in a
         dryrun mode."""
 
+        """
+        If this function is implemented,
+        then it should include this code:
+
         if ignorelabels is None:
             ignorelabels = set()
+        """
 
         raise NotImplementedError
 
