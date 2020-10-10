@@ -73,16 +73,16 @@ def flagsplit(s):
     return imapsplit(s[1:-1])
 
 
-def __options2hash(list):
-    """convert list [1,2,3,4,5,6] to {1:2, 3:4, 5:6}"""
+def __options2hash(l_list):
+    """convert l_list [1,2,3,4,5,6] to {1:2, 3:4, 5:6}"""
 
     # effectively this does dict(zip(l[::2],l[1::2])), however
     # measurements seemed to have indicated that the manual variant is
     # faster for mosly small lists.
     retval = {}
     counter = 0
-    while counter < len(list):
-        retval[list[counter]] = list[counter + 1]
+    while counter < len(l_list):
+        retval[l_list[counter]] = l_list[counter + 1]
         counter += 2
     __debug("__options2hash returning:", retval)
     return retval
