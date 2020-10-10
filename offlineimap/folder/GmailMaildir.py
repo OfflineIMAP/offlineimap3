@@ -133,11 +133,14 @@ class GmailMaildirFolder(MaildirFolder):
         self.messagelist[uid]['labels'] = labels
         return ret
 
-    def savemessagelabels(self, uid, labels, ignorelabels=set()):
+    def savemessagelabels(self, uid, labels, ignorelabels=None):
         """Change a message's labels to `labels`.
 
         Note that this function does not check against dryrun settings,
         so you need to ensure that it is never called in a dryrun mode."""
+
+        if ignorelabels is None:
+            ignorelabels = set()
 
         filename = self.messagelist[uid]['filename']
         filepath = os.path.join(self.getfullname(), filename)

@@ -323,12 +323,15 @@ class LocalStatusSQLiteFolder(BaseFolder):
     #        assert False,"getmessageflags() called on non-existing message"
 
     # Interface from BaseFolder
-    def savemessage(self, uid, content, flags, rtime, mtime=0, labels=set()):
+    def savemessage(self, uid, content, flags, rtime, mtime=0, labels=None):
         """Writes a new message, with the specified uid.
 
         See folder/Base for detail. Note that savemessage() does not
         check against dryrun settings, so you need to ensure that
         savemessage is never called in a dryrun mode."""
+
+        if labels is None:
+            labels = set()
 
         if uid < 0:
             # We cannot assign a uid.
