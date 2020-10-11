@@ -316,9 +316,14 @@ class MappedIMAPFolder(IMAPFolder):
     def change_message_uid(self, ruid, new_ruid):
         """Change the message from existing ruid to new_ruid
 
-        :param new_uid: The old remote UID will be changed to a new
+        The old remote UID will be changed to a new
             UID. The UIDMaps case handles this efficiently by simply
-            changing the mappings file."""
+            changing the mappings file.
+
+        Args:
+            ruid: Remote UID
+            new_ruid: New Remote UID
+        """
 
         if ruid not in self.r2l:
             raise OfflineImapError("Cannot change unknown Maildir UID %s" %
