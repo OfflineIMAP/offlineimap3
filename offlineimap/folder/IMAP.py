@@ -91,7 +91,7 @@ class IMAPFolder(BaseFolder):
         name = self.getfullname()
         if self.repository.account.utf_8_support:
             name = imaputil.utf8_IMAP(name)
-        return name
+        return imaputil.foldername_to_imapname(name)
 
     # Interface from BaseFolder
     def suggeststhreads(self):

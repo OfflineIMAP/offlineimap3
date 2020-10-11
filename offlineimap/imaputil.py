@@ -435,3 +435,23 @@ def imap4_utf_7(name):
 
 
 codecs.register(imap4_utf_7)
+
+
+def foldername_to_imapname(folder_name):
+    """
+    This function returns the folder_name ready to send to the
+    IMAP server. It tests if the folder_name has special characters
+    Then, quote it.
+    Args:
+        folder_name: Folder's name
+
+    Returns: The folder_name quoted if needed
+
+    """
+    # If name includes some of these characters, quote it
+    atom_specials = [' ', '/', '(', ')', '{', '}']
+
+    if any((c in atom_specials) for c in folder_name):
+        folder_name = '"' + folder_name + '"'
+
+    return folder_name
