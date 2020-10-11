@@ -524,12 +524,20 @@ class BaseFolder:
 
         raise NotImplementedError
 
-    def savemessagelabels(self, uid, labels, ignorelabels=set(), mtime=0):
+    def savemessagelabels(self, uid, labels, ignorelabels=None, mtime=0):
         """Sets the specified message's labels to the given set.
 
         Note that this function does not check against dryrun settings,
         so you need to ensure that it is never called in a
         dryrun mode."""
+
+        """
+        If this function is implemented,
+        then it should include this code:
+
+        if ignorelabels is None:
+            ignorelabels = set()
+        """
 
         raise NotImplementedError
 

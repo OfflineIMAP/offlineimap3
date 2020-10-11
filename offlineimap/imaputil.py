@@ -73,16 +73,16 @@ def flagsplit(s):
     return imapsplit(s[1:-1])
 
 
-def __options2hash(list):
-    """convert list [1,2,3,4,5,6] to {1:2, 3:4, 5:6}"""
+def __options2hash(l_list):
+    """convert l_list [1,2,3,4,5,6] to {1:2, 3:4, 5:6}"""
 
     # effectively this does dict(zip(l[::2],l[1::2])), however
     # measurements seemed to have indicated that the manual variant is
     # faster for mosly small lists.
     retval = {}
     counter = 0
-    while counter < len(list):
-        retval[list[counter]] = list[counter + 1]
+    while counter < len(l_list):
+        retval[l_list[counter]] = l_list[counter + 1]
         counter += 2
     __debug("__options2hash returning:", retval)
     return retval
@@ -435,3 +435,23 @@ def imap4_utf_7(name):
 
 
 codecs.register(imap4_utf_7)
+
+
+def foldername_to_imapname(folder_name):
+    """
+    This function returns the folder_name ready to send to the
+    IMAP server. It tests if the folder_name has special characters
+    Then, quote it.
+    Args:
+        folder_name: Folder's name
+
+    Returns: The folder_name quoted if needed
+
+    """
+    # If name includes some of these characters, quote it
+    atom_specials = [' ', '/', '(', ')', '{', '}']
+
+    if any((c in atom_specials) for c in folder_name):
+        folder_name = '"' + folder_name + '"'
+
+    return folder_name

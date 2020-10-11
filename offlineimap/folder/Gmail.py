@@ -56,7 +56,7 @@ class GmailFolder(IMAPFolder):
 
         # Labels to be left alone
         ignorelabels = self.repository.account.getconf('ignorelabels', '')
-        self.ignorelabels = set([l for l in re.split(r'\s*,\s*', ignorelabels) if len(l)])
+        self.ignorelabels = set([v for v in re.split(r'\s*,\s*', ignorelabels) if len(v)])
 
     def getmessage(self, uid):
         """Retrieve message with UID from the IMAP server (incl body).  Also

@@ -78,17 +78,6 @@ def monitor():
     """An infinite "monitoring" loop watching for finished ExitNotifyThread's.
 
     This one is supposed to run in the main thread.
-    :param callback: the function to call when a thread terminated. That
-                     function is called with a single argument -- the
-                     ExitNotifyThread that has terminated. The monitor will
-                     not continue to monitor for other threads until
-                     'callback' returns, so if it intends to perform long
-                     calculations, it should start a new thread itself -- but
-                     NOT an ExitNotifyThread, or else an infinite loop
-                     may result.
-                     Furthermore, the monitor will hold the lock all the
-                     while the other thread is waiting.
-    :type callback:  a callable function
     """
 
     global exitedThreads

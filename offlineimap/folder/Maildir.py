@@ -270,13 +270,16 @@ class MaildirFolder(BaseFolder):
         filepath = os.path.join(self.getfullname(), filename)
         return os.path.getmtime(filepath)
 
-    def new_message_filename(self, uid, flags=set(), date=None):
+    def new_message_filename(self, uid, flags=None, date=None):
         """Creates a new unique Maildir filename
 
         :param uid: The UID`None`, or a set of maildir flags
         :param flags: A set of maildir flags
         :param flags: (optional) Date
         :returns: String containing unique message filename"""
+
+        if flags is None:
+            flags = set()
 
         timeval, timeseq = _gettimeseq(date)
         uniq_name = '%d_%d.%d.%s,U=%d,FMD5=%s%s2,%s' % \
