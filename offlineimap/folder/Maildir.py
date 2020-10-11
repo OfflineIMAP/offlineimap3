@@ -15,6 +15,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
+import errno
 import socket
 import time
 import re
@@ -311,7 +312,7 @@ class MaildirFolder(BaseFolder):
             except OSError as e:
                 if not hasattr(e, 'EEXIST'):
                     raise
-                if e.errno == e.EEXIST:
+                if e.errno == errno.EEXIST:
                     if tries:
                         time.sleep(0.23)
                         continue
