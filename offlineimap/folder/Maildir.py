@@ -15,6 +15,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
+import errno
 import socket
 import time
 import re
@@ -311,7 +312,7 @@ class MaildirFolder(BaseFolder):
             except OSError as e:
                 if not hasattr(e, 'EEXIST'):
                     raise
-                if e.errno == e.EEXIST:
+                if e.errno == errno.EEXIST:
                     if tries:
                         time.sleep(0.23)
                         continue
@@ -365,9 +366,8 @@ class MaildirFolder(BaseFolder):
                         content, 'Delivery-date')
             except Exception as e:
                 # This should never happen.
-                from email.Parser import Parser
                 from offlineimap.ui import getglobalui
-                datestr = Parser().parsestr(content, True).get("Date")
+                datestr = emailutil.get_message_date(content)
                 ui = getglobalui()
                 ui.warn("UID %d has invalid date %s: %s\n"
                         "Not using message timestamp as file prefix" %
@@ -386,9 +386,8 @@ class MaildirFolder(BaseFolder):
             # In case date is wrongly so far into the future as to be > max
             # int32.
             except Exception as e:
-                from email.Parser import Parser
                 from offlineimap.ui import getglobalui
-                datestr = Parser().parsestr(content, True).get("Date")
+                datestr = emailutil.get_message_date(content)
                 ui = getglobalui()
                 ui.warn("UID %d has invalid date %s: %s\n"
                         "Not changing file modification time" % (uid, datestr, e))
