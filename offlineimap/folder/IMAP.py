@@ -482,7 +482,8 @@ class IMAPFolder(BaseFolder):
                              item[1], flags=re.IGNORECASE):
                     found = item[0]
             elif found is not None:
-                if type(item) == type(""):
+                if type(item) == type(b""):
+                    item = item.decode('utf-8')
                     uid = re.search("UID\s+(\d+)", item, flags=re.IGNORECASE)
                     if uid:
                         return int(uid.group(1))
