@@ -459,8 +459,9 @@ class SyncableAccount(Account):
             p = Popen(cmd, shell=True,
                       stdin=PIPE, stdout=PIPE, stderr=PIPE,
                       close_fds=True)
-            r = p.communicate()
-            self.ui.callhook("Hook stdout: %s\nHook stderr:%s\n" % r)
+            stdout, stderr = p.communicate()
+            self.ui.callhook("Hook stdout: %s\nHook stderr:%s\n"
+                    % (stdout.decode('utf-8'), stderr.decode('utf-8')))
             self.ui.callhook("Hook return code: %d" % p.returncode)
         except (KeyboardInterrupt, SystemExit):
             raise
