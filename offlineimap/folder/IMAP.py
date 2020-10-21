@@ -839,7 +839,7 @@ class IMAPFolder(BaseFolder):
 
         # Convert bytes to str
         ndata0 = data[0][0].decode('utf-8')
-        ndata1 = data[0][1].decode('utf-8')
+        ndata1 = data[0][1].decode('utf-8', errors='replace')
         ndata = [ndata0, ndata1]
 
         return ndata
