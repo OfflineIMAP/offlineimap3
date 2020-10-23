@@ -19,7 +19,7 @@ import shutil
 import subprocess
 import tempfile
 import random
-import offlineimap.virtual_imaplib2 as imaplib
+import imaplib2 as imaplib
 from offlineimap.CustomConfig import CustomConfigParser
 from . import default_conf
 
