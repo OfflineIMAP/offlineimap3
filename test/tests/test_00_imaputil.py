@@ -58,39 +58,39 @@ class TestInternalFunctions(unittest.TestCase):
 
     def test_01_imapsplit(self):
         """Test imaputil.imapsplit()"""
-        res = imaputil.imapsplit(b'(\\HasNoChildren) "." "INBOX.Sent"')
-        self.assertEqual(res, [b'(\\HasNoChildren)', b'"."', b'"INBOX.Sent"'])
+        res = imaputil.imapsplit('(\\HasNoChildren) "." "INBOX.Sent"')
+        self.assertEqual(res, ['(\\HasNoChildren)', '"."', '"INBOX.Sent"'])
 
-        res = imaputil.imapsplit(b'"mo\\" o" sdfsdf')
-        self.assertEqual(res, [b'"mo\\" o"', b'sdfsdf'])
+        res = imaputil.imapsplit('"mo\\" o" sdfsdf')
+        self.assertEqual(res, ['"mo\\" o"', 'sdfsdf'])
 
     def test_02_flagsplit(self):
         """Test imaputil.flagsplit()"""
-        res = imaputil.flagsplit(b'(\\Draft \\Deleted)')
-        self.assertEqual(res, [b'\\Draft', b'\\Deleted'])
+        res = imaputil.flagsplit('(\\Draft \\Deleted)')
+        self.assertEqual(res, ['\\Draft', '\\Deleted'])
 
-        res = imaputil.flagsplit(b'(FLAGS (\\Seen Old) UID 4807)')
-        self.assertEqual(res, [b'FLAGS', b'(\\Seen Old)', b'UID', b'4807'])
+        res = imaputil.flagsplit('(FLAGS (\\Seen Old) UID 4807)')
+        self.assertEqual(res, ['FLAGS', '(\\Seen Old)', 'UID', '4807'])
 
     def test_04_flags2hash(self):
         """Test imaputil.flags2hash()"""
-        res = imaputil.flags2hash(b'(FLAGS (\\Seen Old) UID 4807)')
-        self.assertEqual(res, {b'FLAGS': b'(\\Seen Old)', b'UID': b'4807'})
+        res = imaputil.flags2hash('(FLAGS (\\Seen Old) UID 4807)')
+        self.assertEqual(res, {'FLAGS': '(\\Seen Old)', 'UID': '4807'})
 
     def test_05_flagsimap2maildir(self):
         """Test imaputil.flagsimap2maildir()"""
-        res = imaputil.flagsimap2maildir(b'(\\Draft \\Deleted)')
-        self.assertEqual(res, set(b'DT'))
+        res = imaputil.flagsimap2maildir('(\\Draft \\Deleted)')
+        self.assertEqual(res, set('DT'))
 
     def test_06_flagsmaildir2imap(self):
         """Test imaputil.flagsmaildir2imap()"""
-        res = imaputil.flagsmaildir2imap(set(b'DR'))
-        self.assertEqual(res, b'(\\Answered \\Draft)')
+        res = imaputil.flagsmaildir2imap(set('DR'))
+        self.assertEqual(res, '(\\Answered \\Draft)')
         # test all possible flags
-        res = imaputil.flagsmaildir2imap(set(b'SRFTD'))
-        self.assertEqual(res, b'(\\Answered \\Deleted \\Draft \\Flagged \\Seen)')
+        res = imaputil.flagsmaildir2imap(set('SRFTD'))
+        self.assertEqual(res, '(\\Answered \\Deleted \\Draft \\Flagged \\Seen)')
 
     def test_07_uid_sequence(self):
         """Test imaputil.uid_sequence()"""
         res = imaputil.uid_sequence([1, 2, 3, 4, 5, 10, 12, 13])
-        self.assertEqual(res, b'1:5,10,12:13')
+        self.assertEqual(res, '1:5,10,12:13')
