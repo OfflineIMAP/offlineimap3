@@ -11,29 +11,27 @@ try:
 except ImportError:
     from distro import linux_distribution
 
-# Each dictionary value is either string or some iterable.
-#
 # For the former we will just return the value, for an iterable
 # we will walk through the values and will return the first
 # one that corresponds to the existing file.
 __DEF_OS_LOCATIONS = {
-    'freebsd': '/usr/local/share/certs/ca-root-nss.crt',
-    'openbsd': '/etc/ssl/cert.pem',
-    'dragonfly': '/etc/ssl/cert.pem',
+    'freebsd': ['/usr/local/share/certs/ca-root-nss.crt'],
+    'openbsd': ['/etc/ssl/cert.pem'],
+    'dragonfly': ['/etc/ssl/cert.pem'],
     'darwin': [
         # MacPorts, port curl-ca-bundle
         '/opt/local/share/curl/curl-ca-bundle.crt',
         # homebrew, package openssl
         '/usr/local/etc/openssl/cert.pem',
     ],
-    'linux-ubuntu': '/etc/ssl/certs/ca-certificates.crt',
-    'linux-debian': '/etc/ssl/certs/ca-certificates.crt',
-    'linux-gentoo': '/etc/ssl/certs/ca-certificates.crt',
-    'linux-fedora': '/etc/pki/tls/certs/ca-bundle.crt',
-    'linux-redhat': '/etc/pki/tls/certs/ca-bundle.crt',
-    'linux-suse': '/etc/ssl/ca-bundle.pem',
-    'linux-opensuse': '/etc/ssl/ca-bundle.pem',
-    'linux-arch': '/etc/ssl/certs/ca-certificates.crt',
+    'linux-ubuntu': ['/etc/ssl/certs/ca-certificates.crt'],
+    'linux-debian': ['/etc/ssl/certs/ca-certificates.crt'],
+    'linux-gentoo': ['/etc/ssl/certs/ca-certificates.crt'],
+    'linux-fedora': ['/etc/pki/tls/certs/ca-bundle.crt'],
+    'linux-redhat': ['/etc/pki/tls/certs/ca-bundle.crt'],
+    'linux-suse': ['/etc/ssl/ca-bundle.pem'],
+    'linux-opensuse': ['/etc/ssl/ca-bundle.pem'],
+    'linux-arch': ['/etc/ssl/certs/ca-certificates.crt'],
 }
 
 
