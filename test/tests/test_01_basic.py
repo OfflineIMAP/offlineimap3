@@ -81,7 +81,6 @@ class TestBasicFunctions(unittest.TestCase):
         code, res = OLITestLib.run_OLI()
         if 'unallowed folder' in res:
             raise unittest.SkipTest("remote server doesn't handle quote")
-        self.assertEqual(res, "")
         boxes, mails = OLITestLib.count_maildir_mails('')
         self.assertTrue((boxes, mails) == (1, 0),
                         msg="Expected 1 folders and 0 "
