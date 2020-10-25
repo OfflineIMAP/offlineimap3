@@ -42,16 +42,16 @@ def get_os_name():
     proper name capitalisation.
 
     """
-    OS = platform.system().lower()
+    os_name = platform.system().lower()
 
-    if OS.startswith('linux'):
+    if os_name.startswith('linux'):
         DISTRO = platform.linux_distribution()[0]
         if DISTRO:
-            OS = OS + "-%s" % DISTRO.split()[0].lower()
+            os_name = os_name + "-%s" % DISTRO.split()[0].lower()
         if os.path.exists('/etc/arch-release'):
-            OS = "linux-arch"
+            os_name = "linux-arch"
 
-    return OS
+    return os_name
 
 
 def get_os_sslcertfile_searchpath():
