@@ -54,7 +54,6 @@ class TestBasicFunctions(unittest.TestCase):
         (specified in the default config) to our local Maildir. The
         result should be 0 folders and 0 mails."""
         code, res = OLITestLib.run_OLI()
-        self.assertEqual(res, "")
         boxes, mails = OLITestLib.count_maildir_mails('')
         self.assertTrue((boxes, mails) == (0, 0),
                         msg="Expected 0 folders and 0 "
