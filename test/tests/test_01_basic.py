@@ -53,7 +53,7 @@ class TestBasicFunctions(unittest.TestCase):
         Cleans existing remote test folders. Then syncs all "OLItest*
         (specified in the default config) to our local Maildir. The
         result should be 0 folders and 0 mails."""
-        code, res = OLITestLib.run_OLI()
+        OLITestLib.run_OLI()
         boxes, mails = OLITestLib.count_maildir_mails('')
         self.assertTrue((boxes, mails) == (0, 0),
                         msg="Expected 0 folders and 0 "
@@ -64,7 +64,7 @@ class TestBasicFunctions(unittest.TestCase):
         """Create local 'OLItest 1', sync"""
         OLITestLib.delete_maildir('')  # Delete all local maildir folders
         OLITestLib.create_maildir('INBOX.OLItest 1')
-        code, res = OLITestLib.run_OLI()
+        OLITestLib.run_OLI()
         boxes, mails = OLITestLib.count_maildir_mails('')
         self.assertTrue((boxes, mails) == (1, 0),
                         msg="Expected 1 folders and 0 "
@@ -78,7 +78,7 @@ class TestBasicFunctions(unittest.TestCase):
         one is included here as a small challenge."""
         OLITestLib.delete_maildir('')  # Delete all local maildir folders
         OLITestLib.create_maildir('INBOX.OLItest "1"')
-        code, res = OLITestLib.run_OLI()
+        code, res  = OLITestLib.run_OLI()
         if 'unallowed folder' in res:
             raise unittest.SkipTest("remote server doesn't handle quote")
         boxes, mails = OLITestLib.count_maildir_mails('')
@@ -150,9 +150,9 @@ class TestBasicFunctions(unittest.TestCase):
         OLITestLib.delete_remote_testfolders()
         OLITestLib.delete_maildir('')
         OLITestLib.create_maildir('INBOX.OLItest')
-        code, res = OLITestLib.run_OLI()
+        OLITestLib.run_OLI()
         OLITestLib.delete_maildir('INBOX.OLItest')
-        code, res = OLITestLib.run_OLI()
+        OLITestLib.run_OLI()
         boxes, mails = OLITestLib.count_maildir_mails('')
         self.assertTrue((boxes, mails) == (0, 0),
                         msg="Expected 0 folders and 0 "
