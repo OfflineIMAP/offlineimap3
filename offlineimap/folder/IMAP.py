@@ -219,7 +219,7 @@ class IMAPFolder(BaseFolder):
                                        OfflineImapError.ERROR.FOLDER)
             # Davmail returns list instead of list of one element string.
             # On first run the first element is empty.
-            if ' ' in res_data[0] or res_data[0] == '':
+            if b' ' in res_data[0] or res_data[0] == b'':
                 res_data = res_data[0].split()
             # Some servers are broken.
             if 0 in res_data:
@@ -839,7 +839,7 @@ class IMAPFolder(BaseFolder):
 
         # Convert bytes to str
         ndata0 = data[0][0].decode('utf-8')
-        ndata1 = data[0][1].decode('utf-8')
+        ndata1 = data[0][1].decode('utf-8', errors='replace')
         ndata = [ndata0, ndata1]
 
         return ndata
