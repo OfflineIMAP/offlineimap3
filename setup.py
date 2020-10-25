@@ -45,8 +45,7 @@ class TestCommand(Command):
         # set credentials and OfflineImap command to be executed:
         OLITestLib(cred_file='./test/credentials.conf', cmd='./offlineimap.py')
         suite = TestLoader().discover('./test/tests')
-        #TODO: failfast does not seem to exist in python2.6?
-        TextTestRunner(verbosity=2,failfast=True).run(suite)
+        TextTestRunner(verbosity=2, failfast=True).run(suite)
 
 
 setup(name = "offlineimap",
