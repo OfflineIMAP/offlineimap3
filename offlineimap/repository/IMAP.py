@@ -24,7 +24,8 @@ from threading import Event
 from offlineimap import folder, imaputil, imapserver, OfflineImapError
 from offlineimap.repository.Base import BaseRepository
 from offlineimap.threadutil import ExitNotifyThread
-from offlineimap.utils.distro import get_os_sslcertfile, get_os_sslcertfile_searchpath
+from offlineimap.utils.distro_utils import get_os_sslcertfile, \
+    get_os_sslcertfile_searchpath
 
 
 class IMAPRepository(BaseRepository):
