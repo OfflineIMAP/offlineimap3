@@ -247,7 +247,6 @@ class IMAPRepository(BaseRepository):
         the above behaviour, so any explicitely-requested configuration
         that doesn't result in an existing file will give an exception.
         """
-
         xforms = [os.path.expanduser, os.path.expandvars, os.path.abspath]
         cacertfile = self.getconf_xform('sslcacertfile', xforms, None)
         # Can't use above cacertfile because of abspath.
