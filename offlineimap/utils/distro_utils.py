@@ -73,12 +73,12 @@ def get_os_sslcertfile_searchpath():
 
     os_name = get_os_name()
 
-    l = None
+    location = None
     if os_name in __DEF_OS_LOCATIONS:
-        l = __DEF_OS_LOCATIONS[os_name]
-        if not hasattr(l, '__iter__'):
-            l = (l,)
-    return l
+        location = __DEF_OS_LOCATIONS[os_name]
+        if not hasattr(location, '__iter__'):
+            location = (location,)
+    return location
 
 
 def get_os_sslcertfile():
