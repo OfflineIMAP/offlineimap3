@@ -19,7 +19,7 @@ import shutil
 import subprocess
 import tempfile
 import random
-import offlineimap.virtual_imaplib2 as imaplib
+import imaplib2 as imaplib
 from offlineimap.CustomConfig import CustomConfigParser
 from . import default_conf
 
@@ -147,7 +147,7 @@ class OLITestLib:
                     continue
                 if isinstance(d, tuple):
                     # literal (unquoted)
-                    folder = b'"%s"' % d[1].replace('"', '\\"')
+                    folder = '"%s"' % d[1].replace('"', '\\"')
                 else:
                     m = re.search(br'''
                         [ ]                     # space
@@ -156,13 +156,15 @@ class OLITestLib:
                         ([^"]|\\")*             # a non-quote or a backslashded quote
                         (?P=quote))$            # ending quote
                         ''', d, flags=re.VERBOSE)
-                    folder = bytearray(m.group('dir'))
+                    folder = m.group('dir').decode('utf-8')
                     if not m.group('quote'):
                         folder = '"%s"' % folder
                 # folder = folder.replace(br'\"', b'"') # remove quoting
                 dirs.append(folder)
             # 2) filter out those not starting with INBOX.OLItest and del...
-            dirs = [d for d in dirs if d.startswith(b'"INBOX.OLItest') or d.startswith(b'"INBOX/OLItest')]
+            dirs = [d for d in dirs
+                    if d.startswith('"INBOX.OLItest')
+                    or d.startswith('"INBOX/OLItest')]
             for folder in dirs:
                 res_t, data = imapobj.delete(folder)
                 assert res_t == 'OK', "Folder deletion of {0} failed with error" \
