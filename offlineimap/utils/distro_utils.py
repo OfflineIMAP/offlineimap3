@@ -91,11 +91,11 @@ def get_os_sslcertfile():
     correspond to non-existing filesystem objects.
     """
 
-    l = get_os_sslcertfile_searchpath()
-    if l is None:
+    location = get_os_sslcertfile_searchpath()
+    if location is None:
         return None
 
-    for f in l:
+    for f in location:
         assert (type(f) == type(""))
         if os.path.exists(f) and (os.path.isfile(f) or os.path.islink(f)):
             return f
