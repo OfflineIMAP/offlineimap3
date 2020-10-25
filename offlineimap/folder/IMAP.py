@@ -666,7 +666,7 @@ class IMAPFolder(BaseFolder):
                 # Do the APPEND.
                 try:
                     (typ, dat) = imapobj.append(self.getfullIMAPname(),
-                                                imaputil.flagsmaildir2imap(flags), date, content)
+                                                imaputil.flagsmaildir2imap(flags), date, bytes(content, 'utf-8'))
                     # This should only catch 'NO' responses since append()
                     # will raise an exception for 'BAD' responses:
                     if typ != 'OK':
