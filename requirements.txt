@@ -2,3 +2,4 @@
 gssapi[kerberos]
 portalocker[cygwin]
 rfc6555
+distro
