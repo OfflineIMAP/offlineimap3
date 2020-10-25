@@ -65,7 +65,6 @@ class TestBasicFunctions(unittest.TestCase):
         OLITestLib.delete_maildir('')  # Delete all local maildir folders
         OLITestLib.create_maildir('INBOX.OLItest 1')
         code, res = OLITestLib.run_OLI()
-        self.assertEqual(res, "")
         boxes, mails = OLITestLib.count_maildir_mails('')
         self.assertTrue((boxes, mails) == (1, 0),
                         msg="Expected 1 folders and 0 "
