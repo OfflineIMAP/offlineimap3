@@ -16,6 +16,7 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 import datetime
+import hashlib
 import hmac
 import socket
 import json
@@ -184,7 +185,9 @@ class IMAPServer():
         self.ui.debug('imap', '__md5handler: got challenge %s' % challenge)
 
         passwd = self.__getpassword()
-        retval = self.username + ' ' + hmac.new(passwd, challenge).hexdigest()
+        retval = self.username + ' ' +\
+                 hmac.new(bytes(passwd, encoding='utf-8'), challenge,
+                          digestmod=hashlib.md5).hexdigest()
         self.ui.debug('imap', '__md5handler: returning %s' % retval)
         return retval
 
