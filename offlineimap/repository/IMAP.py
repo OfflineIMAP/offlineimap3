@@ -255,8 +255,8 @@ class IMAPRepository(BaseRepository):
         # Can't use above cacertfile because of abspath.
         conf_sslacertfile = self.getconf('sslcacertfile', None)
         if conf_sslacertfile == "OS-DEFAULT" or \
-            conf_sslacertfile == None or \
-            conf_sslacertfile == '':
+                conf_sslacertfile is None or \
+                conf_sslacertfile == '':
             cacertfile = get_os_sslcertfile()
             if cacertfile is None:
                 searchpath = get_os_sslcertfile_searchpath()
