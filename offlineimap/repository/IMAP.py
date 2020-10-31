@@ -199,7 +199,8 @@ class IMAPRepository(BaseRepository):
                 return netrcentry[0]
 
         try:
-            netrcentry = netrc.netrc('/etc/netrc').authenticators(self.gethost())
+            netrcentry = netrc.netrc('/etc/netrc')\
+                .authenticators(self.gethost())
         except IOError as inst:
             if inst.errno not in (errno.ENOENT, errno.EACCES):
                 raise
@@ -293,7 +294,8 @@ class IMAPRepository(BaseRepository):
         comma-separated fingerprints in hex form."""
 
         value = self.getconf('cert_fingerprint', "")
-        return [f.strip().lower().replace(":", "") for f in value.split(',') if f]
+        return [f.strip().lower().replace(":", "")
+                for f in value.split(',') if f]
 
     def setoauth2_request_url(self, url):
         self.oauth2_request_url = url
@@ -416,7 +418,8 @@ class IMAPRepository(BaseRepository):
                     return netrcentry[2]
         # 5. Read password from /etc/netrc.
         try:
-            netrcentry = netrc.netrc('/etc/netrc').authenticators(self.gethost())
+            netrcentry = netrc.netrc('/etc/netrc')\
+                .authenticators(self.gethost())
         except IOError as inst:
             if inst.errno not in (errno.ENOENT, errno.EACCES):
                 raise
@@ -456,7 +459,8 @@ class IMAPRepository(BaseRepository):
             listfunction = imapobj.lsub
 
         try:
-            result, listresult = listfunction(directory=self.imapserver.reference, pattern='"*"')
+            result, listresult = \
+                listfunction(directory=self.imapserver.reference, pattern='"*"')
             if result != 'OK':
                 raise OfflineImapError("Could not list the folders for"
                                        " repository %s. Server responded: %s" %
@@ -561,7 +565,8 @@ class IMAPRepository(BaseRepository):
             return
 
         parts = foldername.split(self.getsep())
-        folder_paths = [self.getsep().join(parts[:n + 1]) for n in range(len(parts))]
+        folder_paths = [self.getsep().join(parts[:n + 1])
+                        for n in range(len(parts))]
         for folder_path in folder_paths:
             try:
                 self.makefolder_single(folder_path)
