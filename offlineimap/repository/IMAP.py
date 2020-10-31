@@ -459,7 +459,7 @@ class IMAPRepository(BaseRepository):
             if result != 'OK':
                 raise OfflineImapError("Could not list the folders for"
                                        " repository %s. Server responded: %s" %
-                                       (self.name, self, str(listresult)),
+                                       (self.name, str(listresult)),
                                        OfflineImapError.ERROR.FOLDER)
         finally:
             self.imapserver.releaseconnection(imapobj)
