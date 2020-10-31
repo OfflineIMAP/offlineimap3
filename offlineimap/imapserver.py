@@ -18,9 +18,10 @@
 import datetime
 import hashlib
 import hmac
-import socket
 import json
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 import time
 import errno
 import socket
