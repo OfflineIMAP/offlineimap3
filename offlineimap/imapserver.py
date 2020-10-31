@@ -332,7 +332,8 @@ class IMAPServer():
             except imapobj.error as e:
                 raise OfflineImapError("Failed to start "
                                        "TLS connection: %s" % str(e),
-                                       OfflineImapError.ERROR.REPO, None, exc_info()[2])
+                                       OfflineImapError.ERROR.REPO,
+                                       exc_info()[2])
 
     # All __authn_* procedures are helpers that do authentication.
     # They are class methods that take one parameter, IMAP object.
