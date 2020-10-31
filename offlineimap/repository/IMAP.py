@@ -398,7 +398,7 @@ class IMAPRepository(BaseRepository):
         # 3. Read password from file specified in Repository 'remotepassfile'.
         passfile = self.getconf('remotepassfile', None)
         if passfile is not None:
-            fd = open(os.path.expanduser(passfile), 'r', 'utf-8')
+            fd = open(os.path.expanduser(passfile), 'r', encoding='utf-8')
             password = fd.readline().strip()
             fd.close()
             return password.encode('UTF-8')
