@@ -107,9 +107,9 @@ class IMAPRepository(BaseRepository):
 
         This requires that self.imapserver has been initialized with an
         acquireconnection() or it will still be `None`"""
-        assert self.imapserver.delim is not None, "'%s' " \
-                                                  "repository called getsep() before the folder separator was " \
-                                                  "queried from the server" % self
+        assert self.imapserver.delim is not None, \
+            "'%s' repository called getsep() before the folder separator was " \
+            "queried from the server" % self
         return self.imapserver.delim
 
     def gethost(self):
@@ -141,7 +141,8 @@ class IMAPRepository(BaseRepository):
 
         # No success.
         raise OfflineImapError("No remote host for repository "
-                               "'%s' specified." % self, OfflineImapError.ERROR.REPO)
+                               "'%s' specified." % self,
+                               OfflineImapError.ERROR.REPO)
 
     def get_remote_identity(self):
         """Remote identity is used for certain SASL mechanisms
@@ -167,8 +168,8 @@ class IMAPRepository(BaseRepository):
         for m in mechs:
             if m not in supported:
                 raise OfflineImapError("Repository %s: " % self +
-                                       "unknown authentication mechanism '%s'" % m,
-                                       OfflineImapError.ERROR.REPO)
+                                       "unknown authentication mechanism '%s'"
+                                       % m, OfflineImapError.ERROR.REPO)
 
         self.ui.debug('imap', "Using authentication mechanisms %s" % mechs)
         return mechs
@@ -486,7 +487,8 @@ class IMAPRepository(BaseRepository):
             try:
                 for foldername in self.folderincludes:
                     try:
-                        imapobj.select(imaputil.utf8_IMAP(foldername), readonly=True)
+                        imapobj.select(imaputil.utf8_IMAP(foldername),
+                                       readonly=True)
                     except OfflineImapError as e:
                         # couldn't select this folderinclude, so ignore folder.
                         if e.severity > OfflineImapError.ERROR.FOLDER:
@@ -514,7 +516,8 @@ class IMAPRepository(BaseRepository):
                         self.obj = obj
 
                     def __cmp__(self, other):
-                        return mycmp(self.obj.getvisiblename(), other.obj.getvisiblename())
+                        return mycmp(self.obj.getvisiblename(),
+                                     other.obj.getvisiblename())
 
                 return K
 
@@ -532,9 +535,9 @@ class IMAPRepository(BaseRepository):
         try:
             result = imapobj.delete(foldername)
             if result[0] != 'OK':
-                raise OfflineImapError("Folder '%s'[%s] could not be deleted. "
-                                       "Server responded: %s" % (foldername, self, str(result)),
-                                       OfflineImapError.ERROR.FOLDER)
+                msg = "Folder '%s'[%s] could not be deleted. "\
+                      "Server responded: %s" % (foldername, self, str(result))
+                raise OfflineImapError(msg, OfflineImapError.ERROR.FOLDER)
         finally:
             self.imapserver.releaseconnection(imapobj)
 
@@ -577,9 +580,9 @@ class IMAPRepository(BaseRepository):
 
             result = imapobj.create(foldername)
             if result[0] != 'OK':
-                raise OfflineImapError("Folder '%s'[%s] could not be created. "
-                                       "Server responded: %s" % (foldername, self, str(result)),
-                                       OfflineImapError.ERROR.FOLDER)
+                msg = "Folder '%s'[%s] could not be created. "\
+                      "Server responded: %s" % (foldername, self, str(result))
+                raise OfflineImapError(msg, OfflineImapError.ERROR.FOLDER)
         finally:
             self.imapserver.releaseconnection(imapobj)
 
