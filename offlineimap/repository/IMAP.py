@@ -60,7 +60,7 @@ class IMAPRepository(BaseRepository):
         self.kathread = ExitNotifyThread(target=self.imapserver.keepalive,
                                          name="Keep alive " + self.getname(),
                                          args=(keepalivetime, self.kaevent))
-        self.kathread.setDaemon(1)
+        self.kathread.setDaemon(True)
         self.kathread.start()
 
     def stopkeepalive(self):

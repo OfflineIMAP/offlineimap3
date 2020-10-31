@@ -778,7 +778,7 @@ class IdleThread:
             self.thread = Thread(target=self.noop)
         else:
             self.thread = Thread(target=self.__idle)
-        self.thread.setDaemon(1)
+        self.thread.setDaemon(True)
 
     def start(self):
         self.thread.start()
