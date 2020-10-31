@@ -40,7 +40,7 @@ except ImportError:
     have_gss = False
 
 
-class IMAPServer():
+class IMAPServer:
     """Initializes all variables from an IMAPRepository() instance
 
     Various functions, such as acquireconnection() return an IMAP4
