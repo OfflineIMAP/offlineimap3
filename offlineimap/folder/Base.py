@@ -1139,7 +1139,7 @@ class BaseFolder:
                 break
             try:
                 action(dstfolder, statusfolder)
-            except (KeyboardInterrupt):
+            except KeyboardInterrupt:
                 raise
             except OfflineImapError as e:
                 if e.severity > OfflineImapError.ERROR.FOLDER:
