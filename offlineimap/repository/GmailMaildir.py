@@ -23,6 +23,9 @@ from offlineimap.folder.GmailMaildir import GmailMaildirFolder
 
 
 class GmailMaildirRepository(MaildirRepository):
+    """
+    GMail Maildir Repository Class
+    """
     def __init__(self, reposname, account):
         """Initialize a MaildirRepository object.  Takes a path name
         to the directory holding all the Maildir directories."""
