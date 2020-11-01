@@ -152,8 +152,6 @@ class LocalStatusRepository(BaseRepository):
         the file names that we have available. TODO: need to store a
         list of folder names somehow?"""
 
-        pass
-
     def forgetfolders(self):
         """Forgets the cached list of folders, if any.  Useful to run
         after a sync run."""
