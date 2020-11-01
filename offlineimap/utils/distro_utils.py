@@ -89,9 +89,10 @@ def get_os_sslcertfile():
     if location is None:
         return None
 
-    for f in location:
-        assert isinstance(f, str)
-        if os.path.exists(f) and (os.path.isfile(f) or os.path.islink(f)):
-            return f
+    for l_file in location:
+        assert isinstance(l_file, str)
+        if os.path.exists(l_file) and (os.path.isfile(l_file) or
+                                       os.path.islink(l_file)):
+            return l_file
 
     return None
