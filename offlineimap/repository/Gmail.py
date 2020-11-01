@@ -71,10 +71,10 @@ class GmailRepository(IMAPRepository):
 
         port = super(GmailRepository, self).getport()
 
-        if port is None:
-            return 993
+        if port is not None:
+            return port
 
-        return port
+        return 993
 
     def getssl(self):
         ssl = self.getconfboolean('ssl', None)
