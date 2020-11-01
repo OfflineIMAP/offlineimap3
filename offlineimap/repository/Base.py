@@ -73,8 +73,6 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
         False), applies only to local Maildir mailboxes and does nothing
         on all other repository types."""
 
-        pass
-
     def connect(self):
         """Establish a connection to the remote, if necessary.  This exists
         so that IMAP connections can all be established up front, gathering
@@ -83,8 +81,6 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
         trap in order to validate the password, and that's the point of
         this function."""
 
-        pass
-
     def holdordropconnections(self):
         """
         Hold the drop connections functions.
@@ -92,7 +88,6 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
         Returns: None
 
         """
-        pass
 
     def dropconnections(self):
         """
@@ -101,7 +96,6 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
         Returns: None
 
         """
-        pass
 
     def getaccount(self):
         """
@@ -179,8 +173,6 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
     def forgetfolders(self):
         """Forgets the cached list of folders, if any.  Useful to run
         after a sync run."""
-
-        pass
 
     def getsep(self):
         """
@@ -372,13 +364,9 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
     def startkeepalive(self):
         """The default implementation will do nothing."""
 
-        pass
-
     def stopkeepalive(self):
         """Stop keep alive, but don't bother waiting
         for the threads to terminate."""
-
-        pass
 
     def getlocalroot(self):
         """ Local root folder for storing messages.
