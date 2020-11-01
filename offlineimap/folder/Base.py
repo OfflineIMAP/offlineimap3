@@ -1,19 +1,21 @@
-# Base folder support
-# Copyright (C) 2002-2016 John Goerzen & contributors
-#
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+"""
+Base folder support
+Copyright (C) 2002-2016 John Goerzen & contributors
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+"""
 
 import os.path
 import re
@@ -27,6 +29,9 @@ import offlineimap.accounts
 
 
 class BaseFolder:
+    """
+    Base Folder Class
+    """
     __hash__ = None
 
     def __init__(self, name, repository):
@@ -130,6 +135,12 @@ class BaseFolder:
             return self.repository.should_sync_folder(self.ffilter_name)
 
     def dofsync(self):
+        """
+        Call and returns _dofsync()
+
+        Returns: Call and returns _dofsync()
+
+        """
         return self._dofsync
 
     def suggeststhreads(self):
@@ -196,6 +207,13 @@ class BaseFolder:
         return self.sep
 
     def getfullname(self):
+        """
+        Returns the folder full name, using the getname(). If getroot() is set
+        their value is concatenated to getname() using the separator
+
+        Returns: The folder full name
+
+        """
         if self.getroot():
             return self.getroot() + self.getsep() + self.getname()
         else:
@@ -371,6 +389,12 @@ class BaseFolder:
                                    OfflineImapError.ERROR.MESSAGE)
 
     def getmaxsize(self):
+        """
+        Get the maxsize for account name. If not found, returns None.
+
+        Returns: A string with the maxise of the account name
+
+        """
         return self.config.getdefaultint("Account %s" %
                                          self.accountname, "maxsize", None)
 
@@ -396,6 +420,12 @@ class BaseFolder:
                                    OfflineImapError.ERROR.MESSAGE)
 
     def get_min_uid_file(self):
+        """
+        Get the min UID file name. Create it if not found.
+
+        Returns: Min UID file name.
+
+        """
         startuiddir = os.path.join(self.config.getmetadatadir(),
                                    'Repository-' + self.repository.name,
                                    'StartUID')
@@ -404,12 +434,27 @@ class BaseFolder:
         return os.path.join(startuiddir, self.getfolderbasename())
 
     def save_min_uid(self, min_uid):
+        """
+        Save the min UID in the min uid file
+
+        Args:
+            min_uid: min_uid to save
+
+        Returns: None
+
+        """
         uidfile = self.get_min_uid_file()
         fd = open(uidfile, 'wt')
         fd.write(str(min_uid) + "\n")
         fd.close()
 
     def retrieve_min_uid(self):
+        """
+        Retrieve the min UID file
+
+        Returns: min UID of file
+
+        """
         uidfile = self.get_min_uid_file()
         if not os.path.exists(uidfile):
             return None
