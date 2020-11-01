@@ -84,8 +84,8 @@ class GmailRepository(IMAPRepository):
             # GMail. Maybe this should look more similar to gethost &
             # we could just rely on the global "ssl = yes" default.
             return True
-        else:
-            return ssl
+
+        return ssl
 
     def getpreauthtunnel(self):
         return None
