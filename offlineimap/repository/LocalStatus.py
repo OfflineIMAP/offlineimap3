@@ -85,20 +85,20 @@ class LocalStatusRepository(BaseRepository):
         Returns: None
 
         """
-        for bk, dic in list(self.backends.items()):
+        for bkend, dic in list(self.backends.items()):
             # Skip folder's own type.
             if dic['class'] == type(folder):
                 continue
 
             repobk = LocalStatusRepository(self.name, self.account)
-            repobk.setup_backend(bk)  # Fake the backend.
+            repobk.setup_backend(bkend)  # Fake the backend.
             folderbk = dic['class'](folder.name, repobk)
 
             # If backend contains data, import it to folder.
             if not folderbk.isnewfolder():
                 self.ui._msg("Migrating LocalStatus cache from %s to %s "
                              "status folder for %s:%s" %
-                             (bk, self._backend, self.name, folder.name))
+                             (bkend, self._backend, self.name, folder.name))
 
                 folderbk.cachemessagelist()
                 folder.messagelist = folderbk.messagelist
