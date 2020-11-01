@@ -25,6 +25,9 @@ from offlineimap.repository.Base import BaseRepository
 
 
 class MaildirRepository(BaseRepository):
+    """
+    Maildir Repository Class
+    """
     def __init__(self, reposname, account):
         """Initialize a MaildirRepository object.  Takes a path name
         to the directory holding all the Maildir directories."""
@@ -77,6 +80,15 @@ class MaildirRepository(BaseRepository):
         return self.getconf_xform('localfolders', xforms)
 
     def debug(self, msg):
+        """
+        Debug function for the message. It calls the ui.debug function and
+        prepends the string 'maildir'.
+        Args:
+            msg: Message to send to the debug
+
+        Returns: None
+
+        """
         self.ui.debug('maildir', msg)
 
     def getsep(self):
@@ -211,6 +223,12 @@ class MaildirRepository(BaseRepository):
         return self.folders
 
     def getfoldertype(self):
+        """
+        Returns a folder MaildirFolder type.
+
+        Returns: A MaildirFolder class
+
+        """
         return folder.Maildir.MaildirFolder
 
     def forgetfolders(self):
