@@ -57,11 +57,11 @@ class GmailRepository(IMAPRepository):
 
         url = super().getoauth2_request_url()
         if url is None:
-            # Nothing was configured, cache and return hardcoded one.
+            # Nothing was configured, use a hardcoded one.
             url = "https://accounts.google.com/o/oauth2/token"
-            self.setoauth2_request_url(url)
-        else:
-            self.setoauth2_request_url(url)
+
+        self.setoauth2_request_url(url)
+
         return self.oauth2_request_url
 
     def getport(self):
