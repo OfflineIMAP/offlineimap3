@@ -69,12 +69,8 @@ def get_os_sslcertfile_searchpath():
     Returned value of None means that there is no search path
     at all.
     """
-
     os_name = get_os_name()
-
-    location = None
-    if os_name in __DEF_OS_LOCATIONS:
-        location = __DEF_OS_LOCATIONS[os_name]
+    location = __DEF_OS_LOCATIONS.get(os_name, None)
 
     return location
 
