@@ -30,6 +30,9 @@ from offlineimap.utils.distro_utils import get_os_sslcertfile, \
 
 
 class IMAPRepository(BaseRepository):
+    """
+    IMAP Repository Class, children of BaseRepository
+    """
     def __init__(self, reposname, account):
         self.idlefolders = None
         BaseRepository.__init__(self, reposname, account)
@@ -93,11 +96,25 @@ class IMAPRepository(BaseRepository):
         return self.copy_ignore_eval(foldername)
 
     def getholdconnectionopen(self):
+        """
+        Value of holdconnectionopen or False if it is not set
+
+        Returns: Value of holdconnectionopen or False if it is not set
+
+        """
         if self.getidlefolders():
             return True
         return self.getconfboolean("holdconnectionopen", False)
 
     def getkeepalive(self):
+        """
+        This function returns the keepalive value. If it is not set, then
+        check if the getidlefolders is set. If getidlefolders is set, then
+        returns 29 * 60
+
+        Returns: keepalive value
+
+        """
         num = self.getconfint("keepalive", 0)
         if num == 0 and self.getidlefolders():
             return 29 * 60
@@ -156,6 +173,13 @@ class IMAPRepository(BaseRepository):
         return identity
 
     def get_auth_mechanisms(self):
+        """
+        Get the AUTH mechanisms. We have (ranged from the strongest to weakest)
+        these methods: "GSSAPI", "XOAUTH2", "CRAM-MD5", "PLAIN", "LOGIN"
+
+        Returns: The supported AUTH Methods
+
+        """
         supported = ["GSSAPI", "XOAUTH2", "CRAM-MD5", "PLAIN", "LOGIN"]
         # Mechanisms are ranged from the strongest to the
         # weakest ones.
@@ -176,6 +200,12 @@ class IMAPRepository(BaseRepository):
         return mechs
 
     def getuser(self):
+        """
+        Returns the remoteusereval or remoteuser  or netrc user value.
+
+        Returns: Returns the remoteusereval or remoteuser or netrc user value.
+
+        """
         localeval = self.localeval
 
         if self.config.has_option(self.getsection(), 'remoteusereval'):
@@ -210,6 +240,12 @@ class IMAPRepository(BaseRepository):
                 return netrcentry[0]
 
     def getport(self):
+        """
+        Returns remoteporteval value or None if not found.
+
+        Returns: Returns remoteporteval int value or None if not found.
+
+        """
         port = None
 
         if self.config.has_option(self.getsection(), 'remoteporteval'):
@@ -220,16 +256,40 @@ class IMAPRepository(BaseRepository):
         return self.getconfint('remoteport', None)
 
     def getipv6(self):
+        """
+        Returns if IPv6 is set. If not set, then return None
+
+        Returns: Boolean flag if IPv6 is set.
+
+        """
         return self.getconfboolean('ipv6', None)
 
     def getssl(self):
+        """
+        Get the boolean SSL value. Default is True, used if not found.
+
+        Returns: Get the boolean SSL value. Default is True
+
+        """
         return self.getconfboolean('ssl', True)
 
     def getsslclientcert(self):
+        """
+        Return the SSL client cert (sslclientcert) or None if not found
+
+        Returns: SSL client key (sslclientcert) or None if not found
+
+        """
         xforms = [os.path.expanduser, os.path.expandvars, os.path.abspath]
         return self.getconf_xform('sslclientcert', xforms, None)
 
     def getsslclientkey(self):
+        """
+        Return the SSL client key (sslclientkey) or None if not found
+
+        Returns: SSL client key (sslclientkey) or None if not found
+
+        """
         xforms = [os.path.expanduser, os.path.expandvars, os.path.abspath]
         return self.getconf_xform('sslclientkey', xforms, None)
 
@@ -280,12 +340,30 @@ class IMAPRepository(BaseRepository):
         return cacertfile
 
     def gettlslevel(self):
+        """
+        Returns the TLS level (tls_level). If not set, returns 'tls_compat'
+
+        Returns: TLS level (tls_level). If not set, returns 'tls_compat'
+
+        """
         return self.getconf('tls_level', 'tls_compat')
 
     def getsslversion(self):
+        """
+        Returns the SSL version. If not set, returns None.
+
+        Returns: SSL version. If not set, returns None.
+
+        """
         return self.getconf('ssl_version', None)
 
     def getstarttls(self):
+        """
+        Get the value of starttls. If not set, returns True
+
+        Returns: Value of starttls. If not set, returns True
+
+        """
         return self.getconfboolean('starttls', True)
 
     def get_ssl_fingerprint(self):
@@ -299,9 +377,25 @@ class IMAPRepository(BaseRepository):
                 for f in value.split(',') if f]
 
     def setoauth2_request_url(self, url):
+        """
+        Set the OAUTH2 URL request.
+
+        Args:
+            url: OAUTH2 URL request
+
+        Returns: None
+
+        """
         self.oauth2_request_url = url
 
     def getoauth2_request_url(self):
+        """
+        Returns the OAUTH2 URL request from configuration (oauth2_request_url).
+        If it is not found, then returns None
+
+        Returns: OAUTH2 URL request (oauth2_request_url)
+
+        """
         if self.oauth2_request_url is not None:  # Use cached value if possible.
             return self.oauth2_request_url
 
@@ -309,6 +403,14 @@ class IMAPRepository(BaseRepository):
         return self.oauth2_request_url
 
     def getoauth2_refresh_token(self):
+        """
+        Get the OAUTH2 refresh token from the configuration
+        (oauth2_refresh_token)
+        If the access token is not found, then returns None.
+
+        Returns: OAUTH2 refresh token (oauth2_refresh_token)
+
+        """
         refresh_token = self.getconf('oauth2_refresh_token', None)
         if refresh_token is None:
             refresh_token = self.localeval.eval(
@@ -319,6 +421,13 @@ class IMAPRepository(BaseRepository):
         return refresh_token
 
     def getoauth2_access_token(self):
+        """
+        Get the OAUTH2 access token from the configuration (oauth2_access_token)
+        If the access token is not found, then returns None.
+
+        Returns: OAUTH2 access token (oauth2_access_token)
+
+        """
         access_token = self.getconf('oauth2_access_token', None)
         if access_token is None:
             access_token = self.localeval.eval(
@@ -329,6 +438,13 @@ class IMAPRepository(BaseRepository):
         return access_token
 
     def getoauth2_client_id(self):
+        """
+        Get the OAUTH2 client id (oauth2_client_id) from the configuration.
+        If not found, returns None
+
+        Returns: OAUTH2 client id (oauth2_client_id)
+
+        """
         client_id = self.getconf('oauth2_client_id', None)
         if client_id is None:
             client_id = self.localeval.eval(
@@ -339,6 +455,13 @@ class IMAPRepository(BaseRepository):
         return client_id
 
     def getoauth2_client_secret(self):
+        """
+        Get the OAUTH2 client secret (oauth2_client_secret) from the
+        configuration. If it is not found, then returns None.
+
+        Returns: OAUTH2 client secret
+
+        """
         client_secret = self.getconf('oauth2_client_secret', None)
         if client_secret is None:
             client_secret = self.localeval.eval(
@@ -349,18 +472,51 @@ class IMAPRepository(BaseRepository):
         return client_secret
 
     def getpreauthtunnel(self):
+        """
+        Get the value of preauthtunnel. If not found, then returns None.
+
+        Returns: Returns preauthtunnel value. If not found, returns None.
+
+        """
         return self.getconf('preauthtunnel', None)
 
     def gettransporttunnel(self):
+        """
+        Get the value of transporttunnel. If not found, then returns None.
+
+        Returns: Returns transporttunnel value. If not found, returns None.
+
+        """
         return self.getconf('transporttunnel', None)
 
     def getreference(self):
+        """
+        Get the reference value in the configuration. If the value is not found
+        then returns a double quote ("") as string.
+
+        Returns: The reference variable. If not set, then returns '""'
+
+        """
         return self.getconf('reference', '""')
 
     def getdecodefoldernames(self):
+        """
+        Get the boolean value of decodefoldernames configuration variable,
+        if the value is not found, returns False.
+
+        Returns: Boolean value of decodefoldernames, else False
+
+        """
         return self.getconfboolean('decodefoldernames', False)
 
     def getidlefolders(self):
+        """
+        Get the list of idlefolders from configuration. If the value is not
+        found, returns an empty list.
+
+        Returns: A list of idle folders
+
+        """
         if self.idlefolders is None:
             self.idlefolders = self.localeval.eval(
                 self.getconf('idlefolders', '[]')
@@ -368,11 +524,25 @@ class IMAPRepository(BaseRepository):
         return self.idlefolders
 
     def getmaxconnections(self):
+        """
+        Get the maxconnections configuration value from configuration.
+        If the value is not set, returns 1 connection
+
+        Returns: Integer value of maxconnections configuration variable, else 1
+
+        """
         num1 = len(self.getidlefolders())
         num2 = self.getconfint('maxconnections', 1)
         return max(num1, num2)
 
     def getexpunge(self):
+        """
+        Get the expunge configuration value from configuration.
+        If the value is not set in the configuration, then returns True
+
+        Returns: Boolean value of expunge configuration variable
+
+        """
         return self.getconfboolean('expunge', True)
 
     def getpassword(self):
@@ -438,6 +608,13 @@ class IMAPRepository(BaseRepository):
         return self.getfoldertype()(self.imapserver, foldername, self, decode)
 
     def getfoldertype(self):
+        """
+        This function returns the folder type, in this case
+        folder.IMAP.IMAPFolder
+
+        Returns: folder.IMAP.IMAPFolder
+
+        """
         return folder.IMAP.IMAPFolder
 
     def connect(self):
@@ -511,12 +688,16 @@ class IMAPRepository(BaseRepository):
             retval.sort(key=lambda x: str.lower(x.getvisiblename()))
         else:
             # do foldersort in a python3-compatible way
-            # http://bytes.com/topic/python/answers/844614-python-3-sorting-comparison-function
+            # http://bytes.com/topic/python/answers/ \
+            # 844614-python-3-sorting-comparison-function
             def cmp2key(mycmp):
                 """Converts a cmp= function into a key= function
                 We need to keep cmp functions for backward compatibility"""
 
                 class K:
+                    """
+                    Class to compare getvisiblename() between two objects.
+                    """
                     def __init__(self, obj, *args):
                         self.obj = obj
 
@@ -547,14 +728,19 @@ class IMAPRepository(BaseRepository):
             self.imapserver.releaseconnection(imapobj)
 
     def makefolder(self, foldername):
-        """Create a folder on the IMAP server
+        """
+        Create a folder on the IMAP server
 
         This will not update the list cached in :meth:`getfolders`. You
         will need to invoke :meth:`forgetfolders` to force new caching
         when you are done creating folders yourself.
 
-        :param foldername: Full path of the folder to be created."""
+        Args:
+            foldername: Full path of the folder to be created
 
+        Returns: None
+
+        """
         if foldername == '':
             return
 
@@ -576,6 +762,15 @@ class IMAPRepository(BaseRepository):
                     raise
 
     def makefolder_single(self, foldername):
+        """
+        Create a IMAP folder.
+
+        Args:
+            foldername: Folder's name to create
+
+        Returns: None
+
+        """
         self.ui.makefolder(self, foldername)
         if self.account.dryrun:
             return
@@ -594,5 +789,10 @@ class IMAPRepository(BaseRepository):
 
 
 class MappedIMAPRepository(IMAPRepository):
+    """
+    This subclass of IMAPRepository includes only the method
+    getfoldertype modified that returns folder.UIDMaps.MappedIMAPFolder
+    instead of folder.IMAP.IMAPFolder
+    """
     def getfoldertype(self):
         return folder.UIDMaps.MappedIMAPFolder
