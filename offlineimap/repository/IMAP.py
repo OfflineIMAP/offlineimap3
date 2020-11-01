@@ -142,10 +142,10 @@ class IMAPRepository(BaseRepository):
             host = self.getconf('remotehosteval')
             try:
                 host = self.localeval.eval(host)
-            except Exception as e:
+            except Exception as exc:
                 raise OfflineImapError(
                     "remotehosteval option for repository "
-                    "'%s' failed:\n%s" % (self, e),
+                    "'%s' failed:\n%s" % (self, exc),
                     OfflineImapError.ERROR.REPO,
                     exc_info()[2])
             if host:
@@ -190,11 +190,11 @@ class IMAPRepository(BaseRepository):
         mechs = self.getconflist('auth_mechanisms', r',\s*',
                                  default)
 
-        for m in mechs:
-            if m not in supported:
+        for mech in mechs:
+            if mech not in supported:
                 raise OfflineImapError("Repository %s: " % self +
                                        "unknown authentication mechanism '%s'"
-                                       % m, OfflineImapError.ERROR.REPO)
+                                       % mech, OfflineImapError.ERROR.REPO)
 
         self.ui.debug('imap', "Using authentication mechanisms %s" % mechs)
         return mechs
@@ -572,9 +572,10 @@ class IMAPRepository(BaseRepository):
         # 3. Read password from file specified in Repository 'remotepassfile'.
         passfile = self.getconf('remotepassfile', None)
         if passfile is not None:
-            fd = open(os.path.expanduser(passfile), 'r', encoding='utf-8')
-            password = fd.readline().strip()
-            fd.close()
+            file_desc = open(os.path.expanduser(passfile), 'r',
+                             encoding='utf-8')
+            password = file_desc.readline().strip()
+            file_desc.close()
             return password.encode('UTF-8')
         # 4. Read password from ~/.netrc.
         try:
@@ -647,16 +648,16 @@ class IMAPRepository(BaseRepository):
         finally:
             self.imapserver.releaseconnection(imapobj)
 
-        for s in listresult:
-            if s is None or (isinstance(s, str) and s == ''):
+        for fldr in listresult:
+            if fldr is None or (isinstance(fldr, str) and fldr == ''):
                 # Bug in imaplib: empty strings in results from
                 # literals. TODO: still relevant?
                 continue
             try:
-                flags, delim, name = imaputil.imapsplit(s)
+                flags, delim, name = imaputil.imapsplit(fldr)
             except ValueError:
                 self.ui.error(
-                    "could not correctly parse server response; got: %s" % s)
+                    "could not correctly parse server response; got: %s" % fldr)
                 raise
             flaglist = [x.lower() for x in imaputil.flagsplit(flags)]
             if '\\noselect' in flaglist:
@@ -671,11 +672,11 @@ class IMAPRepository(BaseRepository):
                     try:
                         imapobj.select(imaputil.utf8_IMAP(foldername),
                                        readonly=True)
-                    except OfflineImapError as e:
+                    except OfflineImapError as exc:
                         # couldn't select this folderinclude, so ignore folder.
-                        if e.severity > OfflineImapError.ERROR.FOLDER:
+                        if exc.severity > OfflineImapError.ERROR.FOLDER:
                             raise
-                        self.ui.error(e, exc_info()[2],
+                        self.ui.error(exc, exc_info()[2],
                                       'Invalid folderinclude:')
                         continue
                     retval.append(self.getfoldertype()(
@@ -757,8 +758,8 @@ class IMAPRepository(BaseRepository):
         for folder_path in folder_paths:
             try:
                 self.makefolder_single(folder_path)
-            except OfflineImapError as e:
-                if '[ALREADYEXISTS]' not in e.reason:
+            except OfflineImapError as exc:
+                if '[ALREADYEXISTS]' not in exc.reason:
                     raise
 
     def makefolder_single(self, foldername):
