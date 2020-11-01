@@ -84,4 +84,3 @@ class Repository:
         :param account: :class:`Account`
         :param reqtype: 'remote', 'local', or 'status'
         """
-        pass
