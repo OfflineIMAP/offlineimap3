@@ -60,19 +60,19 @@ class Repository:
         config = account.getconfig()
         try:
             repostype = config.get('Repository ' + name, 'type').strip()
-        except NoSectionError:
+        except NoSectionError as exc:
             errstr = ("Could not find section '%s' in configuration. Required "
                       "for account '%s'." % ('Repository %s' % name, account))
             raise OfflineImapError(errstr, OfflineImapError.ERROR.REPO,
-                                   exc_info()[2])
+                                   exc_info()[2]) from exc
 
         try:
             repo = typemap[repostype]
-        except KeyError:
+        except KeyError as exc:
             errstr = "'%s' repository not supported for '%s' repositories." % \
                      (repostype, reqtype)
             raise OfflineImapError(errstr, OfflineImapError.ERROR.REPO,
-                                   exc_info()[2])
+                                   exc_info()[2]) from exc
 
         return repo(name, account)
 
