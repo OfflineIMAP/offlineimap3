@@ -25,6 +25,9 @@ from offlineimap.error import OfflineImapError
 
 
 class BaseRepository(CustomConfig.ConfigHelperMixin):
+    """
+    Base Class for Repository
+    """
     def __init__(self, reposname, account):
         self.ui = getglobalui()
         self.account = account
@@ -83,15 +86,39 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
         pass
 
     def holdordropconnections(self):
+        """
+        Hold the drop connections functions.
+
+        Returns: None
+
+        """
         pass
 
     def dropconnections(self):
+        """
+        Drop connections functions.
+
+        Returns: None
+
+        """
         pass
 
     def getaccount(self):
+        """
+        This patch returns the account
+
+        Returns: The account
+
+        """
         return self.account
 
     def getname(self):
+        """
+        Get the repository name
+
+        Returns: String with the repository name
+
+        """
         return self.name
 
     def __str__(self):
@@ -104,9 +131,21 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
         return self._accountname
 
     def getuiddir(self):
+        """
+        The FolderValidity directory
+
+        Returns: The FolderValidity directory
+
+        """
         return self.uiddir
 
     def getmapdir(self):
+        """
+        Get the map dir (UIDMapping)
+
+        Returns: The UIDMapping directory
+
+        """
         return self.mapdir
 
     # Interface from CustomConfig.ConfigHelperMixin
@@ -124,6 +163,12 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
         return self._readonly
 
     def getlocaleval(self):
+        """
+        Get the account local eval.
+
+        Returns: LocalEval class for account.
+
+        """
         return self.account.getlocaleval()
 
     def getfolders(self):
@@ -138,9 +183,25 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
         pass
 
     def getsep(self):
+        """
+        Get the separator.
+
+        This function is not implemented.
+
+        Returns: None
+
+        """
         raise NotImplementedError
 
     def getkeywordmap(self):
+        """
+        Get the keyword map.
+
+        This function is not implemented.
+
+        Returns: None
+
+        """
         raise NotImplementedError
 
     def should_sync_folder(self, fname):
@@ -158,11 +219,30 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
                                                             True)
 
     def makefolder(self, foldername):
-        """Create a new folder."""
+        """
+        Create a new folder.
+        This function is not implemented
 
+        Args:
+            foldername: Folder to create
+
+        Returns: None
+
+        """
         raise NotImplementedError
 
     def deletefolder(self, foldername):
+        """
+        Remove the selected folder.
+
+        This function is not implemented
+
+        Args:
+            foldername: Folder to delete
+
+        Returns: None
+
+        """
         raise NotImplementedError
 
     def getfolder(self, foldername, decode=True):
