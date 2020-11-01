@@ -46,19 +46,19 @@ class MaildirRepository(BaseRepository):
 
         # Create the keyword->char mapping
         self.keyword2char = dict()
-        for c in 'abcdefghijklmnopqrstuvwxyz':
-            confkey = 'customflag_' + c
+        for char in 'abcdefghijklmnopqrstuvwxyz':
+            confkey = 'customflag_' + char
             keyword = self.getconf(confkey, None)
             if keyword is not None:
-                self.keyword2char[keyword] = c
+                self.keyword2char[keyword] = char
 
     def _append_folder_atimes(self, foldername):
         """Store the atimes of a folder's new|cur in self.folder_atimes"""
 
-        p = os.path.join(self.root, foldername)
-        new = os.path.join(p, 'new')
-        cur = os.path.join(p, 'cur')
-        atimes = (p, os.path.getatime(new), os.path.getatime(cur))
+        path = os.path.join(self.root, foldername)
+        new = os.path.join(path, 'new')
+        cur = os.path.join(path, 'cur')
+        atimes = (path, os.path.getatime(new), os.path.getatime(cur))
         self.folder_atimes.append(atimes)
 
     def restore_atime(self):
@@ -129,16 +129,16 @@ class MaildirRepository(BaseRepository):
         self.debug("makefolder: calling makedirs '%s'" % full_path)
         try:
             os.makedirs(full_path, 0o700)
-        except OSError as e:
-            if e.errno == 17 and os.path.isdir(full_path):
+        except OSError as exc:
+            if exc.errno == 17 and os.path.isdir(full_path):
                 self.debug("makefolder: '%s' already a directory" % foldername)
             else:
                 raise
         for subdir in ['cur', 'new', 'tmp']:
             try:
                 os.mkdir(os.path.join(full_path, subdir), 0o700)
-            except OSError as e:
-                if e.errno == 17 and os.path.isdir(full_path):
+            except OSError as exc:
+                if exc.errno == 17 and os.path.isdir(full_path):
                     self.debug("makefolder: '%s' already has subdir %s" %
                                (foldername, subdir))
                 else:
@@ -156,9 +156,9 @@ class MaildirRepository(BaseRepository):
 
         # getfolders() will scan and cache the values *if* necessary
         folders = self.getfolders()
-        for f in folders:
-            if foldername == f.name:
-                return f
+        for foldr in folders:
+            if foldername == foldr.name:
+                return foldr
         raise OfflineImapError("getfolder() asked for a nonexisting "
                                "folder '%s'." % foldername, OfflineImapError.ERROR.FOLDER)
 
@@ -207,9 +207,9 @@ class MaildirRepository(BaseRepository):
                 self.debug("  This is maildir folder '%s'." % foldername)
                 if self.getconfboolean('restoreatime', False):
                     self._append_folder_atimes(foldername)
-                fd = self.getfoldertype()(self.root, foldername,
-                                          self.getsep(), self)
-                retval.append(fd)
+                file_desc = self.getfoldertype()(self.root, foldername,
+                                                 self.getsep(), self)
+                retval.append(file_desc)
 
             if self.getsep() == '/' and dirname != '':
                 # Recursively check sub-directories for folders too.
