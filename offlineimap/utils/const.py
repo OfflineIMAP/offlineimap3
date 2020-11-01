@@ -1,8 +1,9 @@
-# Copyright (C) 2013-2014 Eygene A. Ryabinkin and contributors
-#
-# Collection of classes that implement const-like behaviour
-# for various objects.
+"""
+Copyright (C) 2013-2014 Eygene A. Ryabinkin and contributors
 
+Collection of classes that implement const-like behaviour
+for various objects.
+"""
 import copy
 
 
