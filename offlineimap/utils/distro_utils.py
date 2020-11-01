@@ -1,7 +1,8 @@
-# Copyright 2006-2018 Eygene A. Ryabinkin & contributors.
-#
-# Module that supports distribution-specific functions.
+"""
+Copyright 2006-2018 Eygene A. Ryabinkin & contributors.
 
+Module that supports distribution-specific functions.
+"""
 import platform
 import os
 
