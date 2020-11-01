@@ -1,6 +1,8 @@
-# Copyright 2013 Eygene A. Ryabinkin
-# Functions to perform stack tracing (for multithreaded programs
-# as well as for single-threaded ones).
+"""
+Copyright 2013 Eygene A. Ryabinkin
+Functions to perform stack tracing (for multithreaded programs
+as well as for single-threaded ones).
+"""
 
 import sys
 import threading
