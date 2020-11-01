@@ -37,7 +37,8 @@ class MaildirRepository(BaseRepository):
         self.root = self.getlocalroot()
         self.folders = None
         self.ui = getglobalui()
-        self.debug("MaildirRepository initialized, sep is %s" % repr(self.getsep()))
+        self.debug("MaildirRepository initialized, sep is %s" %
+                   repr(self.getsep()))
         self.folder_atimes = []
 
         # Create the top-level folder if it doesn't exist
@@ -121,8 +122,10 @@ class MaildirRepository(BaseRepository):
                 assert component not in ['new', 'cur', 'tmp'], \
                     "When using nested folders (/ as a Maildir separator), " \
                     "folder names may not contain 'new', 'cur', 'tmp'."
-        assert foldername.find('../') == -1, "Folder names may not contain ../"
-        assert not foldername.startswith('/'), "Folder names may not begin with /"
+        assert foldername.find('../') == -1, \
+            "Folder names may not contain ../"
+        assert not foldername.startswith('/'), \
+            "Folder names may not begin with /"
 
         # If we're using hierarchical folders, it's possible that
         # sub-folders may be created before higher-up ones.
@@ -160,7 +163,8 @@ class MaildirRepository(BaseRepository):
             if foldername == foldr.name:
                 return foldr
         raise OfflineImapError("getfolder() asked for a nonexisting "
-                               "folder '%s'." % foldername, OfflineImapError.ERROR.FOLDER)
+                               "folder '%s'." % foldername,
+                               OfflineImapError.ERROR.FOLDER)
 
     def _getfolders_scandir(self, root, extension=None):
         """Recursively scan folder 'root'; return a list of MailDirFolder
@@ -214,7 +218,8 @@ class MaildirRepository(BaseRepository):
             if self.getsep() == '/' and dirname != '':
                 # Recursively check sub-directories for folders too.
                 retval.extend(self._getfolders_scandir(root, foldername))
-        self.debug("_GETFOLDERS_SCANDIR RETURNING %s" % repr([x.getname() for x in retval]))
+        self.debug("_GETFOLDERS_SCANDIR RETURNING %s" %
+                   repr([x.getname() for x in retval]))
         return retval
 
     def getfolders(self):
