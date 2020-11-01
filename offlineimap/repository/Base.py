@@ -284,8 +284,8 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
                     local_repo.makefolder(local_name)
                     # Need to refresh list.
                     local_repo.forgetfolders()
-                except OfflineImapError as e:
-                    self.ui.error(e, exc_info()[2],
+                except OfflineImapError as exc:
+                    self.ui.error(exc, exc_info()[2],
                                   "Creating folder %s on repository %s" %
                                   (local_name, local_repo))
                     raise
@@ -349,10 +349,10 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
                     remote_repo.makefolder(remote_name)
                     # Need to refresh list.
                     self.forgetfolders()
-                except OfflineImapError as e:
+                except OfflineImapError as exc:
                     msg = "Creating folder %s on repository %s" % \
                           (remote_name, remote_repo)
-                    self.ui.error(e, exc_info()[2], msg)
+                    self.ui.error(exc, exc_info()[2], msg)
                     raise
                 status_repo.makefolder(local_name.replace(
                     local_repo.getsep(), status_repo.getsep()))
