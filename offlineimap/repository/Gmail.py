@@ -98,12 +98,16 @@ class GmailRepository(IMAPRepository):
         return folder.Gmail.GmailFolder
 
     def gettrashfolder(self):
-        # Where deleted mail should be moved
+        """
+        Where deleted mail should be moved
+        """
         return self.getconf('trashfolder', '[Gmail]/Trash')
 
     def getspamfolder(self):
-        # Depending on the IMAP settings (Settings -> Forwarding and
-        # POP/IMAP -> IMAP Access -> "When I mark a message in IMAP as
-        # deleted") GMail might also deletes messages upon EXPUNGE in
-        # the Spam folder.
+        """
+        Depending on the IMAP settings (Settings -> Forwarding and
+        POP/IMAP -> IMAP Access -> "When I mark a message in IMAP as
+        deleted") GMail might also deletes messages upon EXPUNGE in
+        the Spam folder.
+        """
         return self.getconf('spamfolder', '[Gmail]/Spam')
