@@ -40,7 +40,7 @@ class GmailRepository(IMAPRepository):
         We first check the usual IMAP settings, and then fall back to
         imap.gmail.com if nothing is specified."""
         try:
-            return super(GmailRepository, self).gethost()
+            return super().gethost()
         except OfflineImapError:
             # Nothing was configured, cache and return hardcoded
             # one. See the parent class (IMAPRepository) for how this
@@ -55,7 +55,7 @@ class GmailRepository(IMAPRepository):
         https://accounts.google.com/o/oauth2/token if nothing is
         specified."""
 
-        url = super(GmailRepository, self).getoauth2_request_url()
+        url = super().getoauth2_request_url()
         if url is None:
             # Nothing was configured, cache and return hardcoded one.
             self.setoauth2_request_url("https://accounts.google.com/o/oauth2/token")
@@ -69,7 +69,7 @@ class GmailRepository(IMAPRepository):
         This Gmail implementation first checks for the usual IMAP settings
         and falls back to 993 if nothing is specified."""
 
-        port = super(GmailRepository, self).getport()
+        port = super().getport()
 
         if port is not None:
             return port
