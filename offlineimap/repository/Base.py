@@ -258,7 +258,7 @@ class BaseRepository(CustomConfig.ConfigHelperMixin):
         if not self.should_create_folders()\
                 and not local_repo.should_create_folders():
             # Quick exit if no folder creation is enabled on either side.
-            return
+            return None
 
         remote_repo = self
         remote_hash, local_hash = {}, {}
