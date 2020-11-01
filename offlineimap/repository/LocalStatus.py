@@ -25,6 +25,9 @@ from offlineimap.error import OfflineImapError
 
 
 class LocalStatusRepository(BaseRepository):
+    """
+    Local Status Repository Class, child of Base Repository Class
+    """
     def __init__(self, reposname, account):
         BaseRepository.__init__(self, reposname, account)
 
@@ -58,12 +61,30 @@ class LocalStatusRepository(BaseRepository):
         return self.LocalStatusFolderClass(foldername, self)  # Instantiate.
 
     def setup_backend(self, backend):
+        """
+        Setup the backend.
+
+        Args:
+            backend: backend to use
+
+        Returns: None
+
+        """
         if backend in list(self.backends.keys()):
             self._backend = backend
             self.root = self.backends[backend]['root']
             self.LocalStatusFolderClass = self.backends[backend]['class']
 
     def import_other_backend(self, folder):
+        """
+        Import other backend
+
+        Args:
+            folder: folder
+
+        Returns: None
+
+        """
         for bk, dic in list(self.backends.items()):
             # Skip folder's own type.
             if dic['class'] == type(folder):
