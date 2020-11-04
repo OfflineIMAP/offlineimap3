@@ -562,7 +562,21 @@ class IMAPRepository(BaseRepository):
         # 1. Evaluate Repository 'remotepasseval'.
         passwd = self.getconf('remotepasseval', None)
         if passwd is not None:
-            return self.localeval.eval(passwd).encode('utf-8')
+            l_pass = self.localeval.eval(passwd)
+
+            # We need a str password
+            if isinstance(l_pass, bytes):
+                return l_pass.decode(encoding='utf-8')
+            elif isinstance(l_pass, str):
+                return l_pass
+
+            # If is not bytes or str, we have a problem
+            raise OfflineImapError("Could not get a right password format for"
+                                   " repository %s. Type found: %s. "
+                                   "Please, open a bug." %
+                                   (self.name, type(l_pass)),
+                                   OfflineImapError.ERROR.FOLDER)
+
         # 2. Read password from Repository 'remotepass'.
         password = self.getconf('remotepass', None)
         if password is not None:
