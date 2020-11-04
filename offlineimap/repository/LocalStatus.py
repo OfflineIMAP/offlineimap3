@@ -1,20 +1,21 @@
-# Local status cache repository support
-# Copyright (C) 2002-2017 John Goerzen & contributors
-#
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+"""
+Local status cache repository support
+Copyright (C) 2002-2017 John Goerzen & contributors
 
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+"""
 import os
 
 from offlineimap.folder.LocalStatus import LocalStatusFolder
@@ -24,6 +25,9 @@ from offlineimap.error import OfflineImapError
 
 
 class LocalStatusRepository(BaseRepository):
+    """
+    Local Status Repository Class, child of Base Repository Class
+    """
     def __init__(self, reposname, account):
         BaseRepository.__init__(self, reposname, account)
 
@@ -57,26 +61,44 @@ class LocalStatusRepository(BaseRepository):
         return self.LocalStatusFolderClass(foldername, self)  # Instantiate.
 
     def setup_backend(self, backend):
+        """
+        Setup the backend.
+
+        Args:
+            backend: backend to use
+
+        Returns: None
+
+        """
         if backend in list(self.backends.keys()):
             self._backend = backend
             self.root = self.backends[backend]['root']
             self.LocalStatusFolderClass = self.backends[backend]['class']
 
     def import_other_backend(self, folder):
-        for bk, dic in list(self.backends.items()):
+        """
+        Import other backend
+
+        Args:
+            folder: folder
+
+        Returns: None
+
+        """
+        for bkend, dic in list(self.backends.items()):
             # Skip folder's own type.
             if dic['class'] == type(folder):
                 continue
 
             repobk = LocalStatusRepository(self.name, self.account)
-            repobk.setup_backend(bk)  # Fake the backend.
+            repobk.setup_backend(bkend)  # Fake the backend.
             folderbk = dic['class'](folder.name, repobk)
 
             # If backend contains data, import it to folder.
             if not folderbk.isnewfolder():
                 self.ui._msg("Migrating LocalStatus cache from %s to %s "
                              "status folder for %s:%s" %
-                             (bk, self._backend, self.name, folder.name))
+                             (bkend, self._backend, self.name, folder.name))
 
                 folderbk.cachemessagelist()
                 folder.messagelist = folderbk.messagelist
@@ -129,8 +151,6 @@ class LocalStatusRepository(BaseRepository):
         (see getfolderfilename) so we can not derive folder names from
         the file names that we have available. TODO: need to store a
         list of folder names somehow?"""
-
-        pass
 
     def forgetfolders(self):
         """Forgets the cached list of folders, if any.  Useful to run

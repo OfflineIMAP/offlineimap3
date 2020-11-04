@@ -1,19 +1,21 @@
-# Base folder support
-# Copyright (C) 2002-2016 John Goerzen & contributors
-#
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+"""
+Base folder support
+Copyright (C) 2002-2016 John Goerzen & contributors
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+"""
 
 import os.path
 import re
@@ -27,6 +29,9 @@ import offlineimap.accounts
 
 
 class BaseFolder:
+    """
+    Base Folder Class
+    """
     __hash__ = None
 
     def __init__(self, name, repository):
@@ -130,6 +135,12 @@ class BaseFolder:
             return self.repository.should_sync_folder(self.ffilter_name)
 
     def dofsync(self):
+        """
+        Call and returns _dofsync()
+
+        Returns: Call and returns _dofsync()
+
+        """
         return self._dofsync
 
     def suggeststhreads(self):
@@ -196,6 +207,13 @@ class BaseFolder:
         return self.sep
 
     def getfullname(self):
+        """
+        Returns the folder full name, using the getname(). If getroot() is set
+        their value is concatenated to getname() using the separator
+
+        Returns: The folder full name
+
+        """
         if self.getroot():
             return self.getroot() + self.getsep() + self.getname()
         else:
@@ -371,6 +389,12 @@ class BaseFolder:
                                    OfflineImapError.ERROR.MESSAGE)
 
     def getmaxsize(self):
+        """
+        Get the maxsize for account name. If not found, returns None.
+
+        Returns: A string with the maxise of the account name
+
+        """
         return self.config.getdefaultint("Account %s" %
                                          self.accountname, "maxsize", None)
 
@@ -396,19 +420,41 @@ class BaseFolder:
                                    OfflineImapError.ERROR.MESSAGE)
 
     def get_min_uid_file(self):
+        """
+        Get the min UID file name. Create it if not found.
+
+        Returns: Min UID file name.
+
+        """
         startuiddir = os.path.join(self.config.getmetadatadir(),
-                                   'Repository-' + self.repository.name, 'StartUID')
+                                   'Repository-' + self.repository.name,
+                                   'StartUID')
         if not os.path.exists(startuiddir):
             os.mkdir(startuiddir, 0o700)
         return os.path.join(startuiddir, self.getfolderbasename())
 
     def save_min_uid(self, min_uid):
+        """
+        Save the min UID in the min uid file
+
+        Args:
+            min_uid: min_uid to save
+
+        Returns: None
+
+        """
         uidfile = self.get_min_uid_file()
         fd = open(uidfile, 'wt')
         fd.write(str(min_uid) + "\n")
         fd.close()
 
     def retrieve_min_uid(self):
+        """
+        Retrieve the min UID file
+
+        Returns: min UID of file
+
+        """
         uidfile = self.get_min_uid_file()
         if not os.path.exists(uidfile):
             return None
@@ -594,8 +640,8 @@ class BaseFolder:
     def addmessageheader(self, content, linebreak, headername, headervalue):
         """Adds new header to the provided message.
 
-        WARNING: This function is a bit tricky, and modifying it in the wrong way,
-        may easily lead to data-loss.
+        WARNING: This function is a bit tricky, and modifying it in the wrong
+        way, may easily lead to data-loss.
 
         Arguments:
         - content: message content, headers and body as a single string
@@ -605,8 +651,8 @@ class BaseFolder:
 
         .. note::
 
-           The following documentation will not get displayed correctly after being
-           processed by Sphinx. View the source of this method to read it.
+           The following documentation will not get displayed correctly after
+           being processed by Sphinx. View the source of this method to read it.
 
         This has to deal with strange corner cases where the header is
         missing or empty.  Here are illustrations for all the cases,
@@ -659,7 +705,8 @@ class BaseFolder:
             self.ui.debug('', 'addmessageheader: headers were missing')
         else:
             self.ui.debug('',
-                          'addmessageheader: headers end at position %d' % insertionpoint)
+                          'addmessageheader: headers end at position %d' %
+                          insertionpoint)
             mark = '==>EOH<=='
             contextstart = max(0, insertionpoint - 100)
             contextend = min(len(content), insertionpoint + 100)
@@ -693,9 +740,11 @@ class BaseFolder:
         self.ui.debug('',
                       'addmessageheader: insertionpoint = %d' % insertionpoint)
         headers = content[0:insertionpoint]
-        self.ui.debug('', 'addmessageheader: headers = %s' % repr(headers))
+        self.ui.debug('',
+                      'addmessageheader: headers = %s' % repr(headers))
         new_header = prefix + ("%s: %s" % (headername, headervalue)) + suffix
-        self.ui.debug('', 'addmessageheader: new_header = %s' % repr(new_header))
+        self.ui.debug('',
+                      'addmessageheader: new_header = %s' % repr(new_header))
         return headers + new_header + content[insertionpoint:]
 
     def __find_eoh(self, content):
@@ -746,7 +795,8 @@ class BaseFolder:
         - contents: message itself
         - name: name of the header to be searched
 
-        Returns: list of header values or empty list if no such header was found.
+        Returns: list of header values or empty list if no such header was
+        found.
         """
 
         self.ui.debug('', 'getmessageheaderlist: called to get %s' % name)
@@ -769,7 +819,8 @@ class BaseFolder:
 
         if type(header_list) != type([]):
             header_list = [header_list]
-        self.ui.debug('', 'deletemessageheaders: called to delete %s' % header_list)
+        self.ui.debug('',
+                      'deletemessageheaders: called to delete %s' % header_list)
 
         if not len(header_list):
             return content
@@ -783,7 +834,8 @@ class BaseFolder:
         for h in headers.split('\n'):
             keep_it = True
             for trim_h in header_list:
-                if len(h) > len(trim_h) and h[0:len(trim_h) + 1] == (trim_h + ":"):
+                if len(h) > len(trim_h) \
+                        and h[0:len(trim_h) + 1] == (trim_h + ":"):
                     keep_it = False
                     break
             if keep_it:
@@ -873,9 +925,10 @@ class BaseFolder:
                 # IMAP servers ...
                 self.deletemessage(uid)
             else:
-                raise OfflineImapError("Trying to save msg (uid %d) on folder "
-                                       "%s returned invalid uid %d" % (uid, dstfolder.getvisiblename(),
-                                                                       new_uid), OfflineImapError.ERROR.MESSAGE)
+                msg = "Trying to save msg (uid %d) on folder " \
+                      "%s returned invalid uid %d" % \
+                      (uid, dstfolder.getvisiblename(), new_uid)
+                raise OfflineImapError(msg, OfflineImapError.ERROR.MESSAGE)
         except KeyboardInterrupt:  # Bubble up CTRL-C.
             raise
         except OfflineImapError as e:
@@ -884,7 +937,8 @@ class BaseFolder:
             self.ui.error(e, exc_info()[2])
         except Exception as e:
             self.ui.error(e, exc_info()[2],
-                          msg="Copying message %s [acc: %s]" % (uid, self.accountname))
+                          msg="Copying message %s [acc: %s]" %
+                              (uid, self.accountname))
             raise  # Raise on unknown errors, so we can fix those.
 
     def __syncmessagesto_copy(self, dstfolder, statusfolder):
@@ -929,24 +983,28 @@ class BaseFolder:
                     break
 
                 if uid == 0:
-                    self.ui.warn("Assertion that UID != 0 failed; ignoring message.")
+                    msg = "Assertion that UID != 0 failed; ignoring message."
+                    self.ui.warn(msg)
                     continue
 
                 if uid > 0 and dstfolder.uidexists(uid):
-                    # dstfolder has message with that UID already, only update status.
+                    # dstfolder has message with that UID already,
+                    # only update status.
                     flags = self.getmessageflags(uid)
                     rtime = self.getmessagetime(uid)
                     statusfolder.savemessage(uid, None, flags, rtime)
                     continue
 
-                self.ui.copyingmessage(uid, num + 1, num_to_copy, self, dstfolder)
+                self.ui.copyingmessage(uid, num + 1, num_to_copy, self,
+                                       dstfolder)
                 # Exceptions are caught in copymessageto().
                 if self.suggeststhreads():
                     self.waitforthread()
                     thread = threadutil.InstanceLimitedThread(
                         self.getinstancelimitnamespace(),
                         target=self.copymessageto,
-                        name="Copy message from %s:%s" % (self.repository, self),
+                        name="Copy message from %s:%s" % (self.repository,
+                                                          self),
                         args=(uid, dstfolder, statusfolder)
                     )
                     thread.start()
@@ -1015,9 +1073,10 @@ class BaseFolder:
                 # skip them.
                 skipped_keywords = list(selfkeywords - knownkeywords)
                 selfkeywords &= knownkeywords
-                self.ui.warn("Unknown keywords skipped: %s\n"
-                             "You may want to change your configuration to include "
-                             "those\n" % skipped_keywords)
+                msg = "Unknown keywords skipped: %s\n" \
+                      "You may want to change your configuration to include " \
+                      "those\n" % skipped_keywords
+                self.ui.warn(msg)
 
             keywordletterset = set([keywordmap[keyw] for keyw in selfkeywords])
 
@@ -1125,16 +1184,16 @@ class BaseFolder:
                 break
             try:
                 action(dstfolder, statusfolder)
-            except (KeyboardInterrupt):
+            except KeyboardInterrupt:
                 raise
             except OfflineImapError as e:
                 if e.severity > OfflineImapError.ERROR.FOLDER:
                     raise
-                self.ui.error(e, exc_info()[2], "while syncing %s [account %s]" %
-                              (self, self.accountname))
+                msg = "while syncing %s [account %s]" % (self, self.accountname)
+                self.ui.error(e, exc_info()[2], msg)
             except Exception as e:
-                self.ui.error(e, exc_info()[2], "while syncing %s [account %s]" %
-                              (self, self.accountname))
+                msg = "while syncing %s [account %s]" % (self, self.accountname)
+                self.ui.error(e, exc_info()[2], msg)
                 raise  # Raise unknown Exceptions so we can fix them.
 
     def __eq__(self, other):

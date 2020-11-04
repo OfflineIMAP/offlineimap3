@@ -18,9 +18,10 @@
 import datetime
 import hashlib
 import hmac
-import socket
 import json
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 import time
 import errno
 import socket
@@ -39,7 +40,7 @@ except ImportError:
     have_gss = False
 
 
-class IMAPServer():
+class IMAPServer:
     """Initializes all variables from an IMAPRepository() instance
 
     Various functions, such as acquireconnection() return an IMAP4
@@ -331,7 +332,8 @@ class IMAPServer():
             except imapobj.error as e:
                 raise OfflineImapError("Failed to start "
                                        "TLS connection: %s" % str(e),
-                                       OfflineImapError.ERROR.REPO, None, exc_info()[2])
+                                       OfflineImapError.ERROR.REPO,
+                                       exc_info()[2])
 
     # All __authn_* procedures are helpers that do authentication.
     # They are class methods that take one parameter, IMAP object.
@@ -776,7 +778,7 @@ class IdleThread:
             self.thread = Thread(target=self.noop)
         else:
             self.thread = Thread(target=self.__idle)
-        self.thread.setDaemon(1)
+        self.thread.setDaemon(True)
 
     def start(self):
         self.thread.start()

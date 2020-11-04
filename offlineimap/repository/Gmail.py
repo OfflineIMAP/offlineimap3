@@ -1,20 +1,22 @@
-# Gmail IMAP repository support
-# Copyright (C) 2008-2016 Riccardo Murri <riccardo.murri@gmail.com> &
-# contributors
-#
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+"""
+Gmail IMAP repository support
+Copyright (C) 2008-2016 Riccardo Murri <riccardo.murri@gmail.com> &
+contributors
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+"""
 
 from offlineimap.repository.IMAP import IMAPRepository
 from offlineimap import folder, OfflineImapError
@@ -38,7 +40,7 @@ class GmailRepository(IMAPRepository):
         We first check the usual IMAP settings, and then fall back to
         imap.gmail.com if nothing is specified."""
         try:
-            return super(GmailRepository, self).gethost()
+            return super().gethost()
         except OfflineImapError:
             # Nothing was configured, cache and return hardcoded
             # one. See the parent class (IMAPRepository) for how this
@@ -53,12 +55,13 @@ class GmailRepository(IMAPRepository):
         https://accounts.google.com/o/oauth2/token if nothing is
         specified."""
 
-        url = super(GmailRepository, self).getoauth2_request_url()
+        url = super().getoauth2_request_url()
         if url is None:
-            # Nothing was configured, cache and return hardcoded one.
-            self.setoauth2_request_url("https://accounts.google.com/o/oauth2/token")
-        else:
-            self.setoauth2_request_url(url)
+            # Nothing was configured, use a hardcoded one.
+            url = "https://accounts.google.com/o/oauth2/token"
+
+        self.setoauth2_request_url(url)
+
         return self.oauth2_request_url
 
     def getport(self):
@@ -67,12 +70,12 @@ class GmailRepository(IMAPRepository):
         This Gmail implementation first checks for the usual IMAP settings
         and falls back to 993 if nothing is specified."""
 
-        port = super(GmailRepository, self).getport()
+        port = super().getport()
 
-        if port is None:
-            return 993
-        else:
+        if port is not None:
             return port
+
+        return 993
 
     def getssl(self):
         ssl = self.getconfboolean('ssl', None)
@@ -82,8 +85,8 @@ class GmailRepository(IMAPRepository):
             # GMail. Maybe this should look more similar to gethost &
             # we could just rely on the global "ssl = yes" default.
             return True
-        else:
-            return ssl
+
+        return ssl
 
     def getpreauthtunnel(self):
         return None
@@ -96,12 +99,16 @@ class GmailRepository(IMAPRepository):
         return folder.Gmail.GmailFolder
 
     def gettrashfolder(self):
-        # Where deleted mail should be moved
+        """
+        Where deleted mail should be moved
+        """
         return self.getconf('trashfolder', '[Gmail]/Trash')
 
     def getspamfolder(self):
-        # Depending on the IMAP settings (Settings -> Forwarding and
-        # POP/IMAP -> IMAP Access -> "When I mark a message in IMAP as
-        # deleted") GMail might also deletes messages upon EXPUNGE in
-        # the Spam folder.
+        """
+        Depending on the IMAP settings (Settings -> Forwarding and
+        POP/IMAP -> IMAP Access -> "When I mark a message in IMAP as
+        deleted") GMail might also deletes messages upon EXPUNGE in
+        the Spam folder.
+        """
         return self.getconf('spamfolder', '[Gmail]/Spam')

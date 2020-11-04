@@ -1,7 +1,8 @@
-# Copyright 2006-2018 Eygene A. Ryabinkin & contributors.
-#
-# Module that supports distribution-specific functions.
+"""
+Copyright 2006-2018 Eygene A. Ryabinkin & contributors.
 
+Module that supports distribution-specific functions.
+"""
 import platform
 import os
 
@@ -68,12 +69,8 @@ def get_os_sslcertfile_searchpath():
     Returned value of None means that there is no search path
     at all.
     """
-
     os_name = get_os_name()
-
-    location = None
-    if os_name in __DEF_OS_LOCATIONS:
-        location = __DEF_OS_LOCATIONS[os_name]
+    location = __DEF_OS_LOCATIONS.get(os_name, None)
 
     return location
 
@@ -92,9 +89,10 @@ def get_os_sslcertfile():
     if location is None:
         return None
 
-    for f in location:
-        assert isinstance(f, str)
-        if os.path.exists(f) and (os.path.isfile(f) or os.path.islink(f)):
-            return f
+    for l_file in location:
+        assert isinstance(l_file, str)
+        if os.path.exists(l_file) and (os.path.isfile(l_file) or
+                                       os.path.islink(l_file)):
+            return l_file
 
     return None

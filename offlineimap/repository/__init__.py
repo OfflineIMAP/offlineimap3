@@ -1,19 +1,20 @@
-# Copyright (C) 2002-2016 John Goerzen & contributors.
-#
-#    This program is free software; you can redistribute it and/or modify
-#    it under the terms of the GNU General Public License as published by
-#    the Free Software Foundation; either version 2 of the License, or
-#    (at your option) any later version.
-#
-#    This program is distributed in the hope that it will be useful,
-#    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#    GNU General Public License for more details.
-#
-#    You should have received a copy of the GNU General Public License
-#    along with this program; if not, write to the Free Software
-#    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+"""
+Copyright (C) 2002-2016 John Goerzen & contributors.
 
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation; either version 2 of the License, or
+   (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with this program; if not, write to the Free Software
+   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+"""
 from sys import exc_info
 from configparser import NoSectionError
 from offlineimap.repository.IMAP import IMAPRepository, MappedIMAPRepository
@@ -59,19 +60,19 @@ class Repository:
         config = account.getconfig()
         try:
             repostype = config.get('Repository ' + name, 'type').strip()
-        except NoSectionError:
+        except NoSectionError as exc:
             errstr = ("Could not find section '%s' in configuration. Required "
                       "for account '%s'." % ('Repository %s' % name, account))
             raise OfflineImapError(errstr, OfflineImapError.ERROR.REPO,
-                                   exc_info()[2])
+                                   exc_info()[2]) from exc
 
         try:
             repo = typemap[repostype]
-        except KeyError:
+        except KeyError as exc:
             errstr = "'%s' repository not supported for '%s' repositories." % \
                      (repostype, reqtype)
             raise OfflineImapError(errstr, OfflineImapError.ERROR.REPO,
-                                   exc_info()[2])
+                                   exc_info()[2]) from exc
 
         return repo(name, account)
 
@@ -83,4 +84,3 @@ class Repository:
         :param account: :class:`Account`
         :param reqtype: 'remote', 'local', or 'status'
         """
-        pass
