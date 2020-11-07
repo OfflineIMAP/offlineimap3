@@ -595,7 +595,9 @@ class IMAPServer:
             # update capabilities after login, e.g. gmail serves different ones
             typ, dat = imapobj.capability()
             if dat != [None]:
-                imapobj.capabilities = tuple(dat[-1].upper().split())
+                # Get the capabilities and convert them to string from bytes
+                s_dat = [x.decode('utf-8') for x in dat[-1].upper().split()]
+                imapobj.capabilities = tuple(s_dat)
 
             if self.delim is None:
                 listres = imapobj.list(self.reference, '""')[1]
