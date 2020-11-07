@@ -150,6 +150,7 @@ class IMAPFolder(BaseFolder):
         # messages or the UID of the last message have changed.  Otherwise
         # only flag changes could have occurred.
         retry = True  # Should we attempt another round or exit?
+        imapdata = None
         while retry:
             retry = False
             imapobj = self.imapserver.acquireconnection()
@@ -759,7 +760,10 @@ class IMAPFolder(BaseFolder):
                                  "appending a message. Got: %s." % str(resp))
                     return 0
                 try:
-                    uid = int(resp[-1].split(' ')[1])
+                    # Convert the UID from [b'4 1532'] to ['4 1532']
+                    s_uid = [x.decode('utf-8') for x in resp]
+                    # Now, read the UID field
+                    uid = int(s_uid[-1].split(' ')[1])
                 except ValueError:
                     uid = 0  # Definetly not what we should have.
                 except Exception:
