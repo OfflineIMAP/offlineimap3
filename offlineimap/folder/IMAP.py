@@ -238,7 +238,7 @@ class IMAPFolder(BaseFolder):
 
             # Then, I can do the check in the same way than Python 2
             # with string comparison:
-            if ' ' in res_data[0] or res_data[0] == '':
+            if len(res_data) > 0 and (' ' in res_data[0] or res_data[0] == ''):
                 res_data = res_data[0].split()
             # Some servers are broken.
             if 0 in res_data:
