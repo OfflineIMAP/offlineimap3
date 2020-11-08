@@ -515,6 +515,10 @@ class IMAPServer:
         curThread = currentThread()
         imapobj = None
 
+        imap_debug = 0
+        if 'imap' in self.ui.debuglist:
+            imap_debug = 5
+
         if len(self.availableconnections):  # One is available.
             # Try to find one that previously belonged to this thread
             # as an optimization.  Start from the back since that's where
@@ -547,6 +551,7 @@ class IMAPServer:
                     imapobj = imaplibutil.IMAP4_Tunnel(
                         self.tunnel,
                         timeout=socket.getdefaulttimeout(),
+                        debug=imap_debug,
                         use_socket=self.proxied_socket,
                     )
                     success = True
@@ -563,6 +568,7 @@ class IMAPServer:
                         ca_certs=self.sslcacertfile,
                         cert_verify_cb=self.__verifycert,
                         ssl_version=self.sslversion,
+                        debug=imap_debug,
                         timeout=socket.getdefaulttimeout(),
                         fingerprint=self.fingerprint,
                         use_socket=self.proxied_socket,
@@ -576,6 +582,7 @@ class IMAPServer:
                         self.hostname, self.port,
                         timeout=socket.getdefaulttimeout(),
                         use_socket=self.proxied_socket,
+                        debug=imap_debug,
                         af=self.af,
                     )
 
