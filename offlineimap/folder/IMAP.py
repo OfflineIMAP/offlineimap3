@@ -221,9 +221,24 @@ class IMAPFolder(BaseFolder):
                       "Search string was '%s'. Error: %s" % \
                       (self.getrepository(), self, search_cond, str(e))
                 raise OfflineImapError(msg, OfflineImapError.ERROR.FOLDER)
-            # Davmail returns list instead of list of one element string.
-            # On first run the first element is empty.
-            if b' ' in res_data[0] or res_data[0] == b'':
+
+            """
+            In Py2, with IMAP, imaplib2 returned a list of one element string.
+              ['1, 2, 3, ...'] -> in Py3 is [b'1 2 3,...']
+            In Py2, with Davmail, imaplib2 returned a list of strings.
+              ['1', '2', '3', ...] -> in Py3 should be [b'1', b'2', b'3',...]
+
+            In my tests with Py3, I get a list with one element: [b'1 2 3 ...']
+            Then I convert the values to string and I get ['1 2 3 ...']
+
+            With Davmail, it should be [b'1', b'2', b'3',...]
+            When I convert the values to string, I get ['1', '2', '3',...]
+            """
+            res_data = [x.decode('utf-8') for x in res_data]
+
+            # Then, I can do the check in the same way than Python 2
+            # with string comparison:
+            if ' ' in res_data[0] or res_data[0] == '':
                 res_data = res_data[0].split()
             # Some servers are broken.
             if 0 in res_data:
