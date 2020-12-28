@@ -164,6 +164,7 @@ class IMAP4_Tunnel(UsefulIMAPMixIn, IMAP4):
             data = self.compressor.compress(data)
             data += self.compressor.flush(zlib.Z_SYNC_FLUSH)
         self.outfd.write(data)
+        self.outfd.flush()
 
     def shutdown(self):
         self.infd.close()
