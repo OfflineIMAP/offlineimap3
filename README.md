@@ -21,7 +21,7 @@ Links:
 
 ***"Get the emails where you need them."***
 
-[Official offlineimap][offlineimap].
+[Official offlineimap][offlineimap3].
 
 
 ## Description
@@ -43,22 +43,11 @@ message without internet connection? No problem, the message is still there.
 
 ## Project status and future
 
-> As one of the maintainer of OfflineIMAP, I'd like to put my efforts into
-> [imapfw](http://github.com/OfflineIMAP/imapfw). **imapfw** is software in
-> development that I intend to replace OfflineIMAP with in the long term.
->
-> That's why I'm not going to continue OfflineIMAP development. I'll continue
-> to maintain OfflineIMAP (fixing small bugs, reviewing patches and merging,
-> and rolling out new releases), but that's all.
->
-> While I keep tracking issues for OfflineIMAP, you should not expect future support.
->
-> You won't be left at the side. OfflineIMAP's community is large enough so that
-> you'll find people for most of your issues.
->
-> Get news from the [blog][blog].
->
->                                  Nicolas Sebrecht. ,-)
+OfflineIMAP, using Python 3, is based on OfflineIMAP for Python 2.
+Currently we are updating the source code. These changes should not affect
+the user (documentation, configuration files,... are the same) but some
+links or packages could refer to the Python 2 version. In that case, please
+open an issue.
 
 
 ## License
@@ -84,7 +73,7 @@ place on the mailing list.** While not mandatory to send emails, you can
 [subscribe here](http://lists.alioth.debian.org/mailman/listinfo/offlineimap-project).
 
 Bugs, issues and contributions can be requested to both the mailing list or the
-[official Github project][offlineimap].  Provide the following information:
+[official Github project][offlineimap3].  Provide the following information:
 - system/distribution (with version)
 - offlineimap version (`offlineimap -V`)
 - Python version
@@ -98,7 +87,7 @@ Bugs, issues and contributions can be requested to both the mailing list or the
 
 ## The community
 
-* OfflineIMAP's main site is the [project page at Github][offlineimap].
+* OfflineIMAP's main site is the [project page at Github][offlineimap3].
 * There is the [OfflineIMAP community's website][website].
 * And finally, [the wiki][wiki].
 
