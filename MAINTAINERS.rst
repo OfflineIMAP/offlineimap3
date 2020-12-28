@@ -60,6 +60,11 @@ Contacts
   - github: spaetz
   - other: left the project but still responding
 
+- Rodolfo García Peñas (kix)
+  - email: kix at kix.es
+  - github: thekix
+  - system: Linux
+
 
 Testers
 =======
@@ -75,11 +80,13 @@ Testers
 - Łukasz Żarnowiecki
 - Nicolas Sebrecht
 - Remi Locherer
+- Rodolfo García Peñas (kix)
 
 
 Maintainers
 ===========
 
+- Rodolfo García Peñas (kix)
 - Eygene Ryabinkin
 - Sebastian Spaeth
 - Nicolas Sebrecht
