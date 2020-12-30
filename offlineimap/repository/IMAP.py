@@ -720,6 +720,24 @@ class IMAPRepository(BaseRepository):
                         return mycmp(self.obj.getvisiblename(),
                                      other.obj.getvisiblename())
 
+                    def __lt__(self, other):
+                        return self.__cmp__(other) < 0
+
+                    def __le__(self, other):
+                        return self.__cmp__(other) <= 0
+
+                    def __gt__(self, other):
+                        return self.__cmp__(other) > 0
+
+                    def __ge__(self, other):
+                        return self.__cmp__(other) >= 0
+
+                    def __eq__(self, other):
+                        return self.__cmp__(other) == 0
+
+                    def __ne__(self, other):
+                        return self.__cmp__(other) != 0
+
                 return K
 
             retval.sort(key=cmp2key(self.foldersort))
