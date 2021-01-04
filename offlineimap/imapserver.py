@@ -254,7 +254,8 @@ class IMAPServer:
                 except Exception as eparams:
                     msg = "%s [cannot display configuration: %s]" % (e, eparams)
 
-                raise type(e)(msg, exc_info()[2])
+                self.ui.error(msg)
+                raise
             finally:
                 socket.socket = original_socket
 
@@ -660,7 +661,7 @@ class IMAPServer:
                              % (self.hostname, self.repos, e)
                 raise OfflineImapError(reason, severity, exc_info()[2])
 
-            elif isinstance(e, socket.error) and e.args[0] == errno.ECONNREFUSED:
+            elif isinstance(e, socket.error) and e.args and e.args[0] == errno.ECONNREFUSED:
                 # "Connection refused", can be a non-existing port, or an unauthorized
                 # webproxy (open WLAN?)
                 reason = "Connection to host '%s:%d' for repository '%s' was " \
