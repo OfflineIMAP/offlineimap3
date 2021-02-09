@@ -266,7 +266,7 @@ class UIBase:
                           (self.getnicename(x), x.getname()) for x in folder_list])
 
     # WARNINGS
-    def msgtoreadonly(self, destfolder, uid, content, flags):
+    def msgtoreadonly(self, destfolder, uid):
         if self.config.has_option('general', 'ignore-readonly') and \
                 self.config.getboolean('general', 'ignore-readonly'):
             return

@@ -375,7 +375,7 @@ class IMAPFolder(BaseFolder):
     def getmessagekeywords(self, uid):
         return self.messagelist[uid]['keywords']
 
-    def __generate_randomheader(self, content):
+    def __generate_randomheader(self, msg, policy=None):
         """Returns a unique X-OfflineIMAP header
 
          Generate an 'X-OfflineIMAP' mail header which contains a random
@@ -390,6 +390,10 @@ class IMAPFolder(BaseFolder):
         """
 
         headername = 'X-OfflineIMAP'
+        if policy is None:
+            output_policy = self.policy['8bit-RFC']
+        else:
+            output_policy = policy
         # We need a random component too. If we ever upload the same
         # mail twice (e.g. in different folders), we would still need to
         # get the UID for the correct one. As we won't have too many
@@ -398,9 +402,9 @@ class IMAPFolder(BaseFolder):
 
         # Compute unsigned crc32 of 'content' as unique hash.
         # NB: crc32 returns unsigned only starting with python 3.0.
-        headervalue = str(binascii.crc32(str.encode(content))
-                          & 0xffffffff) + '-'
-        headervalue += str(self.randomgenerator.randint(0, 9999999999))
+        headervalue = '{}-{}'.format(
+          (binascii.crc32(msg.as_bytes(policy=output_policy)) & 0xffffffff),
+          self.randomgenerator.randint(0, 9999999999))
         return headername, headervalue
 
     def __savemessage_searchforheader(self, imapobj, headername, headervalue):
@@ -539,7 +543,7 @@ class IMAPFolder(BaseFolder):
 
         return 0
 
-    def __getmessageinternaldate(self, content, rtime=None):
+    def __getmessageinternaldate(self, msg, rtime=None):
         """Parses mail and returns an INTERNALDATE string
 
         It will use information in the following order, falling back as an
@@ -571,7 +575,7 @@ class IMAPFolder(BaseFolder):
                   (which is fine as value for append)."""
 
         if rtime is None:
-            rtime = emailutil.get_message_date(content)
+            rtime = self.get_message_date(msg)
             if rtime is None:
                 return None
         datetuple = time.localtime(rtime)
@@ -619,7 +623,7 @@ class IMAPFolder(BaseFolder):
         return internaldate
 
     # Interface from BaseFolder
-    def savemessage(self, uid, content, flags, rtime):
+    def savemessage(self, uid, msg, flags, rtime):
         """Save the message on the Server
 
         This backend always assigns a new uid, so the uid arg is ignored.
@@ -632,7 +636,7 @@ class IMAPFolder(BaseFolder):
         savemessage is never called in a dryrun mode.
 
         :param uid: Message UID
-        :param content: Message content
+        :param msg: Message Object
         :param flags: Message flags
         :param rtime: A timestamp to be used as the mail date
         :returns: the UID of the new message as assigned by the server. If the
@@ -647,16 +651,19 @@ class IMAPFolder(BaseFolder):
             self.savemessageflags(uid, flags)
             return uid
 
-        content = self.deletemessageheaders(content, self.filterheaders)
+        # Filter user requested headers before uploading to the IMAP server
+        self.deletemessageheaders(msg, self.filterheaders)
 
-        # Use proper CRLF all over the message.
-        content = re.sub("(?<!\r)\n", CRLF, content)
+        # Should just be able to set the policy
+        output_policy = self.policy['8bit-RFC']
+        # # Use proper CRLF all over the message.
+        # content = re.sub("(?<!\r)\n", CRLF, content)
 
         # Get the date of the message, so we can pass it to the server.
-        date = self.__getmessageinternaldate(content, rtime)
+        date = self.__getmessageinternaldate(msg, rtime)
 
         # Message-ID is handy for debugging messages.
-        msg_id = self.getmessageheader(content, "message-id")
+        msg_id = self.getmessageheader(msg, "message-id")
         if not msg_id:
             msg_id = '[unknown message-id]'
 
@@ -676,16 +683,16 @@ class IMAPFolder(BaseFolder):
                 if not use_uidplus:
                     # Insert a random unique header that we can fetch later.
                     (headername, headervalue) = self.__generate_randomheader(
-                        content)
+                        msg)
                     self.ui.debug('imap', 'savemessage: header is: %s: %s' %
                                   (headername, headervalue))
-                    content = self.addmessageheader(content, CRLF,
-                                                    headername, headervalue)
+                    self.addmessageheader(msg, headername, headervalue)
 
+                msg_s = msg.as_string(policy=output_policy)
                 if len(content) > 200:
-                    dbg_output = "%s...%s" % (content[:150], content[-50:])
+                    dbg_output = "%s...%s" % (msg_s[:150], msg_s[-50:])
                 else:
-                    dbg_output = content
+                    dbg_output = msg_s
                 self.ui.debug('imap', "savemessage: date: %s, content: '%s'" %
                               (date, dbg_output))
 
@@ -695,7 +702,7 @@ class IMAPFolder(BaseFolder):
                 except imapobj.readonly:
                     # readonly exception. Return original uid to notify that
                     # we did not save the message. (see savemessage in Base.py)
-                    self.ui.msgtoreadonly(self, uid, content, flags)
+                    self.ui.msgtoreadonly(self, uid)
                     return uid
 
                 # Do the APPEND.
@@ -703,7 +710,7 @@ class IMAPFolder(BaseFolder):
                     (typ, dat) = imapobj.append(
                         self.getfullIMAPname(),
                         imaputil.flagsmaildir2imap(flags),
-                        date,  bytes(content, 'utf-8'))
+                        date,  msg.as_bytes(policy=output_policy))
                     # This should only catch 'NO' responses since append()
                     # will raise an exception for 'BAD' responses:
                     if typ != 'OK':
@@ -716,12 +723,12 @@ class IMAPFolder(BaseFolder):
                         # In this case, we should immediately abort
                         # the repository sync and continue
                         # with the next account.
-                        msg = \
+                        err_msg = \
                             "Saving msg (%s) in folder '%s', " \
                             "repository '%s' failed (abort). " \
                             "Server responded: %s %s\n" % \
                             (msg_id, self, self.getrepository(), typ, dat)
-                        raise OfflineImapError(msg, OfflineImapError.ERROR.REPO)
+                        raise OfflineImapError(err_msg, OfflineImapError.ERROR.REPO)
                     retry_left = 0  # Mark as success.
                 except imapobj.abort as e:
                     # Connection has been reset, release connection and retry.

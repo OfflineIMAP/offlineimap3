@@ -22,6 +22,11 @@ import re
 import time
 from sys import exc_info
 
+from email import policy
+from email.parser import BytesParser
+from email.generator import BytesGenerator
+from email.utils import parsedate_tz, mktime_tz
+
 from offlineimap import threadutil
 from offlineimap.ui import getglobalui
 from offlineimap.error import OfflineImapError
@@ -42,6 +47,22 @@ class BaseFolder:
 
         self.ui = getglobalui()
         self.messagelist = {}
+        # Use the built-in email libraries
+        # Establish some policies
+        self.policy = {
+          '7bit':
+          policy.default.clone(cte_type='7bit',utf8=False,refold_source='none'),
+          '7bit-RFC':
+          policy.default.clone(cte_type='7bit',utf8=False,refold_source='none',linesep='\r\n'),
+          '8bit':
+          policy.default.clone(cte_type='8bit',utf8=True,refold_source='none'),
+          '8bit-RFC':
+          policy.default.clone(cte_type='8bit',utf8=True,refold_source='none',linesep='\r\n'),
+        }
+        # Parsers
+        self.parse = {
+          '8bit': BytesParser(policy=p1),
+        }
         # Save original name for folderfilter operations.
         self.ffilter_name = name
         # Top level dir name is always ''.
@@ -466,7 +487,7 @@ class BaseFolder:
         except:
             raise IOError("Can't read %s" % uidfile)
 
-    def savemessage(self, uid, content, flags, rtime):
+    def savemessage(self, uid, msg, flags, rtime):
         """Writes a new message, with the specified uid.
 
         If the uid is < 0: The backend should assign a new uid and
@@ -637,211 +658,90 @@ class BaseFolder:
         for uid in uidlist:
             self.deletemessagelabels(uid, labels)
 
-    def addmessageheader(self, content, linebreak, headername, headervalue):
+    def addmessageheader(self, msg, headername, headervalue):
         """Adds new header to the provided message.
 
-        WARNING: This function is a bit tricky, and modifying it in the wrong
-        way, may easily lead to data-loss.
-
         Arguments:
-        - content: message content, headers and body as a single string
-        - linebreak: string that carries line ending
+        - msg: message itself
         - headername: name of the header to add
         - headervalue: value of the header to add
 
-        .. note::
+        Returns: None
 
-           The following documentation will not get displayed correctly after
-           being processed by Sphinx. View the source of this method to read it.
-
-        This has to deal with strange corner cases where the header is
-        missing or empty.  Here are illustrations for all the cases,
-        showing where the header gets inserted and what the end result
-        is.  In each illustration, '+' means the added contents.  Note
-        that these examples assume LF for linebreak, not CRLF, so '\n'
-        denotes a linebreak and '\n\n' corresponds to the transition
-        between header and body.  However if the linebreak parameter
-        is set to '\r\n' then you would have to substitute '\r\n' for
-        '\n' in the below examples.
-
-          * Case 1: No '\n\n', leading '\n'
-
-            +X-Flying-Pig-Header: i am here\n
-            \n
-            This is the body\n
-            next line\n
-
-          * Case 2: '\n\n' at position 0
-
-            +X-Flying-Pig-Header: i am here
-            \n
-            \n
-            This is the body\n
-            next line\n
-
-          * Case 3: No '\n\n', no leading '\n'
-
-            +X-Flying-Pig-Header: i am here\n
-            +\n
-            This is the body\n
-            next line\n
-
-          * Case 4: '\n\n' at non-zero position
-
-            Subject: Something wrong with OI\n
-            From: some@person.at
-            +\nX-Flying-Pig-Header: i am here
-            \n
-            \n
-            This is the body\n
-            next line\n
         """
 
         self.ui.debug('', 'addmessageheader: called to add %s: %s' %
                       (headername, headervalue))
 
-        insertionpoint = content.find(linebreak * 2)
-        if insertionpoint == -1:
-            self.ui.debug('', 'addmessageheader: headers were missing')
-        else:
-            self.ui.debug('',
-                          'addmessageheader: headers end at position %d' %
-                          insertionpoint)
-            mark = '==>EOH<=='
-            contextstart = max(0, insertionpoint - 100)
-            contextend = min(len(content), insertionpoint + 100)
-            self.ui.debug('', 'addmessageheader: header/body transition " \
-                "context (marked by %s): %s%s%s' % (
-                mark, repr(content[contextstart:insertionpoint]),
-                mark, repr(content[insertionpoint:contextend])
-            )
-                          )
+        msg.add_header(headername,headervalue)
+        return
 
-        # Hoping for case #4.
-        prefix = linebreak
-        suffix = ''
-        # Case #2.
-        if insertionpoint == 0:
-            prefix = ''
-            suffix = ''
-        # Either case #1 or #3.
-        elif insertionpoint == -1:
-            prefix = ''
-            suffix = linebreak
-            insertionpoint = 0
-            # Case #3: when body starts immediately, without preceding '\n'
-            # (this shouldn't happen with proper mail messages, but
-            # we seen many broken ones), we should add '\n' to make
-            # new (and the only header, in this case) to be properly
-            # separated from the message body.
-            if content[0:len(linebreak)] != linebreak:
-                suffix = suffix + linebreak
-
-        self.ui.debug('',
-                      'addmessageheader: insertionpoint = %d' % insertionpoint)
-        headers = content[0:insertionpoint]
-        self.ui.debug('',
-                      'addmessageheader: headers = %s' % repr(headers))
-        new_header = prefix + ("%s: %s" % (headername, headervalue)) + suffix
-        self.ui.debug('',
-                      'addmessageheader: new_header = %s' % repr(new_header))
-        return headers + new_header + content[insertionpoint:]
-
-    def __find_eoh(self, content):
-        """Searches for the point where mail headers end.
-
-        Either double '\n', or end of string.
-
-        Arguments:
-        - content: contents of the message to search in
-        Returns: position of the first non-header byte.
-        """
-
-        eoh_cr = content.find('\n\n')
-        if eoh_cr == -1:
-            eoh_cr = len(content)
-
-        return eoh_cr
-
-    def getmessageheader(self, content, name):
-        """Return the value of the first occurence of the given header.
+    def getmessageheader(self, msg, headername):
+        """Return the value of an undefined occurence of the given header.
 
         Header name is case-insensitive.
 
         Arguments:
-        - contents: message itself
-        - name: name of the header to be searched
+        - msg: message itself
+        - headername: name of the header to be searched
 
         Returns: header value or None if no such header was found.
         """
 
         self.ui.debug('', 'getmessageheader: called to get %s' % name)
-        eoh = self.__find_eoh(content)
-        self.ui.debug('', 'getmessageheader: eoh = %d' % eoh)
-        headers = content[0:eoh]
-        self.ui.debug('', 'getmessageheader: headers = %s' % repr(headers))
+        return msg.get(headername)
 
-        m = re.search('^%s:(.*)$' % name, headers,
-                      flags=re.MULTILINE | re.IGNORECASE)
-        if m:
-            return m.group(1).strip()
-        else:
-            return None
-
-    def getmessageheaderlist(self, content, name):
+    def getmessageheaderlist(self, msg, headername):
         """Return a list of values for the given header.
 
+        Header name is case-insensitive.
+
         Arguments:
-        - contents: message itself
-        - name: name of the header to be searched
+        - msg: message itself
+        - headername: name of the header to be searched
 
         Returns: list of header values or empty list if no such header was
         found.
         """
 
         self.ui.debug('', 'getmessageheaderlist: called to get %s' % name)
-        eoh = self.__find_eoh(content)
-        self.ui.debug('', 'getmessageheaderlist: eoh = %d' % eoh)
-        headers = content[0:eoh]
-        self.ui.debug('', 'getmessageheaderlist: headers = %s' % repr(headers))
+        return msg.get_all(headername,[])
 
-        return re.findall('^%s:(.*)$' %
-                          name, headers, flags=re.MULTILINE | re.IGNORECASE)
-
-    def deletemessageheaders(self, content, header_list):
-        """Deletes headers in the given list from the message content.
+    def deletemessageheaders(self, msg, header_list):
+        """Deletes headers in the given list from the message.
 
         Arguments:
-        - content: message itself
+        - msg: message itself
         - header_list: list of headers to be deleted or just the header name
 
-        We expect our message to have '\n' as line endings."""
+        """
 
         if type(header_list) != type([]):
             header_list = [header_list]
         self.ui.debug('',
                       'deletemessageheaders: called to delete %s' % header_list)
 
-        if not len(header_list):
-            return content
+        for h in header_list:
+            del msg[h]
 
-        eoh = self.__find_eoh(content)
-        self.ui.debug('', 'deletemessageheaders: end of headers = %d' % eoh)
-        headers = content[0:eoh]
-        rest = content[eoh:]
-        self.ui.debug('', 'deletemessageheaders: headers = %s' % repr(headers))
-        new_headers = []
-        for h in headers.split('\n'):
-            keep_it = True
-            for trim_h in header_list:
-                if len(h) > len(trim_h) \
-                        and h[0:len(trim_h) + 1] == (trim_h + ":"):
-                    keep_it = False
-                    break
-            if keep_it:
-                new_headers.append(h)
+        return
 
-        return '\n'.join(new_headers) + rest
+    def get_message_date(self, msg, header="Date"):
+        """Returns the Unix timestamp of the email message, derived from the
+        Date field header by default.
+
+        Arguments:
+        - msg: message itself
+        - header: headers to extract the date from 
+
+        Returns: timestamp or `None` in the case of failure.
+        """
+
+        datetuple = parsedate_tz(msg.get(header))
+        if datetuple is None:
+            return None
+
+        return mktime_tz(datetuple)
 
     def change_message_uid(self, uid, new_uid):
         """Change the message from existing uid to new_uid.
