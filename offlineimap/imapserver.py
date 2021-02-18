@@ -310,12 +310,8 @@ class IMAPServer:
             # This is a behavior we got from pykerberos.  First byte is one,
             # first four bytes are preserved (pykerberos calls this a length).
             # Any additional bytes are username.
-            reply = []
-            reply[0:4] = response.message[0:4]
-            reply[0] = '\x01'
-            if self.username:
-                reply[5:] = self.username
-            reply = ''.join(reply)
+            reply = b'\x01' + response.message[1:4]
+            reply += bytes(self.username, 'utf-8')
 
             response = self.gss_vc.wrap(reply, response.encrypted)
             return response.message if response.message else ""
