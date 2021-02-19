@@ -370,7 +370,7 @@ class BaseFolder:
         return len(self.getmessagelist())
 
     def getmessage(self, uid):
-        """Returns the content of the specified message."""
+        """Returns and email message object."""
 
         raise NotImplementedError
 

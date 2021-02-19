@@ -254,7 +254,7 @@ class MaildirFolder(BaseFolder):
 
     # Interface from BaseFolder
     def getmessage(self, uid):
-        """Return the content of the message."""
+        """Returns and email message object."""
 
         filename = self.messagelist[uid]['filename']
         filepath = os.path.join(self.getfullname(), filename)
@@ -287,7 +287,7 @@ class MaildirFolder(BaseFolder):
         return uniq_name.replace(os.path.sep, self.sep_subst)
 
     def save_to_tmp_file(self, filename, msg, policy=None):
-        """Saves given content to the named temporary file in the
+        """Saves given message to the named temporary file in the
         'tmp' subdirectory of $CWD.
 
         Arguments:

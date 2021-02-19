@@ -30,13 +30,6 @@ CRLF = '\r\n'
 MSGCOPY_NAMESPACE = 'MSGCOPY_'
 
 
-# NB: message returned from getmessage() will have '\n' all over the place,
-# NB: there will be no CRLFs.  Just before the sending stage of savemessage()
-# NB: '\n' will be transformed back to CRLF.  So, for the most parts of the
-# NB: code the stored content will be clean of CRLF and one can rely that
-# NB: line endings will be pure '\n'.
-
-
 class IMAPFolder(BaseFolder):
     def __init__(self, imapserver, name, repository, decode=True):
         # decode the folder name from IMAP4_utf_7 to utf_8 if
@@ -400,7 +393,7 @@ class IMAPFolder(BaseFolder):
         # mails with identical content, the randomness requirements are
         # not extremly critial though.
 
-        # Compute unsigned crc32 of 'content' as unique hash.
+        # Compute unsigned crc32 of 'msg' (as bytes) into a unique hash.
         # NB: crc32 returns unsigned only starting with python 3.0.
         headervalue = '{}-{}'.format(
           (binascii.crc32(msg.as_bytes(policy=output_policy)) & 0xffffffff),
@@ -654,10 +647,8 @@ class IMAPFolder(BaseFolder):
         # Filter user requested headers before uploading to the IMAP server
         self.deletemessageheaders(msg, self.filterheaders)
 
-        # Should just be able to set the policy
+        # Should just be able to set the policy, to use CRLF in msg output
         output_policy = self.policy['8bit-RFC']
-        # # Use proper CRLF all over the message.
-        # content = re.sub("(?<!\r)\n", CRLF, content)
 
         # Get the date of the message, so we can pass it to the server.
         date = self.__getmessageinternaldate(msg, rtime)
@@ -689,7 +680,7 @@ class IMAPFolder(BaseFolder):
                     self.addmessageheader(msg, headername, headervalue)
 
                 msg_s = msg.as_string(policy=output_policy)
-                if len(content) > 200:
+                if len(msg_s) > 200:
                     dbg_output = "%s...%s" % (msg_s[:150], msg_s[-50:])
                 else:
                     dbg_output = msg_s
