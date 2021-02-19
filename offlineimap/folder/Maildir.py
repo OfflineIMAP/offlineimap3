@@ -20,9 +20,11 @@ import socket
 import time
 import re
 import os
+from pathlib import Path
 from sys import exc_info
 from threading import Lock
 from hashlib import md5
+import chardet
 from offlineimap import OfflineImapError, emailutil
 from .Base import BaseFolder
 
@@ -256,11 +258,18 @@ class MaildirFolder(BaseFolder):
     def getmessage(self, uid):
         """Return the content of the message."""
 
+        # TODO: Perhaps, force the encoding using config file
         filename = self.messagelist[uid]['filename']
         filepath = os.path.join(self.getfullname(), filename)
-        file = open(filepath, 'rt')
-        retval = file.read()
-        file.close()
+        # Open the file as binary and read it
+        file = Path(filepath)
+        blob = file.read_bytes()
+        # Detect the encoding
+        detection = chardet.detect(blob)
+        encoding = detection["encoding"]
+        # Read the file as text
+        retval = blob.decode(encoding)
+
         # TODO: WHY are we replacing \r\n with \n here? And why do we
         #      read it as text?
         return retval.replace("\r\n", "\n")
