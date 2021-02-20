@@ -215,8 +215,8 @@ class IMAPServer:
             authz = self.user_identity
 
         retval = NULL.join((authz, authc, passwd))
-        logsafe_retval = NULL.join((authz, authc, '(passwd hidden for log)'))
-        self.ui.debug('imap', '__plainhandler: returning %s' % logsafe_retval)
+        self.ui.debug('imap', '__plainhandler: returning %s %s '
+                      '(passwd hidden for log)' % (authz, authc))
         return retval
 
     def __xoauth2handler(self, response):
