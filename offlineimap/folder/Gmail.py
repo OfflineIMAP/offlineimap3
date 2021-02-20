@@ -125,11 +125,10 @@ class GmailFolder(IMAPFolder):
             if not msgsToFetch:
                 return  # No messages to sync
 
-            # Get the flags and UIDs for these. single-quotes prevent
-            # imaplib2 from quoting the sequence.
+            # Get the flags and UIDs for these.
             #
             # NB: msgsToFetch are sequential numbers, not UID's
-            res_type, response = imapobj.fetch("'%s'" % msgsToFetch,
+            res_type, response = imapobj.fetch("%s" % msgsToFetch,
                                                '(FLAGS X-GM-LABELS UID)')
             if res_type != 'OK':
                 raise OfflineImapError(
@@ -147,6 +146,9 @@ class GmailFolder(IMAPFolder):
             # Discard initial message number.
             if messagestr is None:
                 continue
+            # We need a str messagestr
+            if isinstance(messagestr, bytes):
+                messagestr = messagestr.decode(encoding='utf-8')
             messagestr = messagestr.split(' ', 1)[1]
             # e.g.: {'X-GM-LABELS': '("Webserver (RW.net)" "\\Inbox" GInbox)', 'FLAGS': '(\\Seen)', 'UID': '275440'}
             options = imaputil.flags2hash(messagestr)
@@ -164,6 +166,8 @@ class GmailFolder(IMAPFolder):
                 else:
                     labels = set()
                 labels = labels - self.ignorelabels
+                if isinstance(messagestr, str):
+                    messagestr = bytes(messagestr, 'utf-8')
                 rtime = imaplibutil.Internaldate2epoch(messagestr)
                 self.messagelist[uid] = {'uid': uid, 'flags': flags, 'labels': labels, 'time': rtime}
 
