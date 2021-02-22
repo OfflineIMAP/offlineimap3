@@ -23,7 +23,7 @@ import os
 from sys import exc_info
 from threading import Lock
 from hashlib import md5
-from offlineimap import OfflineImapError, emailutil
+from offlineimap import OfflineImapError
 from .Base import BaseFolder
 
 # Find the UID in a message filename

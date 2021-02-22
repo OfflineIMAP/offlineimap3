@@ -20,7 +20,7 @@ import binascii
 import re
 import time
 from sys import exc_info
-from offlineimap import imaputil, imaplibutil, emailutil, OfflineImapError
+from offlineimap import imaputil, imaplibutil, OfflineImapError
 from offlineimap import globals
 from imaplib2 import MonthNames
 from .Base import BaseFolder
