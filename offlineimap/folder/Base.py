@@ -51,13 +51,13 @@ class BaseFolder:
         # Establish some policies
         self.policy = {
           '7bit':
-          policy.default.clone(cte_type='7bit',utf8=False,refold_source='none'),
+          policy.default.clone(cte_type='7bit', utf8=False, refold_source='none'),
           '7bit-RFC':
-          policy.default.clone(cte_type='7bit',utf8=False,refold_source='none',linesep='\r\n'),
+          policy.default.clone(cte_type='7bit', utf8=False, refold_source='none', linesep='\r\n'),
           '8bit':
-          policy.default.clone(cte_type='8bit',utf8=True,refold_source='none'),
+          policy.default.clone(cte_type='8bit', utf8=True, refold_source='none'),
           '8bit-RFC':
-          policy.default.clone(cte_type='8bit',utf8=True,refold_source='none',linesep='\r\n'),
+          policy.default.clone(cte_type='8bit', utf8=True, refold_source='none', linesep='\r\n'),
         }
         # Parsers
         self.parse = {
@@ -370,7 +370,7 @@ class BaseFolder:
         return len(self.getmessagelist())
 
     def getmessage(self, uid):
-        """Returns and email message object."""
+        """Returns an email message object."""
 
         raise NotImplementedError
 
@@ -662,7 +662,7 @@ class BaseFolder:
         """Adds new header to the provided message.
 
         Arguments:
-        - msg: message itself
+        - msg: message object
         - headername: name of the header to add
         - headervalue: value of the header to add
 
@@ -673,7 +673,7 @@ class BaseFolder:
         self.ui.debug('', 'addmessageheader: called to add %s: %s' %
                       (headername, headervalue))
 
-        msg.add_header(headername,headervalue)
+        msg.add_header(headername, headervalue)
         return
 
     def getmessageheader(self, msg, headername):
@@ -682,7 +682,7 @@ class BaseFolder:
         Header name is case-insensitive.
 
         Arguments:
-        - msg: message itself
+        - msg: message object
         - headername: name of the header to be searched
 
         Returns: header value or None if no such header was found.
@@ -697,7 +697,7 @@ class BaseFolder:
         Header name is case-insensitive.
 
         Arguments:
-        - msg: message itself
+        - msg: message object
         - headername: name of the header to be searched
 
         Returns: list of header values or empty list if no such header was
@@ -705,13 +705,13 @@ class BaseFolder:
         """
 
         self.ui.debug('', 'getmessageheaderlist: called to get %s' % name)
-        return msg.get_all(headername,[])
+        return msg.get_all(headername, [])
 
     def deletemessageheaders(self, msg, header_list):
         """Deletes headers in the given list from the message.
 
         Arguments:
-        - msg: message itself
+        - msg: message object
         - header_list: list of headers to be deleted or just the header name
 
         """
@@ -731,8 +731,8 @@ class BaseFolder:
         Date field header by default.
 
         Arguments:
-        - msg: message itself
-        - header: headers to extract the date from 
+        - msg: message object
+        - header: header to extract the date from 
 
         Returns: timestamp or `None` in the case of failure.
         """

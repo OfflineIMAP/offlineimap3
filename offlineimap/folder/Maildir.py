@@ -254,7 +254,7 @@ class MaildirFolder(BaseFolder):
 
     # Interface from BaseFolder
     def getmessage(self, uid):
-        """Returns and email message object."""
+        """Returns an email message object."""
 
         filename = self.messagelist[uid]['filename']
         filepath = os.path.join(self.getfullname(), filename)

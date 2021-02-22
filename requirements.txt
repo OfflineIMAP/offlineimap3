@@ -3,3 +3,8 @@ gssapi[kerberos]
 portalocker[cygwin]
 rfc6555
 distro
+
+imaplib2~=3.5
+urllib3~=1.25.9
+certifi~=2020.6.20
+
