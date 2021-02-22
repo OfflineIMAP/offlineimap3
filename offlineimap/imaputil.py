@@ -18,6 +18,7 @@
 import re
 import binascii
 import codecs
+from typing import Tuple
 from offlineimap.ui import getglobalui
 
 # Globals
@@ -352,42 +353,45 @@ def decode_mailbox_name(name):
 
 def IMAP_utf8(foldername):
     """Convert IMAP4_utf_7 encoded string to utf-8"""
-    return foldername.decode('imap4-utf-7').encode('utf-8')
+    return codecs.decode(
+        foldername.encode(),
+        'imap4-utf-7'
+    ).encode('utf-8').decode()
 
 
 def utf8_IMAP(foldername):
     """Convert utf-8 encoded string to IMAP4_utf_7"""
-    return foldername.decode('utf-8').encode('imap4-utf-7')
+    return codecs.decode(
+        foldername.encode(),
+        'utf-8'
+    ).encode('imap4-utf-7').decode()
 
 
 # Codec definition
-
 def modified_base64(s):
     s = s.encode('utf-16be')
-    return binascii.b2a_base64(s).rstrip('\n=').replace('/', ',')
+    return binascii.b2a_base64(s).rstrip(b'\n=').replace(b'/', b',')
 
 
 def doB64(_in, r):
     if _in:
-        r.append('&%s-' % modified_base64(''.join(_in)))
+        r.append(b'&%s-' % modified_base64(''.join(_in)))
         del _in[:]
 
 
-def encoder(s):
+def utf7m_encode(text: str) -> Tuple[bytes, int]:
     r = []
     _in = []
-    for c in s:
-        ordC = ord(c)
-        if 0x20 <= ordC <= 0x25 or 0x27 <= ordC <= 0x7e:
+
+    for c in text:
+        if 0x20 <= ord(c) <= 0x7e:
             doB64(_in, r)
-            r.append(c)
-        elif c == '&':
-            doB64(_in, r)
-            r.append('&-')
+            r.append(b'&-' if c == '&' else c.encode())
         else:
             _in.append(c)
+
     doB64(_in, r)
-    return str(''.join(r)), len(s)
+    return b''.join(r), len(text)
 
 
 # decoding
@@ -396,10 +400,10 @@ def modified_unbase64(s):
     return str(b, 'utf-16be')
 
 
-def decoder(s):
+def utf7m_decode(binary: bytes) -> Tuple[str, int]:
     r = []
     decode = []
-    for c in s:
+    for c in binary.decode():
         if c == '&' and not decode:
             decode.append('&')
         elif c == '-' and decode:
@@ -415,26 +419,31 @@ def decoder(s):
 
     if decode:
         r.append(modified_unbase64(''.join(decode[1:])))
-    bin_str = ''.join(r)
-    return bin_str, len(s)
+
+    return ''.join(r), len(binary)
 
 
 class StreamReader(codecs.StreamReader):
     def decode(self, s, errors='strict'):
-        return decoder(s)
+        return utf7m_decode(s)
 
 
 class StreamWriter(codecs.StreamWriter):
     def decode(self, s, errors='strict'):
-        return encoder(s)
+        return utf7m_encode(s)
 
 
-def imap4_utf_7(name):
-    if name == 'imap4-utf-7':
-        return encoder, decoder, StreamReader, StreamWriter
+def utf7m_search_function(name):
+    return codecs.CodecInfo(
+        utf7m_encode,
+        utf7m_decode,
+        StreamReader,
+        StreamWriter,
+        name='imap4-utf-7'
+    )
 
 
-codecs.register(imap4_utf_7)
+codecs.register(utf7m_search_function)
 
 
 def foldername_to_imapname(folder_name):

@@ -206,12 +206,23 @@ class IMAPRepository(BaseRepository):
         Returns: Returns the remoteusereval or remoteuser or netrc user value.
 
         """
-        localeval = self.localeval
-
         if self.config.has_option(self.getsection(), 'remoteusereval'):
             user = self.getconf('remoteusereval')
             if user is not None:
-                return localeval.eval(user).encode('UTF-8')
+                l_user = self.localeval.eval(user)
+
+                # We need a str username
+                if isinstance(l_user, bytes):
+                    return l_user.decode(encoding='utf-8')
+                elif isinstance(l_user, str):
+                    return l_user
+
+                # If is not bytes or str, we have a problem
+                raise OfflineImapError("Could not get a right username format for"
+                                       " repository %s. Type found: %s. "
+                                       "Please, open a bug." %
+                                       (self.name, type(l_user)),
+                                       OfflineImapError.ERROR.FOLDER)
 
         if self.config.has_option(self.getsection(), 'remoteuser'):
             # Assume the configuration file to be UTF-8 encoded so we must not
@@ -590,7 +601,20 @@ class IMAPRepository(BaseRepository):
                              encoding='utf-8')
             password = file_desc.readline().strip()
             file_desc.close()
-            return password.encode('UTF-8')
+
+            # We need a str password
+            if isinstance(password, bytes):
+                return password.decode(encoding='utf-8')
+            elif isinstance(password, str):
+                return password
+
+            # If is not bytes or str, we have a problem
+            raise OfflineImapError("Could not get a right password format for"
+                                   " repository %s. Type found: %s. "
+                                   "Please, open a bug." %
+                                   (self.name, type(password)),
+                                   OfflineImapError.ERROR.FOLDER)
+
         # 4. Read password from ~/.netrc.
         try:
             netrcentry = netrc.netrc().authenticators(self.gethost())
