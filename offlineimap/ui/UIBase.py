@@ -231,6 +231,9 @@ class UIBase:
         else:
             self.invaliddebug(debugtype)
 
+    def is_debugging(self, debugtype):
+        return (debugtype in self.debuglist)
+
     def debugging(self, debugtype):
         global debugtypes
         self.logger.debug("Now debugging for %s: %s" % (debugtype,

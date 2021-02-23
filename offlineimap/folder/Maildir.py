@@ -259,7 +259,7 @@ class MaildirFolder(BaseFolder):
         filename = self.messagelist[uid]['filename']
         filepath = os.path.join(self.getfullname(), filename)
         fd = open(filepath, 'rb')
-        retval = self.parse['8bit'](fd)
+        retval = self.parser['8bit'].parse(fd)
         fd.close()
         return retval
 

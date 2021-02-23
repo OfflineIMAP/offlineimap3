@@ -60,9 +60,9 @@ class BaseFolder:
           policy.default.clone(cte_type='8bit', utf8=True, refold_source='none', linesep='\r\n'),
         }
         # Parsers
-        self.parse = {
-          '8bit': BytesParser(policy=p1),
-        }
+        self.parser = {}
+        for key in self.policy:
+            self.parser[key] = BytesParser(policy=self.policy[key])
         # Save original name for folderfilter operations.
         self.ffilter_name = name
         # Top level dir name is always ''.

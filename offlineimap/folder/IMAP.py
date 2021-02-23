@@ -342,19 +342,22 @@ class IMAPFolder(BaseFolder):
         data = self._fetch_from_imap(str(uid), self.retrycount)
 
         # Data looks now e.g.
-        # ['320 (17061 BODY[] {2565}','msgbody....']
+        # ['320 (17061 BODY[] {2565}',<email.message.EmailMessage object>]
         # Is a list of two elements. Message is at [1]
-        data = data[1].replace(CRLF, "\n")
+        msg = data[1]
 
-        if len(data) > 200:
-            dbg_output = "%s...%s" % (str(data)[:150], str(data)[-50:])
-        else:
-            dbg_output = data
+        if self.ui.is_debugging('imap'):
+            # Optimization: don't create the debugging objects unless needed
+            msg_s = msg.as_string(policy=self.policy['8bit-RFC'])
+            if len(msg_s) > 200:
+                dbg_output = "%s...%s" % (msg_s[:150], msg_s[-50:])
+            else:
+                dbg_output = msg_s
 
-        self.ui.debug('imap', "Returned object from fetching %d: '%s'" %
-                      (uid, dbg_output))
+            self.ui.debug('imap', "Returned object from fetching %d: '%s'" %
+                          (uid, dbg_output))
 
-        return data
+        return msg
 
     # Interface from BaseFolder
     def getmessagetime(self, uid):
@@ -679,13 +682,15 @@ class IMAPFolder(BaseFolder):
                                   (headername, headervalue))
                     self.addmessageheader(msg, headername, headervalue)
 
-                msg_s = msg.as_string(policy=output_policy)
-                if len(msg_s) > 200:
-                    dbg_output = "%s...%s" % (msg_s[:150], msg_s[-50:])
-                else:
-                    dbg_output = msg_s
-                self.ui.debug('imap', "savemessage: date: %s, content: '%s'" %
-                              (date, dbg_output))
+                if self.ui.is_debugging('imap'):
+                    # Optimization: don't create the debugging objects unless needed
+                    msg_s = msg.as_string(policy=output_policy)
+                    if len(msg_s) > 200:
+                        dbg_output = "%s...%s" % (msg_s[:150], msg_s[-50:])
+                    else:
+                        dbg_output = msg_s
+                    self.ui.debug('imap', "savemessage: date: %s, content: '%s'" %
+                                  (date, dbg_output))
 
                 try:
                     # Select folder for append and make the box READ-WRITE.
@@ -830,7 +835,7 @@ class IMAPFolder(BaseFolder):
         """Fetches data from IMAP server.
 
         Arguments:
-        - uids: message UIDS
+        - uids: message UIDS (OfflineIMAP3: First UID returned only)
         - retry_num: number of retries to make
 
         Returns: data obtained by this query."""
@@ -886,9 +891,21 @@ class IMAPFolder(BaseFolder):
                          "with UID '%s'" % (self.getrepository(), uids)
             raise OfflineImapError(reason, severity)
 
-        # Convert bytes to str
+        # JI: In offlineimap, this function returned a tuple of strings for each
+        # fetched UID, offlineimap3 calls to the imap object return bytes and so
+        # originally a fixed, utf-8 conversion was done and *only* the first
+        # response (d[0]) was returned.  Note that this alters the behavior
+        # between code bases.  However, it seems like a single UID is the intent
+        # of this function so retaining the modfication here for now.
+        # 
+        # TODO: Can we assume the server response containing the meta data is
+        # always 'utf-8' encoded?  Assuming yes for now.
+        #
+        # Convert responses, d[0][0], into a 'utf-8' string (from bytes) and
+        # Convert email, d[0][1], into a message object (from bytes) 
+
         ndata0 = data[0][0].decode('utf-8')
-        ndata1 = data[0][1].decode('utf-8', errors='replace')
+        ndata1 = self.parser['8bit-RFC'].parsebytes(data[0][1])
         ndata = [ndata0, ndata1]
 
         return ndata
