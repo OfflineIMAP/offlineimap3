@@ -76,7 +76,7 @@ class GmailFolder(IMAPFolder):
 
         # Embed the labels into the message headers
         if self.synclabels:
-            m = re.search('X-GM-LABELS\s*[(](.*)[)]', data[0][0])
+            m = re.search('X-GM-LABELS\s*[(](.*)[)]', data[0])
             if m:
                 labels = set([imaputil.dequote(lb) for lb in imaputil.imapsplit(m.group(1))])
             else:
