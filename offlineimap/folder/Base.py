@@ -688,7 +688,7 @@ class BaseFolder:
         Returns: header value or None if no such header was found.
         """
 
-        self.ui.debug('', 'getmessageheader: called to get %s' % name)
+        self.ui.debug('', 'getmessageheader: called to get %s' % headername)
         return msg.get(headername)
 
     def getmessageheaderlist(self, msg, headername):
@@ -704,7 +704,7 @@ class BaseFolder:
         found.
         """
 
-        self.ui.debug('', 'getmessageheaderlist: called to get %s' % name)
+        self.ui.debug('', 'getmessageheaderlist: called to get %s' % headername)
         return msg.get_all(headername, [])
 
     def deletemessageheaders(self, msg, header_list):
