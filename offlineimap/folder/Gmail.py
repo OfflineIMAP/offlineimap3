@@ -69,14 +69,13 @@ class GmailFolder(IMAPFolder):
         data = self._fetch_from_imap(str(uid), self.retrycount)
 
         # data looks now e.g.
-        # ['320 (X-GM-LABELS (...) UID 17061 BODY[] {2565}','msgbody....']
+        # ['320 (X-GM-LABELS (...) UID 17061 BODY[] {2565}',<email.message.EmailMessage object>]
         # we only asked for one message, and that msg is in data[1].
-        # msbody is in [1].
-        body = data[1].replace("\r\n", "\n")
+        msg = data[1]
 
         # Embed the labels into the message headers
         if self.synclabels:
-            m = re.search('X-GM-LABELS\s*[(](.*)[)]', data[0][0])
+            m = re.search('X-GM-LABELS\s*[(](.*)[)]', data[0])
             if m:
                 labels = set([imaputil.dequote(lb) for lb in imaputil.imapsplit(m.group(1))])
             else:
@@ -84,19 +83,23 @@ class GmailFolder(IMAPFolder):
             labels = labels - self.ignorelabels
             labels_str = imaputil.format_labels_string(self.labelsheader, sorted(labels))
 
-            # First remove old label headers that may be in the message content retrieved
+            # First remove old label headers that may be in the message body retrieved
             # from gmail Then add a labels header with current gmail labels.
-            body = self.deletemessageheaders(body, self.labelsheader)
-            body = self.addmessageheader(body, '\n', self.labelsheader, labels_str)
+            self.deletemessageheaders(msg, self.labelsheader)
+            self.addmessageheader(msg, self.labelsheader, labels_str)
 
-        if len(body) > 200:
-            dbg_output = "%s...%s" % (str(body)[:150], str(body)[-50:])
-        else:
-            dbg_output = body
+        if self.ui.is_debugging('imap'):
+            # Optimization: don't create the debugging objects unless needed
+            msg_s = msg.as_string(policy=self.policy['8bit-RFC'])
+            if len(msg_s) > 200:
+                dbg_output = "%s...%s" % (msg_s[:150], msg_s[-50:])
+            else:
+                dbg_output = msg_s
 
-        self.ui.debug('imap', "Returned object from fetching %d: '%s'" %
-                      (uid, dbg_output))
-        return body
+            self.ui.debug('imap', "Returned object from fetching %d: '%s'" %
+                          (uid, dbg_output))
+
+        return msg
 
     def getmessagelabels(self, uid):
         if 'labels' in self.messagelist[uid]:
@@ -167,7 +170,7 @@ class GmailFolder(IMAPFolder):
                 rtime = imaplibutil.Internaldate2epoch(messagestr)
                 self.messagelist[uid] = {'uid': uid, 'flags': flags, 'labels': labels, 'time': rtime}
 
-    def savemessage(self, uid, content, flags, rtime):
+    def savemessage(self, uid, msg, flags, rtime):
         """Save the message on the Server
 
         This backend always assigns a new uid, so the uid arg is ignored.
@@ -180,7 +183,7 @@ class GmailFolder(IMAPFolder):
         savemessage is never called in a dryrun mode.
 
         :param uid: Message UID
-        :param content: Message content
+        :param msg: Message object
         :param flags: Message flags
         :param rtime: A timestamp to be used as the mail date
         :returns: the UID of the new message as assigned by the server. If the
@@ -189,13 +192,13 @@ class GmailFolder(IMAPFolder):
                   read-only for example) it will return -1."""
 
         if not self.synclabels:
-            return super(GmailFolder, self).savemessage(uid, content, flags, rtime)
+            return super(GmailFolder, self).savemessage(uid, msg, flags, rtime)
 
         labels = set()
-        for hstr in self.getmessageheaderlist(content, self.labelsheader):
+        for hstr in self.getmessageheaderlist(msg, self.labelsheader):
             labels.update(imaputil.labels_from_header(self.labelsheader, hstr))
 
-        ret = super(GmailFolder, self).savemessage(uid, content, flags, rtime)
+        ret = super(GmailFolder, self).savemessage(uid, msg, flags, rtime)
         self.savemessagelabels(ret, labels)
         return ret
 

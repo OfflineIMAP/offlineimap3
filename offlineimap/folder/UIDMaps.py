@@ -236,11 +236,11 @@ class MappedIMAPFolder(IMAPFolder):
 
     # Interface from BaseFolder
     def getmessage(self, uid):
-        """Returns the content of the specified message."""
+        """Returns the specified message."""
         return self._mb.getmessage(self.r2l[uid])
 
     # Interface from BaseFolder
-    def savemessage(self, uid, content, flags, rtime):
+    def savemessage(self, uid, msg, flags, rtime):
         """Writes a new message, with the specified uid.
 
         The UIDMaps class will not return a newly assigned uid, as it
@@ -271,7 +271,7 @@ class MappedIMAPFolder(IMAPFolder):
             self.savemessageflags(uid, flags)
             return uid
 
-        newluid = self._mb.savemessage(-1, content, flags, rtime)
+        newluid = self._mb.savemessage(-1, msg, flags, rtime)
         if newluid < 1:
             raise OfflineImapError("server of repository '%s' did not return "
                                    "a valid UID (got '%s') for UID '%s' from '%s'" % (

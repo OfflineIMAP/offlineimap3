@@ -90,12 +90,12 @@ class GmailMaildirFolder(MaildirFolder):
             if not os.path.exists(filepath):
                 return set()
 
-            file = open(filepath, 'rt')
-            content = file.read()
-            file.close()
+            fd = open(filepath, 'rb')
+            msg = self.parser['8bit'].parse(fd)
+            fd.close()
 
             self.messagelist[uid]['labels'] = set()
-            for hstr in self.getmessageheaderlist(content, self.labelsheader):
+            for hstr in self.getmessageheaderlist(msg, self.labelsheader):
                 self.messagelist[uid]['labels'].update(
                     imaputil.labels_from_header(self.labelsheader, hstr))
             self.messagelist[uid]['labels_cached'] = True
@@ -108,7 +108,7 @@ class GmailMaildirFolder(MaildirFolder):
         else:
             return self.messagelist[uid]['mtime']
 
-    def savemessage(self, uid, content, flags, rtime):
+    def savemessage(self, uid, msg, flags, rtime):
         """Writes a new message, with the specified uid.
 
         See folder/Base for detail. Note that savemessage() does not
@@ -116,14 +116,15 @@ class GmailMaildirFolder(MaildirFolder):
         savemessage is never called in a dryrun mode."""
 
         if not self.synclabels:
-            return super(GmailMaildirFolder, self).savemessage(uid, content,
+            return super(GmailMaildirFolder, self).savemessage(uid, msg,
                                                                flags, rtime)
 
         labels = set()
-        for hstr in self.getmessageheaderlist(content, self.labelsheader):
+        for hstr in self.getmessageheaderlist(msg, self.labelsheader):
             labels.update(imaputil.labels_from_header(self.labelsheader, hstr))
 
-        ret = super(GmailMaildirFolder, self).savemessage(uid, content, flags,
+        # TODO - Not sure why the returned uid is stored early as ret here?
+        ret = super(GmailMaildirFolder, self).savemessage(uid, msg, flags,
                                                           rtime)
 
         # Update the mtime and labels.
@@ -145,12 +146,12 @@ class GmailMaildirFolder(MaildirFolder):
         filename = self.messagelist[uid]['filename']
         filepath = os.path.join(self.getfullname(), filename)
 
-        file = open(filepath, 'rt')
-        content = file.read()
-        file.close()
+        fd = open(filepath, 'rb')
+        msg = self.parser['8bit'].parse(fd)
+        fd.close()
 
         oldlabels = set()
-        for hstr in self.getmessageheaderlist(content, self.labelsheader):
+        for hstr in self.getmessageheaderlist(msg, self.labelsheader):
             oldlabels.update(imaputil.labels_from_header(self.labelsheader,
                                                          hstr))
 
@@ -167,15 +168,14 @@ class GmailMaildirFolder(MaildirFolder):
                                                    sorted(labels | ignoredlabels))
 
         # First remove old labels header, and then add the new one.
-        content = self.deletemessageheaders(content, self.labelsheader)
-        content = self.addmessageheader(content, '\n', self.labelsheader,
-                                        labels_str)
+        self.deletemessageheaders(msg, self.labelsheader)
+        self.addmessageheader(msg, self.labelsheader, labels_str)
 
         mtime = int(os.stat(filepath).st_mtime)
 
         # Write file with new labels to a unique file in tmp.
         messagename = self.new_message_filename(uid, set())
-        tmpname = self.save_to_tmp_file(messagename, content)
+        tmpname = self.save_to_tmp_file(messagename, msg)
         tmppath = os.path.join(self.getfullname(), tmpname)
 
         # Move to actual location.

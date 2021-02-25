@@ -20,7 +20,7 @@ import binascii
 import re
 import time
 from sys import exc_info
-from offlineimap import imaputil, imaplibutil, emailutil, OfflineImapError
+from offlineimap import imaputil, imaplibutil, OfflineImapError
 from offlineimap import globals
 from imaplib2 import MonthNames
 from .Base import BaseFolder
@@ -28,13 +28,6 @@ from .Base import BaseFolder
 # Globals
 CRLF = '\r\n'
 MSGCOPY_NAMESPACE = 'MSGCOPY_'
-
-
-# NB: message returned from getmessage() will have '\n' all over the place,
-# NB: there will be no CRLFs.  Just before the sending stage of savemessage()
-# NB: '\n' will be transformed back to CRLF.  So, for the most parts of the
-# NB: code the stored content will be clean of CRLF and one can rely that
-# NB: line endings will be pure '\n'.
 
 
 class IMAPFolder(BaseFolder):
@@ -349,19 +342,22 @@ class IMAPFolder(BaseFolder):
         data = self._fetch_from_imap(str(uid), self.retrycount)
 
         # Data looks now e.g.
-        # ['320 (17061 BODY[] {2565}','msgbody....']
+        # ['320 (17061 BODY[] {2565}',<email.message.EmailMessage object>]
         # Is a list of two elements. Message is at [1]
-        data = data[1].replace(CRLF, "\n")
+        msg = data[1]
 
-        if len(data) > 200:
-            dbg_output = "%s...%s" % (str(data)[:150], str(data)[-50:])
-        else:
-            dbg_output = data
+        if self.ui.is_debugging('imap'):
+            # Optimization: don't create the debugging objects unless needed
+            msg_s = msg.as_string(policy=self.policy['8bit-RFC'])
+            if len(msg_s) > 200:
+                dbg_output = "%s...%s" % (msg_s[:150], msg_s[-50:])
+            else:
+                dbg_output = msg_s
 
-        self.ui.debug('imap', "Returned object from fetching %d: '%s'" %
-                      (uid, dbg_output))
+            self.ui.debug('imap', "Returned object from fetching %d: '%s'" %
+                          (uid, dbg_output))
 
-        return data
+        return msg
 
     # Interface from BaseFolder
     def getmessagetime(self, uid):
@@ -375,7 +371,7 @@ class IMAPFolder(BaseFolder):
     def getmessagekeywords(self, uid):
         return self.messagelist[uid]['keywords']
 
-    def __generate_randomheader(self, content):
+    def __generate_randomheader(self, msg, policy=None):
         """Returns a unique X-OfflineIMAP header
 
          Generate an 'X-OfflineIMAP' mail header which contains a random
@@ -390,17 +386,21 @@ class IMAPFolder(BaseFolder):
         """
 
         headername = 'X-OfflineIMAP'
+        if policy is None:
+            output_policy = self.policy['8bit-RFC']
+        else:
+            output_policy = policy
         # We need a random component too. If we ever upload the same
         # mail twice (e.g. in different folders), we would still need to
         # get the UID for the correct one. As we won't have too many
         # mails with identical content, the randomness requirements are
         # not extremly critial though.
 
-        # Compute unsigned crc32 of 'content' as unique hash.
+        # Compute unsigned crc32 of 'msg' (as bytes) into a unique hash.
         # NB: crc32 returns unsigned only starting with python 3.0.
-        headervalue = str(binascii.crc32(str.encode(content))
-                          & 0xffffffff) + '-'
-        headervalue += str(self.randomgenerator.randint(0, 9999999999))
+        headervalue = '{}-{}'.format(
+          (binascii.crc32(msg.as_bytes(policy=output_policy)) & 0xffffffff),
+          self.randomgenerator.randint(0, 9999999999))
         return headername, headervalue
 
     def __savemessage_searchforheader(self, imapobj, headername, headervalue):
@@ -539,7 +539,7 @@ class IMAPFolder(BaseFolder):
 
         return 0
 
-    def __getmessageinternaldate(self, content, rtime=None):
+    def __getmessageinternaldate(self, msg, rtime=None):
         """Parses mail and returns an INTERNALDATE string
 
         It will use information in the following order, falling back as an
@@ -571,7 +571,7 @@ class IMAPFolder(BaseFolder):
                   (which is fine as value for append)."""
 
         if rtime is None:
-            rtime = emailutil.get_message_date(content)
+            rtime = self.get_message_date(msg)
             if rtime is None:
                 return None
         datetuple = time.localtime(rtime)
@@ -619,7 +619,7 @@ class IMAPFolder(BaseFolder):
         return internaldate
 
     # Interface from BaseFolder
-    def savemessage(self, uid, content, flags, rtime):
+    def savemessage(self, uid, msg, flags, rtime):
         """Save the message on the Server
 
         This backend always assigns a new uid, so the uid arg is ignored.
@@ -632,7 +632,7 @@ class IMAPFolder(BaseFolder):
         savemessage is never called in a dryrun mode.
 
         :param uid: Message UID
-        :param content: Message content
+        :param msg: Message Object
         :param flags: Message flags
         :param rtime: A timestamp to be used as the mail date
         :returns: the UID of the new message as assigned by the server. If the
@@ -647,16 +647,17 @@ class IMAPFolder(BaseFolder):
             self.savemessageflags(uid, flags)
             return uid
 
-        content = self.deletemessageheaders(content, self.filterheaders)
+        # Filter user requested headers before uploading to the IMAP server
+        self.deletemessageheaders(msg, self.filterheaders)
 
-        # Use proper CRLF all over the message.
-        content = re.sub("(?<!\r)\n", CRLF, content)
+        # Should just be able to set the policy, to use CRLF in msg output
+        output_policy = self.policy['8bit-RFC']
 
         # Get the date of the message, so we can pass it to the server.
-        date = self.__getmessageinternaldate(content, rtime)
+        date = self.__getmessageinternaldate(msg, rtime)
 
         # Message-ID is handy for debugging messages.
-        msg_id = self.getmessageheader(content, "message-id")
+        msg_id = self.getmessageheader(msg, "message-id")
         if not msg_id:
             msg_id = '[unknown message-id]'
 
@@ -676,18 +677,20 @@ class IMAPFolder(BaseFolder):
                 if not use_uidplus:
                     # Insert a random unique header that we can fetch later.
                     (headername, headervalue) = self.__generate_randomheader(
-                        content)
+                        msg)
                     self.ui.debug('imap', 'savemessage: header is: %s: %s' %
                                   (headername, headervalue))
-                    content = self.addmessageheader(content, CRLF,
-                                                    headername, headervalue)
+                    self.addmessageheader(msg, headername, headervalue)
 
-                if len(content) > 200:
-                    dbg_output = "%s...%s" % (content[:150], content[-50:])
-                else:
-                    dbg_output = content
-                self.ui.debug('imap', "savemessage: date: %s, content: '%s'" %
-                              (date, dbg_output))
+                if self.ui.is_debugging('imap'):
+                    # Optimization: don't create the debugging objects unless needed
+                    msg_s = msg.as_string(policy=output_policy)
+                    if len(msg_s) > 200:
+                        dbg_output = "%s...%s" % (msg_s[:150], msg_s[-50:])
+                    else:
+                        dbg_output = msg_s
+                    self.ui.debug('imap', "savemessage: date: %s, content: '%s'" %
+                                  (date, dbg_output))
 
                 try:
                     # Select folder for append and make the box READ-WRITE.
@@ -695,7 +698,7 @@ class IMAPFolder(BaseFolder):
                 except imapobj.readonly:
                     # readonly exception. Return original uid to notify that
                     # we did not save the message. (see savemessage in Base.py)
-                    self.ui.msgtoreadonly(self, uid, content, flags)
+                    self.ui.msgtoreadonly(self, uid)
                     return uid
 
                 # Do the APPEND.
@@ -703,7 +706,7 @@ class IMAPFolder(BaseFolder):
                     (typ, dat) = imapobj.append(
                         self.getfullIMAPname(),
                         imaputil.flagsmaildir2imap(flags),
-                        date,  bytes(content, 'utf-8'))
+                        date,  msg.as_bytes(policy=output_policy))
                     # This should only catch 'NO' responses since append()
                     # will raise an exception for 'BAD' responses:
                     if typ != 'OK':
@@ -716,12 +719,12 @@ class IMAPFolder(BaseFolder):
                         # In this case, we should immediately abort
                         # the repository sync and continue
                         # with the next account.
-                        msg = \
+                        err_msg = \
                             "Saving msg (%s) in folder '%s', " \
                             "repository '%s' failed (abort). " \
                             "Server responded: %s %s\n" % \
                             (msg_id, self, self.getrepository(), typ, dat)
-                        raise OfflineImapError(msg, OfflineImapError.ERROR.REPO)
+                        raise OfflineImapError(err_msg, OfflineImapError.ERROR.REPO)
                     retry_left = 0  # Mark as success.
                 except imapobj.abort as e:
                     # Connection has been reset, release connection and retry.
@@ -832,7 +835,7 @@ class IMAPFolder(BaseFolder):
         """Fetches data from IMAP server.
 
         Arguments:
-        - uids: message UIDS
+        - uids: message UIDS (OfflineIMAP3: First UID returned only)
         - retry_num: number of retries to make
 
         Returns: data obtained by this query."""
@@ -888,9 +891,21 @@ class IMAPFolder(BaseFolder):
                          "with UID '%s'" % (self.getrepository(), uids)
             raise OfflineImapError(reason, severity)
 
-        # Convert bytes to str
+        # JI: In offlineimap, this function returned a tuple of strings for each
+        # fetched UID, offlineimap3 calls to the imap object return bytes and so
+        # originally a fixed, utf-8 conversion was done and *only* the first
+        # response (d[0]) was returned.  Note that this alters the behavior
+        # between code bases.  However, it seems like a single UID is the intent
+        # of this function so retaining the modfication here for now.
+        # 
+        # TODO: Can we assume the server response containing the meta data is
+        # always 'utf-8' encoded?  Assuming yes for now.
+        #
+        # Convert responses, d[0][0], into a 'utf-8' string (from bytes) and
+        # Convert email, d[0][1], into a message object (from bytes) 
+
         ndata0 = data[0][0].decode('utf-8')
-        ndata1 = data[0][1].decode('utf-8', errors='replace')
+        ndata1 = self.parser['8bit-RFC'].parsebytes(data[0][1])
         ndata = [ndata0, ndata1]
 
         return ndata

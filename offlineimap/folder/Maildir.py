@@ -20,12 +20,10 @@ import socket
 import time
 import re
 import os
-from pathlib import Path
 from sys import exc_info
 from threading import Lock
 from hashlib import md5
-import chardet
-from offlineimap import OfflineImapError, emailutil
+from offlineimap import OfflineImapError
 from .Base import BaseFolder
 
 # Find the UID in a message filename
@@ -256,23 +254,14 @@ class MaildirFolder(BaseFolder):
 
     # Interface from BaseFolder
     def getmessage(self, uid):
-        """Return the content of the message."""
+        """Returns an email message object."""
 
-        # TODO: Perhaps, force the encoding using config file
         filename = self.messagelist[uid]['filename']
         filepath = os.path.join(self.getfullname(), filename)
-        # Open the file as binary and read it
-        file = Path(filepath)
-        blob = file.read_bytes()
-        # Detect the encoding
-        detection = chardet.detect(blob)
-        encoding = detection["encoding"]
-        # Read the file as text
-        retval = blob.decode(encoding)
-
-        # TODO: WHY are we replacing \r\n with \n here? And why do we
-        #      read it as text?
-        return retval.replace("\r\n", "\n")
+        fd = open(filepath, 'rb')
+        retval = self.parser['8bit'].parse(fd)
+        fd.close()
+        return retval
 
     # Interface from BaseFolder
     def getmessagetime(self, uid):
@@ -297,17 +286,21 @@ class MaildirFolder(BaseFolder):
                      uid, self._foldermd5, self.infosep, ''.join(sorted(flags)))
         return uniq_name.replace(os.path.sep, self.sep_subst)
 
-    def save_to_tmp_file(self, filename, content):
-        """Saves given content to the named temporary file in the
+    def save_to_tmp_file(self, filename, msg, policy=None):
+        """Saves given message to the named temporary file in the
         'tmp' subdirectory of $CWD.
 
         Arguments:
         - filename: name of the temporary file;
-        - content: data to be saved.
+        - msg: Email message object
 
         Returns: relative path to the temporary file
         that was created."""
 
+        if policy is None:
+            output_policy = self.policy['8bit']
+        else:
+            output_policy = policy
         tmpname = os.path.join('tmp', filename)
         # Open file and write it out.
         # XXX: why do we need to loop 7 times?
@@ -333,8 +326,8 @@ class MaildirFolder(BaseFolder):
                 else:
                     raise
 
-        fd = os.fdopen(fd, 'wt')
-        fd.write(content)
+        fd = os.fdopen(fd, 'wb')
+        fd.write(msg.as_bytes(policy=output_policy))
         # Make sure the data hits the disk.
         fd.flush()
         if self.dofsync():
@@ -344,7 +337,7 @@ class MaildirFolder(BaseFolder):
         return tmpname
 
     # Interface from BaseFolder
-    def savemessage(self, uid, content, flags, rtime):
+    def savemessage(self, uid, msg, flags, rtime):
         """Writes a new message, with the specified uid.
 
         See folder/Base for detail. Note that savemessage() does not
@@ -368,15 +361,15 @@ class MaildirFolder(BaseFolder):
         message_timestamp = None
         if self._filename_use_mail_timestamp is not False:
             try:
-                message_timestamp = emailutil.get_message_date(content, 'Date')
+                message_timestamp = self.get_message_date(msg, 'Date')
                 if message_timestamp is None:
                     # Give a try with Delivery-date
-                    message_timestamp = emailutil.get_message_date(
-                        content, 'Delivery-date')
+                    message_timestamp = self.get_message_date(
+                        msg, 'Delivery-date')
             except Exception as e:
                 # This should never happen.
                 from offlineimap.ui import getglobalui
-                datestr = emailutil.get_message_date(content)
+                datestr = self.get_message_date(msg)
                 ui = getglobalui()
                 ui.warn("UID %d has invalid date %s: %s\n"
                         "Not using message timestamp as file prefix" %
@@ -384,11 +377,11 @@ class MaildirFolder(BaseFolder):
                 # No need to check if message_timestamp is None here since it
                 # would be overridden by _gettimeseq.
         messagename = self.new_message_filename(uid, flags, date=message_timestamp)
-        tmpname = self.save_to_tmp_file(messagename, content)
+        tmpname = self.save_to_tmp_file(messagename, msg)
 
         if self._utime_from_header is True:
             try:
-                date = emailutil.get_message_date(content, 'Date')
+                date = self.get_message_date(msg, 'Date')
                 if date is not None:
                     os.utime(os.path.join(self.getfullname(), tmpname),
                              (date, date))
@@ -396,7 +389,7 @@ class MaildirFolder(BaseFolder):
             # int32.
             except Exception as e:
                 from offlineimap.ui import getglobalui
-                datestr = emailutil.get_message_date(content)
+                datestr = self.get_message_date(msg)
                 ui = getglobalui()
                 ui.warn("UID %d has invalid date %s: %s\n"
                         "Not changing file modification time" % (uid, datestr, e))
