@@ -6,10 +6,10 @@ Upstream status (`master` branch):
 Upstream status (`next` branch):
 [![OfflineIMAP build status on Travis-CI.org](https://travis-ci.org/OfflineIMAP/offlineimap.svg?branch=next)](https://travis-ci.org/OfflineIMAP/offlineimap)
 
-[offlineimap]: http://github.com/OfflineIMAP/offlineimap
-[website]: http://www.offlineimap.org
-[wiki]: http://github.com/OfflineIMAP/offlineimap/wiki
-[blog]: http://www.offlineimap.org/posts.html
+[offlineimap]: https://github.com/OfflineIMAP/offlineimap
+[website]: https://www.offlineimap.org
+[wiki]: https://github.com/OfflineIMAP/offlineimap/wiki
+[blog]: https://www.offlineimap.org/posts.html
 
 Links:
 * Official github code repository: [offlineimap]
