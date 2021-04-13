@@ -735,10 +735,8 @@ class IMAPFolder(BaseFolder):
                         raise OfflineImapError(
                             "Saving msg (%s) in folder '%s', "
                             "repository '%s' failed (abort). "
-                            "Server responded: %s\n"
-                            "Message content was: %s" %
-                            (msg_id, self, self.getrepository(),
-                             str(e), dbg_output),
+                            "Server responded: %s\n" %
+                            (msg_id, self, self.getrepository(), str(e)),
                             OfflineImapError.ERROR.MESSAGE,
                             exc_info()[2])
 
@@ -752,10 +750,8 @@ class IMAPFolder(BaseFolder):
                     imapobj = None
                     raise OfflineImapError(
                         "Saving msg (%s) folder '%s', repo '%s'"
-                        "failed (error). Server responded: %s\n"
-                        "Message content was: %s" %
-                        (msg_id, self, self.getrepository(),
-                         str(e), dbg_output),
+                        "failed (error). Server responded: %s\n" %
+                        (msg_id, self, self.getrepository(), str(e)),
                         OfflineImapError.ERROR.MESSAGE,
                         exc_info()[2])
 
