@@ -26,6 +26,7 @@ from email import policy
 from email.parser import BytesParser
 from email.generator import BytesGenerator
 from email.utils import parsedate_tz, mktime_tz
+from email.errors import NoBoundaryInMultipartDefect
 
 from offlineimap import threadutil
 from offlineimap.ui import getglobalui
