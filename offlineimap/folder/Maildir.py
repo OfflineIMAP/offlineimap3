@@ -299,7 +299,11 @@ class MaildirFolder(BaseFolder):
         fd = open(filepath, 'rb')
         retval = self.parser['8bit'].parse(fd)
         try:
-            _ = retval.as_bytes(policy=self.policy['8bit'])
+            if len(retval.defects) > 0:
+                ui.warn("Message has defects: {}".format(retval.defects))
+                # See if the defects are preventing us from obtaining bytes and
+                # handle known issues
+                _ = retval.as_bytes(policy=self.policy['8bit'])
         except UnicodeEncodeError as err:
             if any(isinstance(defect, NoBoundaryInMultipartDefect) for defect in retval.defects):
                 # (Hopefully) Rare instance where multipart boundary is not
