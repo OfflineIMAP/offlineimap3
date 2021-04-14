@@ -243,13 +243,14 @@ class MaildirFolder(BaseFolder):
         # quoted boundaries.
         try: boundary_field = \
             re.search(b"content-type:.*(boundary=[\"]?[A-Za-z0-9'()+_,-./:=? ]+[\"]?)",
-            re.split(b'[\r]?\n[\r]?\n',raw_msg_bytes)[0],re.IGNORECASE).group(1)
+              re.split(b'[\r]?\n[\r]?\n', raw_msg_bytes)[0],
+              (re.IGNORECASE|re.DOTALL)).group(1)
         except AttributeError:
             # No match
             return raw_msg_bytes
         # get the boundary field, and strip off any trailing ws (against RFC rules, leading ws is OK)
         # if it was already quoted, well then there was nothing to fix
-        boundary, value = boundary_field.split(b'=',1)
+        boundary, value = boundary_field.split(b'=', 1)
         value = value.rstrip()
         # ord(b'"') == 34
         if value[0] == value[-1] == 34:
@@ -260,8 +261,8 @@ class MaildirFolder(BaseFolder):
             # boundary="ahahah  " as the email library will trim the ws for us
             return raw_msg_bytes
         else:
-            new_field = b''.join([boundary,b'="',value,b'"'])
-            return(raw_msg_bytes.replace(boundary_field,new_field,1))
+            new_field = b''.join([boundary, b'="', value, b'"'])
+            return(raw_msg_bytes.replace(boundary_field, new_field, 1))
 
 
     # Interface from BaseFolder
