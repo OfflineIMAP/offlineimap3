@@ -241,7 +241,7 @@ class MaildirFolder(BaseFolder):
         # soft fix this message to resolve the python library looking for properly
         # quoted boundaries.
         try: boundary_field = \
-            re.search(b"content-type:.*(boundary=[\"]?[A-Za-z0-9'()+_,-./:=? ]*[\"]?)",
+            re.search(b"content-type:.*(boundary=[\"]?[A-Za-z0-9'()+_,-./:=? ]+[\"]?)",
             re.split(b'[\r]?\n[\r]?\n',raw_msg_bytes)[0],re.IGNORECASE).group(1)
         except AttributeError:
             # No match
