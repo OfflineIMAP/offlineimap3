@@ -21,7 +21,7 @@ Links:
 
 ***"Get the emails where you need them."***
 
-[Official offlineimap][offlineimap3].
+[Official offlineimap][https://github.com/OfflineIMAP/offlineimap3].
 
 
 ## Description
