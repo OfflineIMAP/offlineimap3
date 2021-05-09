@@ -7,6 +7,7 @@ Upstream status (`next` branch):
 [![OfflineIMAP build status on Travis-CI.org](https://travis-ci.org/OfflineIMAP/offlineimap.svg?branch=next)](https://travis-ci.org/OfflineIMAP/offlineimap)
 
 [offlineimap]: https://github.com/OfflineIMAP/offlineimap
+[offlineimap3]: https://github.com/OfflineIMAP/offlineimap3
 [website]: https://www.offlineimap.org
 [wiki]: https://github.com/OfflineIMAP/offlineimap/wiki
 [blog]: https://www.offlineimap.org/posts.html
@@ -21,7 +22,7 @@ Links:
 
 ***"Get the emails where you need them."***
 
-[Official offlineimap][offlineimap3].
+[Official offlineimap][https://github.com/OfflineIMAP/offlineimap3].
 
 
 ## Description
