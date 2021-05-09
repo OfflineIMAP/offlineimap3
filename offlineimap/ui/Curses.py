@@ -583,6 +583,10 @@ class Blinkenlights(UIBase, CursesUtil):
         finally:
             self.unlock()
             self.inputhandler.input_release()
+
+        # We need a str password
+        if isinstance(password, bytes):
+            return password.decode(encoding='utf-8')
         return password
 
     def setupwindows(self, resize=False):
