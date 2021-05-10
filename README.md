@@ -59,7 +59,7 @@ GNU General Public License v2.
 ## Downloads
 
 You should first check if your distribution already packages OfflineIMAP for you.
-Downloads releases as [tarball or zipball](https://github.com/OfflineIMAP/offlineimap/tags).
+Downloads releases as [tarball or zipball](https://github.com/OfflineIMAP/offlineimap3/tags).
 
 If you are running Linux Os, you can install offlineimap with:
 
@@ -98,6 +98,9 @@ Bugs, issues and contributions can be requested to both the mailing list or the
 * Python v3+
 * rfc6555 (required)
 * imaplib2 >= 3.5
+  * If you encounter an error that `cannot import name 'IMAP4' from 'imaplib2'`, it means that you need to install imaplib2 from the git repository.
+  * First, clone https://github.com/jazzband/imaplib2.git to your local computer.
+  * Then, enter the directory of the repository, run `pip install .` or `pip install --user .`.
 * gssapi (optional), for Kerberos authentication
 * portalocker (optional), if you need to run offlineimap in Cygwin for Windows
 
