@@ -905,7 +905,20 @@ class IMAPFolder(BaseFolder):
         # Convert email, d[0][1], into a message object (from bytes) 
 
         ndata0 = data[0][0].decode('utf-8')
-        ndata1 = self.parser['8bit-RFC'].parsebytes(data[0][1])
+        try: ndata1 = self.parser['8bit-RFC'].parsebytes(data[0][1])
+        except:
+          e = exc_info()
+          response_type = type(data[0][1]).__name__
+          try: msg_id = \
+            re.search(b"message-id:.*(<[A-Za-z0-9!#$%&'*+-/=?^_`{}|~.@ ]+>)",
+            re.split(b'[\r]?\n[\r]?\n', bytes(data[0][1]))[0], re.IGNORECASE).group(1)
+          except AttributeError:
+            # No match
+            msg_id = b"<Unknown Msg-ID>"
+          raise OfflineImapError(
+            "Exception parsing message ({} type {}) from imaplib.\n {}: {}".format(
+              msg_id, response_type, e[0].__name__, e[1]),
+            OfflineImapError.ERROR.MESSAGE)
         ndata = [ndata0, ndata1]
 
         return ndata
