@@ -262,7 +262,14 @@ class MaildirFolder(BaseFolder):
         fd = open(filepath, 'rb')
         _fd_bytes = fd.read()
         fd.close()
-        retval = self.parser['8bit'].parsebytes(_fd_bytes)
+        try: retval = self.parser['8bit'].parsebytes(_fd_bytes)
+        except:
+            err = exc_info()
+            msg_id = self._extract_message_id(_fd_bytes)[0].decode('ascii',errors='surrogateescape')
+            raise OfflineImapError(
+                "Exception parsing message with ID ({}) from file ({}).\n {}: {}".format(
+                    msg_id, filename, err[0].__name__, err[1]),
+                OfflineImapError.ERROR.MESSAGE)
         if len(retval.defects) > 0:
             # We don't automatically apply fixes as to attempt to preserve the original message
             self.ui.warn("UID {} has defects: {}".format(uid, retval.defects))
