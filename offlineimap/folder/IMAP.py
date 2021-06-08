@@ -24,6 +24,7 @@ from offlineimap import imaputil, imaplibutil, OfflineImapError
 from offlineimap import globals
 from imaplib2 import MonthNames
 from .Base import BaseFolder
+from email.errors import NoBoundaryInMultipartDefect
 
 # Globals
 CRLF = '\r\n'
