@@ -226,45 +226,6 @@ class MaildirFolder(BaseFolder):
                         retval[uid] = date_excludees[uid]
         return retval
 
-    def _quote_boundary_fix(self, raw_msg_bytes):
-        """Modify a raw message to quote the boundary separator for multipart messages.
-
-        This function quotes only the first occurrence of the boundary field in
-        the email header, and quotes any boundary value.  Improperly quoted
-        boundary fields can give the internal python email library issues.
-
-        :returns: The raw byte stream containing the quoted boundary
-        """
-        # Use re.split to extract just the header, and search for the boundary in
-        # the context-type header and extract just the boundary and characters per
-        # RFC 2046 ( see https://tools.ietf.org/html/rfc2046#section-5.1.1 )
-        # We don't cap the length to 70 characters, because we are just trying to
-        # soft fix this message to resolve the python library looking for properly
-        # quoted boundaries.
-        try: boundary_field = \
-            re.search(b"content-type:.*(boundary=[\"]?[A-Za-z0-9'()+_,-./:=? ]+[\"]?)",
-              re.split(b'[\r]?\n[\r]?\n', raw_msg_bytes)[0],
-              (re.IGNORECASE|re.DOTALL)).group(1)
-        except AttributeError:
-            # No match
-            return raw_msg_bytes
-        # get the boundary field, and strip off any trailing ws (against RFC rules, leading ws is OK)
-        # if it was already quoted, well then there was nothing to fix
-        boundary, value = boundary_field.split(b'=', 1)
-        value = value.rstrip()
-        # ord(b'"') == 34
-        if value[0] == value[-1] == 34:
-            # Sanity Check - Do not requote if already quoted.
-            # A quoted boundary was the end goal so return the original
-            #
-            # No need to worry about if the original email did something like:
-            # boundary="ahahah  " as the email library will trim the ws for us
-            return raw_msg_bytes
-        else:
-            new_field = b''.join([boundary, b'="', value, b'"'])
-            return(raw_msg_bytes.replace(boundary_field, new_field, 1))
-
-
     # Interface from BaseFolder
     def quickchanged(self, statusfolder):
         """Returns True if the Maildir has changed
