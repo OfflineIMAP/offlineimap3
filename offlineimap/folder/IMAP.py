@@ -24,6 +24,7 @@ from offlineimap import imaputil, imaplibutil, OfflineImapError
 from offlineimap import globals
 from imaplib2 import MonthNames
 from .Base import BaseFolder
+from email.errors import NoBoundaryInMultipartDefect
 
 # Globals
 CRLF = '\r\n'
@@ -735,10 +736,8 @@ class IMAPFolder(BaseFolder):
                         raise OfflineImapError(
                             "Saving msg (%s) in folder '%s', "
                             "repository '%s' failed (abort). "
-                            "Server responded: %s\n"
-                            "Message content was: %s" %
-                            (msg_id, self, self.getrepository(),
-                             str(e), dbg_output),
+                            "Server responded: %s\n" %
+                            (msg_id, self, self.getrepository(), str(e)),
                             OfflineImapError.ERROR.MESSAGE,
                             exc_info()[2])
 
@@ -752,10 +751,8 @@ class IMAPFolder(BaseFolder):
                     imapobj = None
                     raise OfflineImapError(
                         "Saving msg (%s) folder '%s', repo '%s'"
-                        "failed (error). Server responded: %s\n"
-                        "Message content was: %s" %
-                        (msg_id, self, self.getrepository(),
-                         str(e), dbg_output),
+                        "failed (error). Server responded: %s\n" %
+                        (msg_id, self, self.getrepository(), str(e)),
                         OfflineImapError.ERROR.MESSAGE,
                         exc_info()[2])
 
@@ -905,7 +902,35 @@ class IMAPFolder(BaseFolder):
         # Convert email, d[0][1], into a message object (from bytes) 
 
         ndata0 = data[0][0].decode('utf-8')
-        ndata1 = self.parser['8bit-RFC'].parsebytes(data[0][1])
+        try: ndata1 = self.parser['8bit-RFC'].parsebytes(data[0][1])
+        except:
+            err = exc_info()
+            response_type = type(data[0][1]).__name__
+            msg_id = self._extract_message_id(data[0][1])[0].decode('ascii',errors='surrogateescape')
+            raise OfflineImapError(
+                "Exception parsing message with ID ({}) from imaplib (response type: {}).\n {}: {}".format(
+                    msg_id, response_type, err[0].__name__, err[1]),
+                OfflineImapError.ERROR.MESSAGE)
+        if len(ndata1.defects) > 0:
+            # We don't automatically apply fixes as to attempt to preserve the original message
+            self.ui.warn("UID {} has defects: {}".format(uids, ndata1.defects))
+            if any(isinstance(defect, NoBoundaryInMultipartDefect) for defect in ndata1.defects):
+                # (Hopefully) Rare defect from a broken client where multipart boundary is
+                # not properly quoted.  Attempt to solve by fixing the boundary and parsing
+                self.ui.warn(" ... applying multipart boundary fix.")
+                ndata1 = self.parser['8bit-RFC'].parsebytes(self._quote_boundary_fix(data[0][1]))
+            try:
+                # See if the defects after fixes are preventing us from obtaining bytes
+                _ = ndata1.as_bytes(policy=self.policy['8bit-RFC'])
+            except UnicodeEncodeError as err:
+                # Unknown issue which is causing failure of as_bytes()
+                msg_id = self.getmessageheader(ndata1, "message-id")
+                if msg_id is None:
+                    msg_id = '<Unknown Message-ID>'
+                raise OfflineImapError(
+                        "UID {} ({}) has defects preventing it from being processed!\n  {}: {}".format(
+                            uids, msg_id, type(err).__name__, err),
+                        OfflineImapError.ERROR.MESSAGE)
         ndata = [ndata0, ndata1]
 
         return ndata

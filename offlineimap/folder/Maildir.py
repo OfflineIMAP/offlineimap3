@@ -25,6 +25,7 @@ from threading import Lock
 from hashlib import md5
 from offlineimap import OfflineImapError
 from .Base import BaseFolder
+from email.errors import NoBoundaryInMultipartDefect
 
 # Find the UID in a message filename
 re_uidmatch = re.compile(',U=(\d+)')
@@ -259,8 +260,36 @@ class MaildirFolder(BaseFolder):
         filename = self.messagelist[uid]['filename']
         filepath = os.path.join(self.getfullname(), filename)
         fd = open(filepath, 'rb')
-        retval = self.parser['8bit'].parse(fd)
+        _fd_bytes = fd.read()
         fd.close()
+        try: retval = self.parser['8bit'].parsebytes(_fd_bytes)
+        except:
+            err = exc_info()
+            msg_id = self._extract_message_id(_fd_bytes)[0].decode('ascii',errors='surrogateescape')
+            raise OfflineImapError(
+                "Exception parsing message with ID ({}) from file ({}).\n {}: {}".format(
+                    msg_id, filename, err[0].__name__, err[1]),
+                OfflineImapError.ERROR.MESSAGE)
+        if len(retval.defects) > 0:
+            # We don't automatically apply fixes as to attempt to preserve the original message
+            self.ui.warn("UID {} has defects: {}".format(uid, retval.defects))
+            if any(isinstance(defect, NoBoundaryInMultipartDefect) for defect in retval.defects):
+                # (Hopefully) Rare defect from a broken client where multipart boundary is
+                # not properly quoted.  Attempt to solve by fixing the boundary and parsing
+                self.ui.warn(" ... applying multipart boundary fix.")
+                retval = self.parser['8bit'].parsebytes(self._quote_boundary_fix(_fd_bytes))
+            try:
+                # See if the defects after fixes are preventing us from obtaining bytes
+                _ = retval.as_bytes(policy=self.policy['8bit'])
+            except UnicodeEncodeError as err:
+                # Unknown issue which is causing failure of as_bytes()
+                msg_id = self.getmessageheader(retval, "message-id")
+                if msg_id is None:
+                    msg_id = '<unknown-message-id>'
+                raise OfflineImapError(
+                        "UID {} ({}) has defects preventing it from being processed!\n  {}: {}".format(
+                            uid, msg_id, type(err).__name__, err),
+                        OfflineImapError.ERROR.MESSAGE)
         return retval
 
     # Interface from BaseFolder
