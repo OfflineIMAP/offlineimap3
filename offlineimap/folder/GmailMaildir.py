@@ -183,7 +183,7 @@ class GmailMaildirFolder(MaildirFolder):
             os.rename(tmppath, filepath)
         except OSError as e:
             raise OfflineImapError("Can't rename file '%s' to '%s': %s" %
-                                   (tmppath, filepath, e[1]),
+                                   (tmppath, filepath, e.errno),
                                    OfflineImapError.ERROR.FOLDER,
                                    exc_info()[2])
 
