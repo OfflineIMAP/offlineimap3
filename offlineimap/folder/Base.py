@@ -302,7 +302,15 @@ class BaseFolder:
 
         with open(uidfilename + ".tmp", "wt") as uidfile:
             uidfile.write("%d\n" % newval)
-        os.rename(uidfilename + ".tmp", uidfilename)
+
+        # This is weird, os.rename on Windows raises an exception,
+        # But not in Linux. In linux the file is overwritten.
+        try:
+            os.rename(uidfilename + ".tmp", uidfilename)
+        except WindowsError:
+            os.remove(uidfilename)
+            os.rename(uidfilename + ".tmp", uidfilename)
+
         self._base_saved_uidvalidity = newval
 
     def get_uidvalidity(self):

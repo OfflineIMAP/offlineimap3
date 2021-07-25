@@ -15,7 +15,6 @@
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 import datetime
 import os
-import fcntl
 import time
 import subprocess
 import threading
@@ -28,6 +27,14 @@ import rfc6555
 from offlineimap import OfflineImapError
 from offlineimap.ui import getglobalui
 from imaplib2 import IMAP4, IMAP4_SSL, InternalDate
+
+try:
+    import portalocker
+except:
+    try:
+        import fcntl
+    except:
+        pass  # Ok if this fails, we can do without.
 
 
 class UsefulIMAPMixIn:

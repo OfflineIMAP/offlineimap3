@@ -26,6 +26,7 @@ import collections
 from optparse import OptionParser
 
 import offlineimap
+from offlineimap.utils.distro_utils import get_os_name
 import imaplib2 as imaplib
 
 # Ensure that `ui` gets loaded before `threadutil` in order to
@@ -72,7 +73,18 @@ class OfflineImap:
     """
 
     def get_env_info(self):
-        info = "imaplib2 v%s, Python v%s" % (imaplib.__version__, PYTHON_VERSION)
+        # Transitional code between imaplib2 versions
+        try:
+            # imaplib2, previous versions, based on Python 2.x
+            l_imaplib_version = imaplib.__version__
+        except AttributeError:
+            # New imaplib2, version >= 3.06
+            l_imaplib_version = imaplib.version()
+        except:
+            # This should not happen
+            l_imaplib_version = " Unknown"
+
+        info = "imaplib2 v%s, Python v%s" % (l_imaplib_version, PYTHON_VERSION)
         try:
             import ssl
             info = "%s, %s" % (info, ssl.OPENSSL_VERSION)
@@ -446,13 +458,16 @@ class OfflineImap:
 
         try:
             self.num_sigterm = 0
-            signal.signal(signal.SIGHUP, sig_handler)
-            signal.signal(signal.SIGUSR1, sig_handler)
-            signal.signal(signal.SIGUSR2, sig_handler)
-            signal.signal(signal.SIGABRT, sig_handler)
-            signal.signal(signal.SIGTERM, sig_handler)
-            signal.signal(signal.SIGINT, sig_handler)
-            signal.signal(signal.SIGQUIT, sig_handler)
+
+            # We cannot use signals in Windows
+            if get_os_name() != 'windows':
+                signal.signal(signal.SIGHUP, sig_handler)
+                signal.signal(signal.SIGUSR1, sig_handler)
+                signal.signal(signal.SIGUSR2, sig_handler)
+                signal.signal(signal.SIGABRT, sig_handler)
+                signal.signal(signal.SIGTERM, sig_handler)
+                signal.signal(signal.SIGINT, sig_handler)
+                signal.signal(signal.SIGQUIT, sig_handler)
 
             # Various initializations that need to be performed:
             activeaccounts = self._get_activeaccounts(options)

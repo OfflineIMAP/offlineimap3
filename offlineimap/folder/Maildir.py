@@ -470,7 +470,7 @@ class MaildirFolder(BaseFolder):
             except OSError as e:
                 raise OfflineImapError(
                     "Can't rename file '%s' to '%s': %s" %
-                    (oldfilename, newfilename, e[1]),
+                    (oldfilename, newfilename, e.errno),
                     OfflineImapError.ERROR.FOLDER,
                     exc_info()[2])
 
@@ -556,7 +556,7 @@ class MaildirFolder(BaseFolder):
                     except OSError as e:
                         raise OfflineImapError(
                             "Can't rename file '%s' to '%s': %s" %
-                            (filename, newfilename, e[1]),
+                            (filename, newfilename, e.errno),
                             OfflineImapError.ERROR.FOLDER,
                             exc_info()[2])
 
