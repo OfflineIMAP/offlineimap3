@@ -26,6 +26,7 @@ import collections
 from optparse import OptionParser
 
 import offlineimap
+from offlineimap.utils.distro_utils import get_os_name
 import imaplib2 as imaplib
 
 # Ensure that `ui` gets loaded before `threadutil` in order to
@@ -457,13 +458,16 @@ class OfflineImap:
 
         try:
             self.num_sigterm = 0
-            signal.signal(signal.SIGHUP, sig_handler)
-            signal.signal(signal.SIGUSR1, sig_handler)
-            signal.signal(signal.SIGUSR2, sig_handler)
-            signal.signal(signal.SIGABRT, sig_handler)
-            signal.signal(signal.SIGTERM, sig_handler)
-            signal.signal(signal.SIGINT, sig_handler)
-            signal.signal(signal.SIGQUIT, sig_handler)
+
+            # We cannot use signals in Windows
+            if get_os_name() != 'windows':
+                signal.signal(signal.SIGHUP, sig_handler)
+                signal.signal(signal.SIGUSR1, sig_handler)
+                signal.signal(signal.SIGUSR2, sig_handler)
+                signal.signal(signal.SIGABRT, sig_handler)
+                signal.signal(signal.SIGTERM, sig_handler)
+                signal.signal(signal.SIGINT, sig_handler)
+                signal.signal(signal.SIGQUIT, sig_handler)
 
             # Various initializations that need to be performed:
             activeaccounts = self._get_activeaccounts(options)
