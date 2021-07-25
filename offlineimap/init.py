@@ -72,7 +72,18 @@ class OfflineImap:
     """
 
     def get_env_info(self):
-        info = "imaplib2 v%s, Python v%s" % (imaplib.__version__, PYTHON_VERSION)
+        # Transitional code between imaplib2 versions
+        try:
+            # imaplib2, previous versions, based on Python 2.x
+            l_imaplib_version = imaplib.__version__
+        except AttributeError:
+            # New imaplib2, version >= 3.06
+            l_imaplib_version = imaplib.version()
+        except:
+            # This should not happen
+            l_imaplib_version = " Unknown"
+
+        info = "imaplib2 v%s, Python v%s" % (l_imaplib_version, PYTHON_VERSION)
         try:
             import ssl
             info = "%s, %s" % (info, ssl.OPENSSL_VERSION)
