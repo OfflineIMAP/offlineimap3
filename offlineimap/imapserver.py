@@ -677,6 +677,13 @@ class IMAPServer:
                     "for repository '%s'. Remote does not answer." % (self.hostname, self.repos),
                     OfflineImapError.ERROR.REPO,
                     exc_info()[2])
+            elif e.args and \
+                    e.args[0][:35] == 'IMAP4 protocol error: socket error:':
+                raise OfflineImapError(
+                    "Could not connect to remote server '{}' "
+                    "for repository '{}'. Connection Refused.".format(
+                        self.hostname, self.repos),
+                    OfflineImapError.ERROR.CRITICAL)
             else:
                 # re-raise all other errors
                 raise
