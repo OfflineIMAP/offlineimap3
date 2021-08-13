@@ -141,7 +141,21 @@ class IMAPRepository(BaseRepository):
         if self.config.has_option(self.getsection(), 'remotehosteval'):
             host = self.getconf('remotehosteval')
             try:
-                host = self.localeval.eval(host)
+                l_host = self.localeval.eval(host)
+
+                # We need a str host
+                if isinstance(l_host, bytes):
+                    return l_host.decode(encoding='utf-8')
+                elif isinstance(l_host, str):
+                    return l_host
+
+                # If is not bytes or str, we have a problem
+                raise OfflineImapError("Could not get a right host format for"
+                                       " repository %s. Type found: %s. "
+                                       "Please, open a bug." %
+                                       (self.name, type(l_host)),
+                                       OfflineImapError.ERROR.FOLDER)
+
             except Exception as exc:
                 raise OfflineImapError(
                     "remotehosteval option for repository "
