@@ -338,18 +338,6 @@ class SyncableAccount(Account):
 
         folderthreads = []
 
-        hook = self.getconf('presynchook', '')
-        self.callhook(hook)
-
-        if self.utf_8_support and self.remoterepos.getdecodefoldernames():
-            raise OfflineImapError("Configuration mismatch in account " +
-                                   "'%s'. " % self.getname() +
-                                   "\nAccount setting 'utf8foldernames' and repository " +
-                                   "setting 'decodefoldernames'\nmay not be used at the " +
-                                   "same time. This account has not been synchronized.\n" +
-                                   "Please check the configuration and documentation.",
-                                   OfflineImapError.ERROR.REPO)
-
         quickconfig = self.getconfint('quick', 0)
         if quickconfig < 0:
             quick = True
@@ -362,6 +350,19 @@ class SyncableAccount(Account):
                 quick = True
         else:
             quick = False
+
+
+        hook = self.getconf('presynchook', '')
+        self.callhook(hook, "quick" if quick else "full")
+
+        if self.utf_8_support and self.remoterepos.getdecodefoldernames():
+            raise OfflineImapError("Configuration mismatch in account " +
+                                   "'%s'. " % self.getname() +
+                                   "\nAccount setting 'utf8foldernames' and repository " +
+                                   "setting 'decodefoldernames'\nmay not be used at the " +
+                                   "same time. This account has not been synchronized.\n" +
+                                   "Please check the configuration and documentation.",
+                                   OfflineImapError.ERROR.REPO)
 
         try:
             startedThread = False
@@ -444,9 +445,9 @@ class SyncableAccount(Account):
             remoterepos.holdordropconnections()
 
         hook = self.getconf('postsynchook', '')
-        self.callhook(hook)
+        self.callhook(hook, "quick" if quick else "full")
 
-    def callhook(self, cmd):
+    def callhook(self, cmd, syncmode):
         # Check for CTRL-C or SIGTERM and run postsynchook.
         if Account.abort_NOW_signal.is_set():
             return
@@ -456,9 +457,11 @@ class SyncableAccount(Account):
             self.ui.callhook("Calling hook: " + cmd)
             if self.dryrun:
                 return
+            environ = os.environ.copy()
+            environ['OFFLINEIMAPSYNCMODE'] = syncmode
             p = Popen(cmd, shell=True,
                       stdin=PIPE, stdout=PIPE, stderr=PIPE,
-                      close_fds=True)
+                      close_fds=True, env=environ)
             stdout, stderr = p.communicate()
             self.ui.callhook("Hook stdout: %s\nHook stderr:%s\n"
                     % (stdout.decode('utf-8'), stderr.decode('utf-8')))
