@@ -45,7 +45,7 @@ class Syslog(UIBase):
         # create syslog handler
         ch = logging.handlers.SysLogHandler('/dev/log')
         # create formatter and add it to the handlers
-        self.formatter = logging.Formatter("%(message)s")
+        self.formatter = logging.Formatter("offlineimap[%(process)d]: %(message)s")
         ch.setFormatter(self.formatter)
         # add the handlers to the logger
         self.logger.addHandler(ch)
