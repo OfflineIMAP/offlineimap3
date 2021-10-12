@@ -583,6 +583,11 @@ class IMAPServer:
                         af=self.af,
                     )
 
+                # If 'ID' extension is used by the server, we should use it
+                if 'ID' in imapobj.capabilities:
+                    l_str = '("name" "OfflineIMAP" "version" "{}")'.format(offlineimap.__version__)
+                    imapobj.id(l_str)
+
                 if not self.preauth_tunnel:
                     try:
                         self.__authn_helper(imapobj)
