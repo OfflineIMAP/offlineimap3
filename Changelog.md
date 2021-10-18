@@ -15,6 +15,42 @@ Note to mainainers:
 * The following excerpt is only usefull when rendered in the website.
 {:toc}
 
+### OfflineIMAP v8.0.0 (2021-10-18)
+
+#### Notes
+
+Migration to Python 3 and related patches.
+New OfflineIMAP3!! Thanks to the contributors!!
+
+This release was tested by:
+
+- Rodolfo García Peñas (kix)
+
+
+#### Authors
+
+- Rodolfo García Peñas (kix) (353)
+- Joseph Ishac (22)
+- Thomas De Schampheleire (6)
+- Sudip Mukherjee (4)
+- Nicolas Sebrecht (3)
+- Phil Mocek (2)
+- Amit Ramon (1)
+- Ashish Panigrahi (1)
+- Ben Yanke (1)
+- Guido Günther (1)
+- Jaroslav Lichtblau (1)
+- Konstantinos Natsakis (1)
+- mh (1)
+- peeweep (1)
+- Pi-Yueh Chuang (1)
+- Xianwen Chen (1)
+
+#### Features
+
+- New source for Python 3
+
+
 ### OfflineIMAP v7.3.0 (2019-08-19)
 
 #### Notes
