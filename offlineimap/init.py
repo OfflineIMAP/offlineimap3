@@ -196,6 +196,14 @@ class OfflineImap:
                           action="store_true", dest="mbnames_prune", default=False,
                           help="remove mbnames entries for accounts not in accounts")
 
+        parser.add_option("--ignore-keyring",
+                          action="store_true", dest="ignore_keyring", default=False,
+                          help="Ignore password which is stored in system keyring")
+
+        parser.add_option("--update-keyring",
+                          action="store_true", dest="update_keyring", default=False,
+                          help="Update system keyring with used password")
+
         (options, args) = parser.parse_args()
         glob.set_options(options)
 
@@ -272,6 +280,16 @@ class OfflineImap:
         if options.dryrun:
             config.set('general', 'dry-run', 'True')
         config.set_if_not_exists('general', 'dry-run', 'False')
+
+        # ignore_keyring? Set [general]ignore_keyring=True.
+        if options.ignore_keyring:
+            config.set('general', 'ignore-keyring', 'True')
+        config.set_if_not_exists('general', 'ignore-keyring', 'False')
+
+        # update_keyring? Set [general]update_keyring=True.
+        if options.update_keyring:
+            config.set('general', 'update-keyring', 'True')
+        config.set_if_not_exists('general', 'update-keyring', 'False')
 
         try:
             # Create the ui class.

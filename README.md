@@ -101,6 +101,7 @@ Bugs, issues and contributions can be requested to both the mailing list or the
 * Python v3+
 * rfc6555 (required)
 * imaplib2 >= 3.5
+* keyring
 * gssapi (optional), for Kerberos authentication
 * portalocker (optional), if you need to run offlineimap in Cygwin for Windows
 

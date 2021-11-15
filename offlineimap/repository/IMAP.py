@@ -22,6 +22,9 @@ import netrc
 import errno
 from sys import exc_info
 from threading import Event
+
+import keyring
+
 from offlineimap import folder, imaputil, imapserver, OfflineImapError
 from offlineimap.repository.Base import BaseRepository
 from offlineimap.threadutil import ExitNotifyThread
@@ -565,7 +568,7 @@ class IMAPRepository(BaseRepository):
         """
         return self.getconfboolean('expunge', True)
 
-    def getpassword(self):
+    def getpassword(self, ignore_keyring):
         """Return the IMAP password for this repository.
 
         It tries to get passwords in the following order:
@@ -647,8 +650,21 @@ class IMAPRepository(BaseRepository):
                 user = self.getuser()
                 if user is None or user == netrcentry[0]:
                     return netrcentry[2]
-        # No strategy yielded a password!
+
+        # 5. Read from keyring as the last option
+        if not ignore_keyring:
+            return keyring.get_password(self.gethost(), self.getuser())
         return None
+
+    def updatepassword(self, password):
+        """
+        This function update provided password into system keyring.
+        None means to remove it.
+        """
+        if password is None:
+            keyring.delete_password(self.gethost(), self.getuser())
+        else:
+            keyring.set_password(self.gethost(), self.getuser(), password)
 
     def getfolder(self, foldername, decode=True):
         """Return instance of OfflineIMAP representative folder."""
