@@ -717,6 +717,9 @@ class IMAPRepository(BaseRepository):
             try:
                 for foldername in self.folderincludes:
                     try:
+                        # Folder names with spaces requires quotes
+                        if ' ' in foldername:
+                            foldername = '"' + foldername + '"'
                         imapobj.select(imaputil.utf8_IMAP(foldername),
                                        readonly=True)
                     except OfflineImapError as exc:
