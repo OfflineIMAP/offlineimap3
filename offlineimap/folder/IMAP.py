@@ -243,15 +243,15 @@ class IMAPFolder(BaseFolder):
         a = self.getfullIMAPname()
         res_type, imapdata = imapobj.select(a, True, True)
 
+        if imapdata == [None] or imapdata[0] == b'0':
+            # Empty folder, no need to populate message list.
+            return None
+        
         # imaplib2 returns the type as string, like "OK" but
         # returns imapdata as list of bytes, like [b'0'] so we need decode it
         # to use the existing code
         imapdata = [x.decode('utf-8') for x in imapdata]
-
-        if imapdata == [None] or imapdata[0] == '0':
-            # Empty folder, no need to populate message list.
-            return None
-
+     
         conditions = []
         # 1. min_uid condition.
         if min_uid is not None:
