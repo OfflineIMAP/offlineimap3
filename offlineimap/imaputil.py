@@ -403,19 +403,19 @@ def modified_unbase64(s):
 def utf7m_decode(binary: bytes) -> Tuple[str, int]:
     r = []
     decode = []
-    for c in binary.decode():
-        if c == '&' and not decode:
+    for c in binary:
+        if c == ord('&') and not decode:
             decode.append('&')
-        elif c == '-' and decode:
+        elif c == ord('-') and decode:
             if len(decode) == 1:
                 r.append('&')
             else:
                 r.append(modified_unbase64(''.join(decode[1:])))
             decode = []
         elif decode:
-            decode.append(c)
+            decode.append(chr(c))
         else:
-            r.append(c)
+            r.append(chr(c))
 
     if decode:
         r.append(modified_unbase64(''.join(decode[1:])))
