@@ -648,7 +648,7 @@ class IMAPServer:
                          (self.hostname, self.repos)
                 raise OfflineImapError(reason, severity, exc_info()[2])
 
-            elif isinstance(e, SSLError) and e.errno == errno.EPERM:
+            if isinstance(e, SSLError) and e.errno == errno.EPERM:
                 # SSL unknown protocol error
                 # happens e.g. when connecting via SSL to a non-SSL service
                 if self.port != 993:
@@ -662,7 +662,7 @@ class IMAPServer:
                              % (self.hostname, self.repos, e)
                 raise OfflineImapError(reason, severity, exc_info()[2])
 
-            elif isinstance(e, socket.error) and e.args and e.args[0] == errno.ECONNREFUSED:
+            if isinstance(e, socket.error) and e.args and e.args[0] == errno.ECONNREFUSED:
                 # "Connection refused", can be a non-existing port, or an unauthorized
                 # webproxy (open WLAN?)
                 reason = "Connection to host '%s:%d' for repository '%s' was " \
@@ -679,16 +679,20 @@ class IMAPServer:
                     "for repository '%s'. Remote does not answer." % (self.hostname, self.repos),
                     OfflineImapError.ERROR.REPO,
                     exc_info()[2])
-            elif e.args and \
-                    e.args[0][:35] == 'IMAP4 protocol error: socket error:':
-                raise OfflineImapError(
-                    "Could not connect to remote server '{}' "
-                    "for repository '{}'. Connection Refused.".format(
-                        self.hostname, self.repos),
-                    OfflineImapError.ERROR.CRITICAL)
-            else:
-                # re-raise all other errors
-                raise
+            if e.args:
+                try:
+                    if e.args[0][:35] == 'IMAP4 protocol error: socket error:':
+                        raise OfflineImapError(
+                            "Could not connect to remote server '{}' "
+                            "for repository '{}'. Connection Refused.".format(
+                                self.hostname, self.repos),
+                            OfflineImapError.ERROR.CRITICAL)
+                except:
+                    pass
+                    e.args[0][:35]
+
+            # re-raise all other errors
+            raise
 
     def connectionwait(self):
         """Waits until there is a connection available.
