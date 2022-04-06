@@ -689,7 +689,6 @@ class IMAPServer:
                             OfflineImapError.ERROR.CRITICAL)
                 except:
                     pass
-                    e.args[0][:35]
 
             # re-raise all other errors
             raise
