@@ -538,10 +538,11 @@ class UIBase:
                 exitstatus = 1
         while not self.exc_queue.empty():
             msg, exc, exc_traceback = self.exc_queue.get()
+            exc_str = "".join(traceback.format_exception_only(type(exc), exc))
             if msg:
-                self.warn("ERROR: %s\n  %s" % (msg, exc))
+                self.warn("ERROR: %s\n  %s" % (msg, exc_str))
             else:
-                self.warn("ERROR: %s" % exc)
+                self.warn("ERROR: %s" % exc_str)
             if exc_traceback:
                 self.warn("\nTraceback:\n%s" % "".join(
                     traceback.format_tb(exc_traceback)))
