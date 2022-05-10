@@ -17,11 +17,11 @@
 import os
 import re
 from sys import exc_info
-from configparser import SafeConfigParser, Error
+from configparser import ConfigParser, Error
 from offlineimap.localeval import LocalEval
 
 
-class CustomConfigParser(SafeConfigParser):
+class CustomConfigParser(ConfigParser):
     def __init__(self):
         SafeConfigParser.__init__(self)
         self.localeval = None
