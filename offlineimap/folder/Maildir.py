@@ -396,13 +396,12 @@ class MaildirFolder(BaseFolder):
                     message_timestamp = self.get_message_date(
                         msg, 'Delivery-date')
             except Exception as e:
-                # This should never happen.
+                # Extracting the date has failed for some reason, such as it
+                # being in an invalid format.
                 from offlineimap.ui import getglobalui
-                datestr = self.get_message_date(msg)
                 ui = getglobalui()
-                ui.warn("UID %d has invalid date %s: %s\n"
-                        "Not using message timestamp as file prefix" %
-                        (uid, datestr, e))
+                ui.warn("UID %d has invalid date: %s\n"
+                        "Not using message timestamp as file prefix" % (uid, e))
                 # No need to check if message_timestamp is None here since it
                 # would be overridden by _gettimeseq.
         messagename = self.new_message_filename(uid, flags, date=message_timestamp)
@@ -414,14 +413,13 @@ class MaildirFolder(BaseFolder):
                 if date is not None:
                     os.utime(os.path.join(self.getfullname(), tmpname),
                              (date, date))
-            # In case date is wrongly so far into the future as to be > max
-            # int32.
             except Exception as e:
+                # Extracting the date has failed for some reason, such as it
+                # being in an invalid format.
                 from offlineimap.ui import getglobalui
-                datestr = self.get_message_date(msg)
                 ui = getglobalui()
-                ui.warn("UID %d has invalid date %s: %s\n"
-                        "Not changing file modification time" % (uid, datestr, e))
+                ui.warn("UID %d has invalid date: %s\n"
+                        "Not changing file modification time" % (uid, e))
 
         self.messagelist[uid] = self.msglist_item_initializer(uid)
         self.messagelist[uid]['flags'] = flags
