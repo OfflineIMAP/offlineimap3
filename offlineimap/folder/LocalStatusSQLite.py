@@ -104,7 +104,7 @@ class LocalStatusSQLiteFolder(BaseFolder):
 
     def openfiles(self):
         # Make sure sqlite is in multithreading SERIALIZE mode.
-        assert sqlite.threadsafety == 1, 'Your sqlite is not multithreading safe.'
+        assert sqlite.threadsafety != 0, 'Your sqlite is not multithreading safe.'
 
         with self._databaseFileLock.getLock():
             # Try to establish connection, no need for threadsafety in __init__.
