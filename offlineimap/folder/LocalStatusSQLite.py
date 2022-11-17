@@ -17,7 +17,7 @@
 
 import os
 import sqlite3 as sqlite
-from sys import exc_info
+from sys import exc_info,version_info
 from threading import Lock
 from .Base import BaseFolder
 
@@ -75,6 +75,11 @@ class LocalStatusSQLiteFolder(BaseFolder):
         self.filename = os.path.join(self.getroot(), self.getfolderbasename())
 
         self._newfolder = False  # Flag if the folder is new.
+        """
+        sqlite threading mode must be 3 as of Python 3.11, checking against
+        1 for versions below Python 3.11 to sustain backwards compatibility.
+        """
+        self._threading_mode_const = 3 if version_info.minor >=11 else 1
 
         dirname = os.path.dirname(self.filename)
         if not os.path.exists(dirname):
@@ -102,9 +107,10 @@ class LocalStatusSQLiteFolder(BaseFolder):
             if self._in_transactions < 1:
                 self.connection.commit()
 
+
     def openfiles(self):
         # Make sure sqlite is in multithreading SERIALIZE mode.
-        assert sqlite.threadsafety == 1, 'Your sqlite is not multithreading safe.'
+        assert sqlite.threadsafety == self._threading_mode_const, 'Your sqlite is not multithreading safe.'
 
         with self._databaseFileLock.getLock():
             # Try to establish connection, no need for threadsafety in __init__.
