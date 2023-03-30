@@ -24,6 +24,8 @@ __DEF_OS_LOCATIONS = {
         '/opt/local/share/curl/curl-ca-bundle.crt',
         # homebrew, package openssl
         '/usr/local/etc/openssl/cert.pem',
+        # homebrew, apple silicon package ca-certificates
+        '/opt/homebrew/etc/ca-certificates/cert.pem',
     ],
     'linux-ubuntu': ['/etc/ssl/certs/ca-certificates.crt'],
     'linux-debian': ['/etc/ssl/certs/ca-certificates.crt'],
