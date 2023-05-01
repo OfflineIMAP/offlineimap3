@@ -356,7 +356,7 @@ class MaildirFolder(BaseFolder):
                     raise
 
         fd = os.fdopen(fd, 'wb')
-        fd.write(msg.as_bytes(policy=output_policy))
+        fd.write(msg.as_string(policy=output_policy).encode('utf-8'))
         # Make sure the data hits the disk.
         fd.flush()
         if self.dofsync():

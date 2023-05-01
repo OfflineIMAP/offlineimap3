@@ -707,7 +707,7 @@ class IMAPFolder(BaseFolder):
                     (typ, dat) = imapobj.append(
                         self.getfullIMAPname(),
                         imaputil.flagsmaildir2imap(flags),
-                        date,  msg.as_bytes(policy=output_policy))
+                        date,  msg.as_string(policy=output_policy).encode('utf-8'))
                     # This should only catch 'NO' responses since append()
                     # will raise an exception for 'BAD' responses:
                     if typ != 'OK':
@@ -921,7 +921,7 @@ class IMAPFolder(BaseFolder):
                 ndata1 = self.parser['8bit-RFC'].parsebytes(self._quote_boundary_fix(data[0][1]))
             try:
                 # See if the defects after fixes are preventing us from obtaining bytes
-                _ = ndata1.as_bytes(policy=self.policy['8bit-RFC'])
+                _ = ndata1.as_string(policy=self.policy['8bit-RFC']).encode('utf-8')
             except UnicodeEncodeError as err:
                 # Unknown issue which is causing failure of as_bytes()
                 msg_id = self.getmessageheader(ndata1, "message-id")
