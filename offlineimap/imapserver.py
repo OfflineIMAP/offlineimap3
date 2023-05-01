@@ -602,11 +602,12 @@ class IMAPServer:
                 imapobj.enable_compression()
 
             # update capabilities after login, e.g. gmail serves different ones
-            typ, dat = imapobj.capability()
-            if dat != [None]:
-                # Get the capabilities and convert them to string from bytes
-                s_dat = [x.decode('utf-8') for x in dat[-1].upper().split()]
-                imapobj.capabilities = tuple(s_dat)
+            if imapobj.capabilities is None:
+                typ, dat = imapobj.capability()
+                if dat != [None]:
+                    # Get the capabilities and convert them to string from bytes
+                    s_dat = [x.decode('utf-8') for x in dat[-1].upper().split()]
+                    imapobj.capabilities = tuple(s_dat)
 
             if self.delim is None:
                 listres = imapobj.list(self.reference, '""')[1]
