@@ -23,7 +23,7 @@ from offlineimap.localeval import LocalEval
 
 class CustomConfigParser(ConfigParser):
     def __init__(self):
-        SafeConfigParser.__init__(self)
+        ConfigParser.__init__(self)
         self.localeval = None
 
     def getdefault(self, section, option, default, *args, **kwargs):
