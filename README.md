@@ -66,7 +66,7 @@ If you are running Linux, you can install offlineimap with:
 
 -  openSUSE `zypper in offlineimap`
 -  fedora `dnf install offlineimap`
--  Arch Linux: through AUR package [offlineimap3-git](https://aur.archlinux.org/packages/offlineimap3-git/)
+-  Arch Linux: [`pacman -S offlineimap`](https://archlinux.org/packages/community/any/offlineimap/), or through AUR package [offlineimap3-git](https://aur.archlinux.org/packages/offlineimap3-git/)
 -  Docker image: `offlineimap/offlineimap:latest` 
  (note: image not published yet, just an example)
 
