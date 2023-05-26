@@ -568,7 +568,7 @@ class IMAPRepository(BaseRepository):
         """
         return self.getconfboolean('expunge', True)
 
-    def getpassword(self, ignore_keyring):
+    def getpassword(self, ignore_keyring=False):
         """Return the IMAP password for this repository.
 
         It tries to get passwords in the following order:
@@ -578,6 +578,7 @@ class IMAPRepository(BaseRepository):
         3. read password from file specified in Repository 'remotepassfile'
         4. read password from ~/.netrc
         5. read password from /etc/netrc
+        6. read password from keyring
 
         On success we return the password.
         If all strategies fail we return None."""
@@ -651,7 +652,7 @@ class IMAPRepository(BaseRepository):
                 if user is None or user == netrcentry[0]:
                     return netrcentry[2]
 
-        # 5. Read from keyring as the last option
+        # 6. Read password from keyring as the last option
         if not ignore_keyring:
             return keyring.get_password(self.gethost(), self.getuser())
         return None
