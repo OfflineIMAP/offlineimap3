@@ -1,0 +1,10 @@
+[build-system]
+requires = [
+    "setuptools>=18.5",
+    "wheel",
+
+    # These dependencies should be kept in sync with setup.py
+    "distro",
+    "imaplib2>=3.5",
+    "rfc6555",
+]
