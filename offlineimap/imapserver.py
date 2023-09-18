@@ -148,24 +148,40 @@ class IMAPServer(object):
         _account_section = 'Account ' + self.repos.account.name
         if not self.config.has_option(_account_section, proxysection):
             return dfltsocket
+
+        if self.af == socket.AF_UNSPEC:
+            # call to rfc6555 for protocol selection bypasses proxied_socket
+            raise OfflineImapError("Account '%s': "
+                                   "cannot use proxy without protocol choice "
+                                   "('ipv6' config must be set to yes or no)"
+                                    % self.repos.account.name,
+                                   OfflineImapError.ERROR.REPO)
+
         proxy = self.config.get(_account_section, proxysection)
         if proxy == '':
             # explicitly set no proxy (overrides default return of dfltsocket)
             return socket.socket
 
         # Powered by PySocks.
+        severity = OfflineImapError.ERROR.REPO
         try:
             import socks
             proxy_type, host, port = proxy.split(":")
             port = int(port)
             socks.setdefaultproxy(getattr(socks, proxy_type), host, port)
             return socks.socksocket
-        except ImportError:
-            self.ui.warn("PySocks not installed, ignoring proxy option.")
+        except ImportError as e:
+            reason = "Account '%s': cannot use proxy: PySocks not found: %s" \
+                     % (self.repos.account.name, e)
+            six.reraise(OfflineImapError,
+                        OfflineImapError(reason, severity),
+                        exc_info()[2])
         except (AttributeError, ValueError) as e:
-            self.ui.warn("Bad proxy option %s for account %s: %s "
-                "Ignoring %s option."%
-                (proxy, self.repos.account.name, e, proxysection))
+            reason = "Account '%s': invalid '%s' config: '%s': %s" \
+                     % (self.repos.account.name, proxysection, proxy, e)
+            six.reraise(OfflineImapError,
+                        OfflineImapError(reason, severity),
+                        exc_info()[2])
         return dfltsocket
 
     def __getpassword(self):
