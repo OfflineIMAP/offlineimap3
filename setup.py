@@ -61,5 +61,6 @@ setup(name="offlineimap",
                 'offlineimap.utils'],
       scripts=['bin/offlineimap'],
       license=offlineimap.__copyright__ + ", Licensed under the GPL version 2",
-      cmdclass={'test': TestCommand}
+      cmdclass={'test': TestCommand},
+      install_requires=['distro', 'imaplib2>=3.5', 'rfc6555', 'gssapi[kerberos]', 'portalocker[cygwin]', 'urllib3~=1.25.9']
       )
