@@ -24,7 +24,8 @@ this virtual_imaplib2 or we might go into troubles.
 
 DESC = None
 
-_MIN_SUPPORTED_VER = (2, 57)
+_SUPPORTED_RELEASE = 2
+_SUPPORTED_REVISION = 57
 
 try:
     # Try any imaplib2 in PYTHONPATH first. This allows both maintainers of
@@ -32,13 +33,12 @@ try:
     from imaplib2 import *
     import imaplib2 as imaplib
 
-    ver = tuple(map(int, imaplib.__version__.split('.')))
-    if ver[:len(_MIN_SUPPORTED_VER)] < _MIN_SUPPORTED_VER:
-        raise ImportError("The provided imaplib2 version '%s' is not supported"
-                          " (required >= %s)" % (imaplib.__version__,
-                          '.'.join(map(str, _MIN_SUPPORTED_VER))))
+    if (int(imaplib.__release__) < _SUPPORTED_RELEASE or
+            int(imaplib.__revision__) < _SUPPORTED_REVISION):
+        raise ImportError("The provided imaplib2 version '%s' is not supported"%
+            imaplib.__version__)
     DESC = "system"
-except (ImportError, NameError, AttributeError, IndexError) as e:
+except (ImportError, NameError) as e:
     try:
         from offlineimap.bundled_imaplib2 import *
         import offlineimap.bundled_imaplib2 as imaplib
@@ -51,3 +51,5 @@ except (ImportError, NameError, AttributeError, IndexError) as e:
 # Upstream won't expose those literals to avoid erasing them with "import *" in
 # case they exist.
 __version__ = imaplib.__version__
+__release__ = imaplib.__release__
+__revision__ = imaplib.__revision__
