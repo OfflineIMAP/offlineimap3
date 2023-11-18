@@ -6,12 +6,6 @@ Module that supports distribution-specific functions.
 import platform
 import os
 
-# linux_distribution deprecated in Python 3.7
-try:
-    from platform import linux_distribution
-except ImportError:
-    from distro import linux_distribution
-
 # For the former we will just return the value, for an iterable
 # we will walk through the values and will return the first
 # one that corresponds to the existing file.
@@ -50,6 +44,12 @@ def get_os_name():
     os_name = platform.system().lower()
 
     if os_name.startswith('linux'):
+        # linux_distribution deprecated in Python 3.7
+        try:
+            from platform import linux_distribution
+        except ImportError:
+            from distro import linux_distribution
+
         distro_name = linux_distribution()[0]
         if distro_name:
             os_name = os_name + "-%s" % distro_name.split()[0].lower()

@@ -2,7 +2,7 @@
 gssapi[kerberos]
 portalocker[cygwin]
 rfc6555
-distro
+distro;platform_system=="Linux" and python_version>"3.7"
 
 imaplib2>=3.5
 urllib3~=1.25.9
