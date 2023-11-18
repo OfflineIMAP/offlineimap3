@@ -16,7 +16,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-import imp
+import importlib.util
 
 
 class LocalEval:
@@ -28,12 +28,9 @@ class LocalEval:
         if path is not None:
             # FIXME: limit opening files owned by current user with rights set
             # to fixed mode 644.
-            foo = open(path, 'r')
-            module = imp.load_module(
-                '<none>',
-                foo,
-                path,
-                ('', 'r', imp.PY_SOURCE))
+            spec = importlib.util.spec_from_file_location('<none>', path)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
             for attr in dir(module):
                 self.namespace[attr] = getattr(module, attr)
 
