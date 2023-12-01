@@ -56,6 +56,8 @@ class IMAPServer:
         self.ui = getglobalui()
         self.repos = repos
         self.config = repos.getconfig()
+        self.ignore_keyring = self.config.getboolean('general', 'ignore-keyring')
+        self.update_keyring = self.config.getboolean('general', 'update-keyring')
 
         self.preauth_tunnel = repos.getpreauthtunnel()
         self.transport_tunnel = repos.gettransporttunnel()
@@ -176,8 +178,10 @@ class IMAPServer:
             return self.password  # non-failed preconfigured one
 
         # get 1) configured password first 2) fall back to asking via UI
-        self.password = self.repos.getpassword() or \
+        self.password = self.repos.getpassword(self.ignore_keyring) or \
                         self.ui.getpass(self.username, self.config, self.passworderror)
+        if self.update_keyring:
+            self.repos.updatepassword(self.password)
         self.passworderror = None
         return self.password
 
