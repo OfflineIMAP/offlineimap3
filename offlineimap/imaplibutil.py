@@ -29,12 +29,9 @@ from offlineimap.ui import getglobalui
 from imaplib2 import IMAP4, IMAP4_SSL, InternalDate
 
 try:
-    import portalocker
+    import fcntl
 except:
-    try:
-        import fcntl
-    except:
-        pass  # Ok if this fails, we can do without.
+    pass  # Ok if this fails, we can do without.
 
 
 class UsefulIMAPMixIn:
@@ -147,11 +144,14 @@ class IMAP4_Tunnel(UsefulIMAPMixIn, IMAP4):
     def set_nonblocking(self, fd):
         """Mark fd as nonblocking"""
 
-        # get the file's current flag settings
-        fl = fcntl.fcntl(fd, fcntl.F_GETFL)
-        # clear non-blocking mode from flags
-        fl = fl & ~os.O_NONBLOCK
-        fcntl.fcntl(fd, fcntl.F_SETFL, fl)
+        try:
+            # get the file's current flag settings
+            fl = fcntl.fcntl(fd, fcntl.F_GETFL)
+            # clear non-blocking mode from flags
+            fl = fl & ~os.O_NONBLOCK
+            fcntl.fcntl(fd, fcntl.F_SETFL, fl)
+        except NameError:
+            pass  # fnctl not available. :(
 
     def read(self, size):
         """data = read(size)
