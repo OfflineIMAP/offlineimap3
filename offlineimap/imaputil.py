@@ -56,8 +56,8 @@ def quote(s):
     It only adds double quotes. This function does NOT consider
     parenthised lists to be quoted."""
 
-    s = s.replace('"', '\\"')
     s = s.replace('\\', '\\\\')
+    s = s.replace('"', '\\"')
     return '"%s"' % s
 
 
