@@ -461,6 +461,6 @@ def foldername_to_imapname(folder_name):
     atom_specials = [' ', '/', '(', ')', '{', '}', '"']
 
     if any((c in atom_specials) for c in folder_name):
-        folder_name = self.quote(folder_name)
+        folder_name = quote(folder_name)
 
     return folder_name
