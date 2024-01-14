@@ -109,7 +109,7 @@ def imapsplit(imapstring):
     ['(\\HasNoChildren)', '"."', '"INBOX.Sent"']"""
 
     if isinstance(imapstring, tuple) and imapstring[0].decode("utf-8").rfind("{")>-1:
-        imapstring = (imapstring[0].decode("utf-8")[0:imapstring[0].decode("utf-8").rindex("{")] + imaputil.quote(imapstring[1].decode("utf-8"))).encode("utf-8")
+        imapstring = (imapstring[0].decode("utf-8")[0:imapstring[0].decode("utf-8").rindex("{")] + quote(imapstring[1].decode("utf-8"))).encode("utf-8")
 
     if not isinstance(imapstring, str):
         imapstring = imapstring.decode('utf-8')
