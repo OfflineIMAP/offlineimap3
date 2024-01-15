@@ -734,10 +734,7 @@ class IMAPRepository(BaseRepository):
             try:
                 for foldername in self.folderincludes:
                     try:
-                        # Folder names with spaces requires quotes
-                        if ' ' in foldername:
-                            foldername = '"' + foldername + '"'
-                        imapobj.select(imaputil.utf8_IMAP(foldername),
+                        imapobj.select(imaputil.utf8_IMAP(imaputil.foldername_to_imapname(foldername)),
                                        readonly=True)
                     except OfflineImapError as exc:
                         # couldn't select this folderinclude, so ignore folder.
@@ -802,8 +799,7 @@ class IMAPRepository(BaseRepository):
         """Delete a folder on the IMAP server."""
 
         # Folder names with spaces requires quotes
-        if ' ' in foldername:
-            foldername = '"' + foldername + '"'
+        foldername = imaputil.foldername_to_imapname(foldername)
 
         if self.account.utf_8_support:
             foldername = imaputil.utf8_IMAP(foldername)
@@ -867,8 +863,7 @@ class IMAPRepository(BaseRepository):
         imapobj = self.imapserver.acquireconnection()
         try:
             # Folder names with spaces requires quotes
-            if ' ' in foldername:
-                foldername = '"' + foldername + '"'
+            foldername = imaputil.foldername_to_imapname(foldername)
 
             if self.account.utf_8_support:
                 foldername = imaputil.utf8_IMAP(foldername)
