@@ -658,9 +658,12 @@ class IMAPFolder(BaseFolder):
         date = self.__getmessageinternaldate(msg, rtime)
 
         # Message-ID is handy for debugging messages.
-        msg_id = self.getmessageheader(msg, "message-id")
-        if not msg_id:
-            msg_id = '[unknown message-id]'
+        try:
+            msg_id = self.getmessageheader(msg, "message-id")
+            if not msg_id:
+                msg_id = '[unknown message-id]'
+        except:
+            msg_id = '[broken message-id]'
 
         retry_left = 2  # succeeded in APPENDING?
         imapobj = self.imapserver.acquireconnection()
