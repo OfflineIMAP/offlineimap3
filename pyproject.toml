@@ -7,4 +7,5 @@ requires = [
     "distro",
     "imaplib2>=3.5",
     "rfc6555",
+    "keyring"
 ]
