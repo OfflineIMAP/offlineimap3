@@ -880,8 +880,8 @@ class IMAPRepository(BaseRepository):
                       "Server responded: %s" % (foldername, self, str(result))
                 raise OfflineImapError(msg, OfflineImapError.ERROR.FOLDER)
             else:
-                self.forgetfolders
-                self.getfolders
+                self.forgetfolders()
+                self.getfolders()
         finally:
             self.imapserver.releaseconnection(imapobj)
 
