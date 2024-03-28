@@ -28,6 +28,7 @@ class LocalEval:
         if path is not None:
             # FIXME: limit opening files owned by current user with rights set
             # to fixed mode 644.
+            importlib.machinery.SOURCE_SUFFIXES.append('') # empty string to allow any file
             spec = importlib.util.spec_from_file_location('<none>', path)
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
