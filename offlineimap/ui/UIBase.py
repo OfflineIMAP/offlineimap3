@@ -177,15 +177,15 @@ class UIBase:
     def registerthread(self, account):
         """Register current thread as being associated with an account name."""
 
-        cur_thread = threading.currentThread()
+        cur_thread = threading.current_thread()
         if cur_thread in self.threadaccounts:
             # was already associated with an old account, update info
             self.debug('thread', "Register thread '%s' (previously '%s', now "
-                                 "'%s')" % (cur_thread.getName(),
+                                 "'%s')" % (cur_thread.name,
                                             self.getthreadaccount(cur_thread), account))
         else:
             self.debug('thread', "Register new thread '%s' (account '%s')" %
-                       (cur_thread.getName(), account))
+                       (cur_thread.name, account))
         self.threadaccounts[cur_thread] = account
 
     def unregisterthread(self, thr):
@@ -193,7 +193,7 @@ class UIBase:
 
         if thr in self.threadaccounts:
             del self.threadaccounts[thr]
-        self.debug('thread', "Unregister thread '%s'" % thr.getName())
+        self.debug('thread', "Unregister thread '%s'" % thr.name)
 
     def getthreadaccount(self, thr=None):
         """Get Account() for a thread (current if None)
@@ -201,13 +201,13 @@ class UIBase:
         If no account has been registered with this thread, return 'None'."""
 
         if thr is None:
-            thr = threading.currentThread()
+            thr = threading.current_thread()
         if thr in self.threadaccounts:
             return self.threadaccounts[thr]
         return None
 
     def debug(self, debugtype, msg):
-        cur_thread = threading.currentThread()
+        cur_thread = threading.current_thread()
         if cur_thread not in self.debugmessages:
             # deque(..., self.debugmsglen) would be handy but was
             # introduced in p2.6 only, so we'll need to work around and
@@ -503,11 +503,11 @@ class UIBase:
     def getThreadDebugLog(self, thread):
         if thread in self.debugmessages:
             message = "\nLast %d debug messages logged for %s prior to exception:\n" \
-                      % (len(self.debugmessages[thread]), thread.getName())
+                      % (len(self.debugmessages[thread]), thread.name)
             message += "\n".join(self.debugmessages[thread])
         else:
             message = "\nNo debug messages were logged for %s." % \
-                      thread.getName()
+                      thread.name
         return message
 
     def delThreadDebugLog(self, thread):
@@ -516,7 +516,7 @@ class UIBase:
 
     def getThreadExceptionString(self, thread):
         message = "Thread '%s' terminated with exception:\n%s" % \
-                  (thread.getName(), thread.exit_stacktrace)
+                  (thread.name, thread.exit_stacktrace)
         message += "\n" + self.getThreadDebugLog(thread)
         return message
 
