@@ -25,7 +25,6 @@ from sys import exc_info
 
 from email import policy
 from email.parser import BytesParser
-from email.generator import BytesGenerator
 from email.utils import parsedate_tz, mktime_tz
 from email.charset import Charset
 
@@ -262,7 +261,7 @@ class BaseFolder:
             basename = self.name.replace('/', '.')
         # Replace with literal 'dot' if final path name is '.' as '.' is
         # an invalid file name.
-        basename = re.sub('(^|\/)\.$', '\\1dot', basename)
+        basename = re.sub(r'(^|\/)\.$', '\\1dot', basename)
         return basename
 
     def check_uidvalidity(self):
@@ -879,7 +878,7 @@ class BaseFolder:
         """
         msg_header = re.split(b'[\r]?\n[\r]?\n', raw_msg_bytes)[0]
         try:
-            msg_id = re.search(b"\nmessage-id:[\s]+(<[A-Za-z0-9!#$%&'*+-/=?^_`{}|~.@ ]+>)", 
+            msg_id = re.search(br"\nmessage-id:[\s]+(<[A-Za-z0-9!#$%&'*+-/=?^_`{}|~.@ ]+>)", 
                 msg_header, re.IGNORECASE).group(1)
         except AttributeError:
             # No match - Likely not following RFC rules.  Try and find anything
