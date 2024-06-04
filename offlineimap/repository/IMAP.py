@@ -879,11 +879,11 @@ class IMAPRepository(BaseRepository):
                 msg = "Folder '%s'[%s] could not be created. "\
                       "Server responded: %s" % (foldername, self, str(result))
                 raise OfflineImapError(msg, OfflineImapError.ERROR.FOLDER)
-            else:
-                self.forgetfolders()
-                self.getfolders()
         finally:
             self.imapserver.releaseconnection(imapobj)
+            if result[0] == 'OK':
+                self.forgetfolders()
+                self.getfolders()
 
 
 class MappedIMAPRepository(IMAPRepository):
