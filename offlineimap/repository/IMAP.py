@@ -845,11 +845,12 @@ class IMAPRepository(BaseRepository):
         folder_paths = [self.getsep().join(parts[:n + 1])
                         for n in range(len(parts))]
         for folder_path in folder_paths:
-            try:
-                self.makefolder_single(folder_path)
-            except OfflineImapError as exc:
-                if '[ALREADYEXISTS]' not in exc.reason:
-                    raise
+            if not imaputil.foldername_to_imapname(folder_path) in [ f.getfullIMAPname() for f in self.getfolders() ] :
+                try:
+                    self.makefolder_single(folder_path)
+                except OfflineImapError as exc:
+                    if '[ALREADYEXISTS]' not in exc.reason:
+                        raise
 
     def makefolder_single(self, foldername):
         """
@@ -880,6 +881,9 @@ class IMAPRepository(BaseRepository):
                 raise OfflineImapError(msg, OfflineImapError.ERROR.FOLDER)
         finally:
             self.imapserver.releaseconnection(imapobj)
+            if result[0] == 'OK':
+                self.forgetfolders()
+                self.getfolders()
 
 
 class MappedIMAPRepository(IMAPRepository):
