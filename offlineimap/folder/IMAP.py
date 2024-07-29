@@ -24,7 +24,7 @@ from offlineimap import imaputil, imaplibutil, OfflineImapError
 from offlineimap import globals
 from imaplib2 import MonthNames
 from .Base import BaseFolder
-from email.errors import NoBoundaryInMultipartDefect
+from email.errors import HeaderParseError, NoBoundaryInMultipartDefect
 
 # Globals
 CRLF = '\r\n'
@@ -658,7 +658,10 @@ class IMAPFolder(BaseFolder):
         date = self.__getmessageinternaldate(msg, rtime)
 
         # Message-ID is handy for debugging messages.
-        msg_id = self.getmessageheader(msg, "message-id")
+        try:
+            msg_id = self.getmessageheader(msg, "message-id")
+        except (HeaderParseError, IndexError):
+            msg_id = None
         if not msg_id:
             msg_id = '[unknown message-id]'
 
