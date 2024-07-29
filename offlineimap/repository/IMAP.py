@@ -23,8 +23,6 @@ import errno
 from sys import exc_info
 from threading import Event
 
-import keyring
-
 from offlineimap import folder, imaputil, imapserver, OfflineImapError
 from offlineimap.repository.Base import BaseRepository
 from offlineimap.threadutil import ExitNotifyThread
@@ -654,6 +652,7 @@ class IMAPRepository(BaseRepository):
 
         # 6. Read password from keyring as the last option
         if not ignore_keyring:
+            import keyring
             return keyring.get_password(self.gethost(), self.getuser())
         return None
 
@@ -662,6 +661,7 @@ class IMAPRepository(BaseRepository):
         This function update provided password into system keyring.
         None means to remove it.
         """
+        import keyring
         if password is None:
             keyring.delete_password(self.gethost(), self.getuser())
         else:
