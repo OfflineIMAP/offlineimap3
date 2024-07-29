@@ -271,7 +271,7 @@ def Internaldate2epoch(resp):
     # INTERNALDATE timezone must be subtracted to get UT
 
     zone = (zoneh * 60 + zonem) * 60
-    if zonen == '-':
+    if zonen == b'-':
         zone = -zone
 
     tt = (year, mon, day, hour, minu, sec, -1, -1, -1)
