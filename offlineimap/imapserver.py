@@ -28,7 +28,7 @@ import socket
 from socket import gaierror
 from sys import exc_info
 from ssl import SSLError, cert_time_to_seconds
-from threading import Lock, BoundedSemaphore, Thread, Event, currentThread
+from threading import Lock, BoundedSemaphore, Thread, Event, current_thread
 import offlineimap.accounts
 from offlineimap import imaplibutil, imaputil, threadutil, OfflineImapError
 from offlineimap.ui import getglobalui
@@ -513,7 +513,7 @@ class IMAPServer:
 
         self.semaphore.acquire()
         self.connectionlock.acquire()
-        curThread = currentThread()
+        curThread = current_thread()
         imapobj = None
 
         imap_debug = 0
@@ -847,7 +847,7 @@ class IdleThread:
         account.callhook(hook, "idle")
 
         ui = getglobalui()
-        ui.unregisterthread(currentThread())  # syncfolder registered the thread
+        ui.unregisterthread(current_thread())  # syncfolder registered the thread
 
     def __idle(self):
         """Invoke IDLE mode until timeout or self.stop() is invoked."""

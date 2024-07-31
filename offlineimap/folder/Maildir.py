@@ -28,9 +28,9 @@ from .Base import BaseFolder
 from email.errors import NoBoundaryInMultipartDefect
 
 # Find the UID in a message filename
-re_uidmatch = re.compile(',U=(\d+)')
+re_uidmatch = re.compile(r',U=(\d+)')
 # Find a numeric timestamp in a string (filename prefix)
-re_timestampmatch = re.compile('(\d+)')
+re_timestampmatch = re.compile(r'(\d+)')
 
 timehash = {}
 timelock = Lock()
@@ -61,7 +61,7 @@ class MaildirFolder(BaseFolder):
             "Account " + self.accountname, "maildir-windows-compatible", False)
         self.infosep = '!' if self.wincompatible else ':'
         """infosep is the separator between maildir name and flag appendix"""
-        self.re_flagmatch = re.compile('%s2,(\w*)' % self.infosep)
+        self.re_flagmatch = re.compile(r'%s2,(\w*)' % self.infosep)
         # self.ui is set in BaseFolder.init()
         # Everything up to the first comma or colon (or ! if Windows):
         self.re_prefixmatch = re.compile('([^' + self.infosep + ',]*)')

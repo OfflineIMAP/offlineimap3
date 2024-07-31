@@ -55,7 +55,7 @@ def syncitall(list_accounts, config):
             target=account.syncrunner,
             name="Account sync %s" % accountname
         )
-        thread.setDaemon(True)
+        thread.daemon = True
         # The add() method expects a started thread.
         thread.start()
         threads.add(thread)

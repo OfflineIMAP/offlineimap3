@@ -246,12 +246,12 @@ class IMAPFolder(BaseFolder):
         if imapdata == [None] or imapdata[0] == b'0':
             # Empty folder, no need to populate message list.
             return None
-        
+
         # imaplib2 returns the type as string, like "OK" but
         # returns imapdata as list of bytes, like [b'0'] so we need decode it
         # to use the existing code
         imapdata = [x.decode('utf-8') for x in imapdata]
-     
+
         conditions = []
         # 1. min_uid condition.
         if min_uid is not None:
@@ -509,14 +509,14 @@ class IMAPFolder(BaseFolder):
                 item = [x.decode('utf-8') for x in item]
 
                 # Walk just tuples.
-                if re.search("(?:^|\\r|\\n)%s:\s*%s(?:\\r|\\n)" %
+                if re.search(r"(?:^|\\r|\\n)%s:\s*%s(?:\\r|\\n)" %
                              (headername, headervalue),
                              item[1], flags=re.IGNORECASE):
                     found = item[0]
             elif found is not None:
                 if isinstance(item, bytes):
                     item = item.decode('utf-8')
-                    uid = re.search("UID\s+(\d+)", item, flags=re.IGNORECASE)
+                    uid = re.search(r"UID\s+(\d+)", item, flags=re.IGNORECASE)
                     if uid:
                         return int(uid.group(1))
                     else:
@@ -526,7 +526,7 @@ class IMAPFolder(BaseFolder):
                         # ')'
                         # and item[0] stored in "found" is like:
                         # '1694 (UID 1694 RFC822.HEADER {1294}'
-                        uid = re.search("\d+\s+\(UID\s+(\d+)", found,
+                        uid = re.search(r"\d+\s+\(UID\s+(\d+)", found,
                                         flags=re.IGNORECASE)
                         if uid:
                             return int(uid.group(1))
