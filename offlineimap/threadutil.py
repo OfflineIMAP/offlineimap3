@@ -120,7 +120,7 @@ def monitor():
 class ExitNotifyThread(Thread):
     """This class is designed to alert a "monitor" to the fact that a
     thread has exited and to provide for the ability for it to find out
-    why.  All instances are made daemon threads (setDaemon(True), so we
+    why.  All instances are made daemon threads (.daemon=True, so we
     bail out when the mainloop dies.
 
     The thread can set instance variables self.exit_message for a human
@@ -133,7 +133,7 @@ class ExitNotifyThread(Thread):
         super(ExitNotifyThread, self).__init__(*args, **kwargs)
         # These are all child threads that are supposed to go away when
         # the main thread is killed.
-        self.setDaemon(True)
+        self.daemon = True
         self.exit_message = None
         self._exit_exc = None
         self._exit_stacktrace = None
