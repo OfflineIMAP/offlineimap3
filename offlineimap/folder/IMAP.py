@@ -24,7 +24,7 @@ from offlineimap import imaputil, imaplibutil, OfflineImapError
 from offlineimap import globals
 from imaplib2 import MonthNames
 from .Base import BaseFolder
-from email.errors import NoBoundaryInMultipartDefect
+from email.errors import HeaderParseError, NoBoundaryInMultipartDefect
 
 # Globals
 CRLF = '\r\n'
@@ -662,7 +662,7 @@ class IMAPFolder(BaseFolder):
             msg_id = self.getmessageheader(msg, "message-id")
             if not msg_id:
                 msg_id = '[unknown message-id]'
-        except:
+        except (HeaderParseError, IndexError):
             msg_id = '[broken message-id]'
 
         retry_left = 2  # succeeded in APPENDING?
