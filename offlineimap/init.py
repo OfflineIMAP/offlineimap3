@@ -567,3 +567,13 @@ class OfflineImap:
             folders = localrepo.getfolders()
             for f in folders:
                 f.migratefmd5(options.dryrun)
+
+
+def main():
+    oi = OfflineImap()
+    oi.run()
+
+
+if __name__ == "__main__":
+    main()
+

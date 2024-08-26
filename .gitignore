@@ -10,6 +10,7 @@
 *.css
 /docs/dev-doc/
 /build/
+offlineimap.egg-info/
 *.pyc
 offlineimap.1
 offlineimapui.7

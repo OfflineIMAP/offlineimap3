@@ -21,51 +21,76 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA
 
+import re
 try:
     from setuptools import setup, Command
 except:
     from distutils.core import setup, Command
 
-import offlineimap
-import logging
-from test.OLItest import TextTestRunner, TestLoader, OLITestLib
 
+with open('offlineimap/__init__.py') as f:
+    version_grp = re.search(r"__version__ = ['\"](.+)['\"]", f.read())
+    if version_grp:
+        version = version_grp.group(1)
+    else:
+        version = "0.0.0"
 
-class TestCommand(Command):
-    """runs the OLI testsuite"""
-    description = """Runs the test suite. In order to execute only a single
-        test, you could also issue e.g. 'python -m unittest
-        test.tests.test_01_basic.TestBasicFunctions.test_01_olistartup' on the
-        command line."""
-    user_options = []
+    f.seek(0)
+    description_grp = re.search(r"__description__ = ['\"](.+)['\"]", f.read())
+    if description_grp:
+        description = description_grp.group(1)
+    else:
+        description = "Disconnected Universal IMAP Mail Synchronization/Reader Support"
 
-    def initialize_options(self):
-        pass
+    f.seek(0)
+    author_grp = re.search(r"__author__ = ['\"](.+)['\"]", f.read())
+    if author_grp:
+        author = author_grp.group(1)
+    else:
+        author = "John Goerzen"
 
-    def finalize_options(self):
-        pass
+    f.seek(0)
+    author_email_grp = re.search(r"__author_email__ = ['\"](.+)['\"]", f.read())
+    if author_email_grp:
+        author_email = author_email_grp.group(1)
+    else:
+        author_email = ""
 
-    def run(self):
-        logging.basicConfig(format='%(message)s')
-        # set credentials and OfflineImap command to be executed:
-        OLITestLib(cred_file='./test/credentials.conf', cmd='./offlineimap.py')
-        suite = TestLoader().discover('./test/tests')
-        TextTestRunner(verbosity=2, failfast=True).run(suite)
+    f.seek(0)
+    homepage_grp = re.search(r"__homepage__ = ['\"](.+)['\"]", f.read())
+    if homepage_grp:
+        homepage = homepage_grp.group(1)
+    else:
+        homepage = "http://www.offlineimap.org"
+
+    f.seek(0)
+    copyright_grp = re.search(r"__copyright__ = ['\"](.+)['\"]", f.read())
+    if copyright_grp:
+        copyright = copyright_grp.group(1)
+    else:
+        copyright = ""
 
 
 setup(name="offlineimap",
-      version=offlineimap.__version__,
-      description=offlineimap.__description__,
-      long_description=offlineimap.__description__,
-      author=offlineimap.__author__,
-      author_email=offlineimap.__author_email__,
-      url=offlineimap.__homepage__,
+      version=version,
+      description=description,
+      long_description=description,
+      author=author,
+      author_email=author_email,
+      url=homepage,
       packages=['offlineimap', 'offlineimap.folder',
                 'offlineimap.repository', 'offlineimap.ui',
                 'offlineimap.utils'],
       scripts=['bin/offlineimap'],
-      license=offlineimap.__copyright__ + ", Licensed under the GPL version 2",
-      cmdclass={'test': TestCommand},
-      install_requires=['distro', 'imaplib2>=3.5', 'rfc6555', 'gssapi[kerberos]', 'portalocker[cygwin]', 'urllib3~=1.25.9'],
-      extras_require={'keyring': ['keyring']},
+      setup_requires=['setuptools>=18.5', 'wheel', 'imaplib2'],
+      license=copyright + ", Licensed under the GPL version 2",
+      install_requires=['distro',
+                        'imaplib2>=3.5',
+                        'rfc6555',
+                        'urllib3~=1.25.9'],
+      extras_require={'kerberos':'gssapi[kerberos]',
+                      'keyring':'keyring[keyring]',
+                      'cygwin':'portalocker[cygwin]',
+                      'testinternet':'certifi~=2020.6.20'}
       )
+

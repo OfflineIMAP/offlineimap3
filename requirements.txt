@@ -1,10 +1,5 @@
 # Requirements
-gssapi[kerberos]
-portalocker[cygwin]
 rfc6555
-distro;platform_system=="Linux" and python_version>"3.7"
-keyring
+distro; python_version > "3.6"
 imaplib2>=3.5
 urllib3~=1.25.9
-certifi~=2020.6.20
-
