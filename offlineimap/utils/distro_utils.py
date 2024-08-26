@@ -72,7 +72,25 @@ def get_os_sslcertfile_searchpath():
     at all.
     """
     os_name = get_os_name()
-    location = __DEF_OS_LOCATIONS.get(os_name, None)
+    location = __DEF_OS_LOCATIONS.get(os_name, [])
+
+    try:
+        import ssl
+        verify_paths = ssl.get_default_verify_paths()
+        cafile_by_envvar = os.getenv(verify_paths.openssl_cafile_env)
+        if cafile_by_envvar is not None:
+            location += [cafile_by_envvar]
+        cafile_resolved = verify_paths.cafile
+        if cafile_resolved is not None:
+            location += [cafile_resolved]
+        cafile_hardcoded = verify_paths.openssl_cafile
+        if cafile_hardcoded is not None:
+            location += [cafile_hardcoded]
+    except AttributeError:
+        pass
+    finally:
+        if len(location) == 0:
+            return None
 
     return location
 
