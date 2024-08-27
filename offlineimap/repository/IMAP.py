@@ -695,7 +695,13 @@ class IMAPRepository(BaseRepository):
         if self.folders is not None:
             return self.folders
         retval = []
-        imapobj = self.imapserver.acquireconnection()
+
+        try:
+            imapobj = self.imapserver.acquireconnection()
+        except OfflineImapError as e:
+            err_msg = f"Error adquiring connection for repository {self.name}: {str(e)}"
+            raise OfflineImapError(err_msg, OfflineImapError.ERROR.REPO, exc_info()[2])
+
         # check whether to list all folders, or subscribed only
         listfunction = imapobj.list
         if self.getconfboolean('subscribedonly', False):
