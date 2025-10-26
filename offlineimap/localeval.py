@@ -26,6 +26,8 @@ class LocalEval:
         self.namespace = {}
 
         if path is not None:
+            import importlib.machinery
+
             # FIXME: limit opening files owned by current user with rights set
             # to fixed mode 644.
             importlib.machinery.SOURCE_SUFFIXES.append('') # empty string to allow any file
