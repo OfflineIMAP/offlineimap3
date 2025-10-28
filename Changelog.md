@@ -15,6 +15,67 @@ Note to mainainers:
 * The following excerpt is only usefull when rendered in the website.
 {:toc}
 
+### OfflineIMAP v8.0.1 (2025-10-28)
+
+**Notes**
+
+This release includes multiple improvements, bug fixes, and compatibility updates for Python 3.12 and modern systems.
+
+#### Features
+
+- **Run OfflineIMAP without server connection**: The application no longer crashes if the network is temporarily down or the server is unreachable. [kix]
+
+- **Packaging and dependency improvements**: `requirements.txt` split into multiple files, `setup.py` and `pyproject.toml` aligned, and improved module startup functions. Easier installation and use with or without optional modules. [kix]
+
+- **Apple Silicon CA certificates support** via Homebrew and enhanced CA search paths for Python 3.4+. [Schspa Shi, Keith Bowes]
+
+- **Optional keyring support**: OfflineIMAP can be installed without keyring dependencies, with compatibility for the system keyring. [Hugo Osvaldo Barrera, Kirill A. Korinsky]
+
+- **Python 3.12 compatibility**: Configuration files with any extension are allowed, and obsolete modules (`imp`) are avoided. [Hugo Osvaldo Barrera, serge-sans-paille]
+
+#### Changes
+
+- **Regex and ConfigParser fixes**: Raw strings are used in configuration examples to prevent warnings and ensure compatibility. [Derek Schrock, Lilydjwg]
+
+- **Fixed "module importlib has no attribute 'machinery'"** by importing the required module. [Tugdual Saunier]
+
+- **Improved `foldername_to_imapname()`**: Escapes and quotes folder names correctly and prevents creating existing folders. [Robo Shimmer]
+
+- **IMAP UTF-7 decoding fixes** and filtering for folder names containing spaces. [Lilydjwg, Hubert Pineault, Alessio Pascolini]
+
+- **Message ID and date header error handling**: Broken message IDs and invalid date headers no longer cause synchronization failures. [kix, Adam Dinwoodie, Robo Shimmer]
+
+- **Installation examples updated** for FreeBSD and Debian; optional packages like `distro` handled correctly. [kix, Derek Schrock, Chrysle, Alex Gaynor, Adam Dinwoodie]
+
+- **Minor IMAP.py improvements**: Password handling and escaping special characters in folder names. [Chris Coleman, Robo Shimmer]
+
+#### Authors
+
+- Rodolfo García Peñas (kix) (38)
+- Robo Shimmer (10)
+- Keith Bowes (5)
+- lilydjwg (5)
+- Chris Coleman (4)
+- Adam Dinwoodie (2)
+- Derek Schrock (2)
+- Hugo Osvaldo Barrera (2)
+- Kirill A. Korinsky (2)
+- 0pointerexception (1)
+- alessio-pascolini (1)
+- Alex Gaynor (1)
+- chrysle (1)
+- Hubert Pineault (1)
+- Hugo van Kemenade (1)
+- Luciano Rocha (1)
+- Magarnicle (1)
+- Nicolas Sebrecht (1)
+- peterb-dev (1)
+- Schspa Shi (1)
+- serge-sans-paille (1)
+- Sudip Mukherjee (1)
+- Tugdual Saunier (1)
+
+
 ### OfflineIMAP v8.0.0 (2021-10-18)
 
 #### Notes
