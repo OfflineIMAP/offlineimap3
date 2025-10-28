@@ -71,7 +71,7 @@ class OLITestLib:
         assert cls.cred_file is not None
         assert cls.testdir is not None
         config = CustomConfigParser()
-        config.readfp(default_conf)
+        config.read_file(default_conf)
         default_conf.seek(0)  # rewind config_file to start
         config.read(cls.cred_file)
         config.set("general", "metadata", cls.testdir)
@@ -234,7 +234,7 @@ Content here.''')
         return boxes, mails
 
     # find UID in a maildir filename
-    re_uidmatch = re.compile(',U=(\d+)')
+    re_uidmatch = re.compile(r',U=(\d+)')
 
     @classmethod
     def get_maildir_uids(cls, folder):
