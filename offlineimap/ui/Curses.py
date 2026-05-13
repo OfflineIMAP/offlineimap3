@@ -384,15 +384,14 @@ class Blinkenlights(UIBase, CursesUtil):
         # No TERM specified?  Can't use curses.
         if not os.environ.get('TERM', None):
             return False
-        # Test if ncurses actually starts up fine. Only do so for
-        # python>=2.6.6 as calling initscr() twice messing things up.
-        # see http://bugs.python.org/issue7567 in python 2.6 to 2.6.5
-        if sys.version_info[0:3] < (2, 6) or sys.version_info[0:3] >= (2, 6, 6):
-            try:
-                curses.initscr()
-                curses.endwin()
-            except:
+
+        # Test if ncurses actually starts up fine.
+        try:
+            curses.initscr()
+            curses.endwin()
+        except Exception:
                 return False
+
         return True
 
     def init_banner(self):
