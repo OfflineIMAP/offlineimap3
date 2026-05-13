@@ -363,32 +363,95 @@ class IMAPServer:
             return None
 
     def __start_tls(self, imapobj):
-        if 'STARTTLS' in imapobj.capabilities and not self.usessl:
-            self.ui.debug('imap', 'Using STARTTLS connection')
-            # imaplib2.starttls() unconditionally calls _get_capabilities() right
-            # after the TLS handshake (before setting _tls_established=True).
-            # Servers like Protonmail Bridge do not respond to CAPABILITY at
-            # that stage, causing a 60-second hang.  We bypass it by temporarily
-            # substituting a no-op; imaplib2 still sets _tls_established=True
-            # normally, and acquireconnection() already guards its own
-            # post-login CAPABILITY refresh against that flag (see below).
-            _orig_get_cap = imapobj._get_capabilities
-            imapobj._get_capabilities = lambda: None
+        """Upgrade connection to TLS if STARTTLS is configured.
+
+        - Uses pre-TLS capabilities only to decide whether to perform STARTTLS.
+        - After STARTTLS, forces a CAPABILITY command and replaces internal
+          capabilities with the post-TLS response.
+        - If no reliable post-TLS CAPABILITY is available:
+          - In strict mode (allow_nonstandard_capabilities = no): abort.
+          - In tolerant mode (allow_nonstandard_capabilities = yes):
+            reuse pre-TLS capabilities, removing LOGINDISABLED.
+        """
+
+        # If the repository does not want STARTTLS, do nothing.
+        if not self.starttls or self.usessl:
+            return
+
+        # Pre-TLS capabilities (from initial banner / CAPABILITY).
+        caps_pre = set(getattr(imapobj, '_offlineimap_capabilities_pre_tls',
+                               getattr(imapobj, 'capabilities', [])))
+
+        # If the server does not advertise STARTTLS, respect that.
+        if 'STARTTLS' not in caps_pre:
+            return
+
+        # Execute STARTTLS.
+        self.ui.debug('imap', 'Using STARTTLS connection')
+
+        # Disable _get_capabilities() during starttls() to prevent imaplib2
+        # from issuing CAPABILITY before we can do it ourselves.
+        _orig_get_cap = imapobj._get_capabilities
+        imapobj._get_capabilities = lambda: None
+        try:
             try:
                 imapobj.starttls()
             except imapobj.error as e:
                 err = "Failed to start TLS connection: %s" % str(e)
                 raise OfflineImapError(err, OfflineImapError.ERROR.REPO,
                                        exc_info()[2])
-            finally:
-                # Always restore the original method, even on success.
-                imapobj._get_capabilities = _orig_get_cap
-        elif self.starttls and not self.usessl:
+        finally:
+            # Always restore the original method, even on error.
+            imapobj._get_capabilities = _orig_get_cap
+
+        # At this point, the socket is encrypted. Now we must refresh CAPABILITY.
+        caps_post = None
+        try:
+            typ, data = imapobj.capability()
+            if typ == 'OK' and data:
+                # data is a list of bytes, e.g. [b'IMAP4rev1 IDLE AUTH=PLAIN']
+                line = data[0]
+                if isinstance(line, bytes):
+                    line = line.decode('ascii', 'ignore')
+                caps_post = set(line.upper().split())
+        except Exception:
+            caps_post = None
+
+        if caps_post is not None:
+            # Standard path: completely replace capabilities
+            imapobj.capabilities = caps_post
+            imapobj._offlineimap_capabilities_post_tls = caps_post
+            return
+
+        # If we reach here, we do not have reliable post-TLS capabilities.
+        # Decide based on repository configuration.
+        allow_nonstandard = getattr(self.repos,
+                                    'allow_nonstandard_capabilities', False)
+
+        if not allow_nonstandard:
+            # Strict mode: abort with clear error.
             raise OfflineImapError(
-                "STARTTLS requested but server does not advertise STARTTLS capability. "
-                "Aborting to prevent sending password in plaintext (possible MITM attack). "
-                "If you REALLY want an insecure connection, set 'starttls = no'.",
-                OfflineImapError.ERROR.REPO)
+                "Server did not provide valid CAPABILITY after STARTTLS; "
+                "set 'allow_nonstandard_capabilities = yes' in repository "
+                "configuration to enable a non-standard fallback.",
+                OfflineImapError.ERROR.REPO
+            )
+
+        # Tolerant mode: best-effort using caps_pre.
+        caps_fallback = set(caps_pre)
+        if 'LOGINDISABLED' in caps_fallback:
+            # We assume that after STARTTLS, LOGINDISABLED no longer applies,
+            # so we remove it to allow LOGIN/AUTH configured by the user.
+            caps_fallback.remove('LOGINDISABLED')
+
+        imapobj.capabilities = caps_fallback
+        imapobj._offlineimap_capabilities_post_tls = caps_fallback
+
+        self.ui.warn(
+            "Server did not provide CAPABILITY after STARTTLS; "
+            "falling back to pre-TLS capabilities without LOGINDISABLED "
+            "due to allow_nonstandard_capabilities = yes."
+        )
 
     # All __authn_* procedures are helpers that do authentication.
     # They are class methods that take one parameter, IMAP object.
@@ -604,6 +667,15 @@ class IMAPServer:
             self.assignedconnections.append(imapobj)
             self.lastowner[imapobj] = curThread.ident
             self.connectionlock.release()
+
+            # Store the pre-TLS capabilities (from banner and initial CAPABILITY).
+            # This will be used only to decide STARTTLS and, in case of non-standard
+            # fallback, to reconstruct an approximate post-TLS capability list.
+            try:
+                caps_pre = set(getattr(imapobj, 'capabilities', []))
+            except Exception:
+                caps_pre = set()
+            imapobj._offlineimap_capabilities_pre_tls = caps_pre
 
             # Verify that the connection is still alive before returning it
             # to the caller.  If not, clean up and recursively call

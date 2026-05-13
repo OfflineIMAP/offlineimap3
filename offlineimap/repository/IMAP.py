@@ -38,6 +38,13 @@ class IMAPRepository(BaseRepository):
         self.idlefolders = None
         BaseRepository.__init__(self, reposname, account)
         # self.ui is being set by the BaseRepository
+
+        # Allow tolerance for non-standard IMAP servers that do not provide
+        # reliable CAPABILITY after STARTTLS. Default is strict (False).
+        # If set to True, heuristics using pre-TLS capabilities are applied
+        # as a fallback.
+        self.allow_nonstandard_capabilities = self.getconfboolean(
+            'allow_nonstandard_capabilities', False)
         self._host = None
         # Must be set before calling imapserver.IMAPServer(self)
         self.oauth2_request_url = None
