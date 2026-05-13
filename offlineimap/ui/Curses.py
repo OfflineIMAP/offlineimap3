@@ -379,8 +379,9 @@ class Blinkenlights(UIBase, CursesUtil):
         """Returns true if the backend is usable ie Curses works."""
 
         # Not a terminal?  Can't use curses.
-        if not sys.stdout.isatty() and sys.stdin.isatty():
+        if not sys.stdout.isatty():
             return False
+
         # No TERM specified?  Can't use curses.
         if not os.environ.get('TERM', None):
             return False
