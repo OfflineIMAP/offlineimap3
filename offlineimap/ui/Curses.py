@@ -375,7 +375,7 @@ class Blinkenlights(UIBase, CursesUtil):
         # intialization stuff currently done in init_banner. Move here?
         return ch
 
-    def isusable(s):
+    def isusable(self):
         """Returns true if the backend is usable ie Curses works."""
 
         # Not a terminal?  Can't use curses.
