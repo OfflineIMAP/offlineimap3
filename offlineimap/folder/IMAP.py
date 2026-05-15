@@ -41,7 +41,7 @@ class IMAPFolder(BaseFolder):
         #    a folder object from a locally available utf_8 name)
         # In any case the given name is first dequoted.
         name = imaputil.dequote(name)
-        if decode and repository.account.utf_8_support:
+        if decode:
             name = imaputil.IMAP_utf8(name)
         self.sep = imapserver.delim
         super(IMAPFolder, self).__init__(name, repository)
@@ -82,10 +82,7 @@ class IMAPFolder(BaseFolder):
             imapobj.select(self.getfullIMAPname(), readonly=True, force=force)
 
     def getfullIMAPname(self):
-        name = self.getfullname()
-        if self.repository.account.utf_8_support:
-            name = imaputil.utf8_IMAP(name)
-        return imaputil.foldername_to_imapname(name)
+        return imaputil.encode_mailbox_name(self.getfullname())
 
     # Interface from BaseFolder
     def suggeststhreads(self):

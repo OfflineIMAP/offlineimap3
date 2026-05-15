@@ -449,6 +449,10 @@ def utf7m_search_function(name):
 codecs.register(utf7m_search_function)
 
 
+def encode_mailbox_name(mbox_name):
+    return foldername_to_imapname(utf8_IMAP(mbox_name))
+
+
 def foldername_to_imapname(folder_name):
     """
     This function returns the folder_name ready to send to the
@@ -461,7 +465,9 @@ def foldername_to_imapname(folder_name):
 
     """
     # If name includes some of these characters, quote it
-    atom_specials = [' ', '/', '(', ')', '{', '}', '"']
+    atom_specials = [' ', '/', '(', ')', '{', '}', '%', '*', '"', '\\', ']']
+    atom_specials.extend([chr(x) for x in range(32)])
+    atom_specials.append(chr(127))  # DEL, CTL per RFC 2234
 
     if any((c in atom_specials) for c in folder_name):
         folder_name = quote(folder_name)
