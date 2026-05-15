@@ -180,7 +180,7 @@ class GmailFolder(IMAPFolder):
         This backend always assigns a new uid, so the uid arg is ignored.
 
         This function will update the self.messagelist dict to contain
-        the new message after sucessfully saving it, including labels.
+        the new message after successfully saving it, including labels.
 
         See folder/Base for details. Note that savemessage() does not
         check against dryrun settings, so you need to ensure that

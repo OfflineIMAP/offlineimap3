@@ -322,7 +322,7 @@ class IMAPRepository(BaseRepository):
     def getsslcacertfile(self):
         """Determines CA bundle.
 
-        Returns path to the CA bundle.  It is either explicitely specified
+        Returns path to the CA bundle.  It is either explicitly specified
         or requested via "OS-DEFAULT" value (and we will search known
         locations for the current OS and distribution).
 
@@ -333,7 +333,7 @@ class IMAPRepository(BaseRepository):
         It is also an error to specify non-existent file via configuration:
         it will error out later, but, perhaps, with less verbose explanation,
         so we will also throw an exception.  It is consistent with
-        the above behaviour, so any explicitely-requested configuration
+        the above behaviour, so any explicitly-requested configuration
         that doesn't result in an existing file will give an exception.
         """
         xforms = [os.path.expanduser, os.path.expandvars, os.path.abspath]
@@ -699,7 +699,7 @@ class IMAPRepository(BaseRepository):
         try:
             imapobj = self.imapserver.acquireconnection()
         except OfflineImapError as e:
-            err_msg = f"Error adquiring connection for repository {self.name}: {str(e)}"
+            err_msg = f"Error acquiring connection for repository {self.name}: {str(e)}"
             raise OfflineImapError(err_msg, OfflineImapError.ERROR.REPO, exc_info()[2])
 
         # check whether to list all folders, or subscribed only

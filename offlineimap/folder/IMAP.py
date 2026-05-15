@@ -395,7 +395,7 @@ class IMAPFolder(BaseFolder):
         # mail twice (e.g. in different folders), we would still need to
         # get the UID for the correct one. As we won't have too many
         # mails with identical content, the randomness requirements are
-        # not extremly critial though.
+        # not extremely critical though.
 
         # Compute unsigned crc32 of 'msg' (as bytes) into a unique hash.
         # NB: crc32 returns unsigned only starting with python 3.0.
@@ -626,7 +626,7 @@ class IMAPFolder(BaseFolder):
         This backend always assigns a new uid, so the uid arg is ignored.
 
         This function will update the self.messagelist dict to contain
-        the new message after sucessfully saving it.
+        the new message after successfully saving it.
 
         See folder/Base for details. Note that savemessage() does not
         check against dryrun settings, so you need to ensure that
@@ -783,7 +783,7 @@ class IMAPFolder(BaseFolder):
                     # Now, read the UID field
                     uid = int(s_uid[-1].split(' ')[1])
                 except ValueError:
-                    uid = 0  # Definetly not what we should have.
+                    uid = 0  # Definitely not what we should have.
                 except Exception:
                     raise OfflineImapError("Unexpected response: %s" %
                                            str(resp),
@@ -791,7 +791,7 @@ class IMAPFolder(BaseFolder):
                 if uid == 0:
                     self.ui.warn("savemessage: Server supports UIDPLUS, but"
                                  " we got no usable UID back. APPENDUID "
-                                 "reponse was '%s'" % str(resp))
+                                 "response was '%s'" % str(resp))
             else:
                 try:
                     # We don't use UIDPLUS.
@@ -812,7 +812,7 @@ class IMAPFolder(BaseFolder):
                                      "Could not determine new UID on %s." %
                                      self.getname())
                 # Something wrong happened while trying to get the UID. Explain
-                # the error might be about the 'get UID' process not necesseraly
+                # the error might be about the 'get UID' process not necessarily
                 # the APPEND.
                 except Exception:
                     self.ui.warn("%s: could not determine the UID while we got "
@@ -898,7 +898,7 @@ class IMAPFolder(BaseFolder):
         # originally a fixed, utf-8 conversion was done and *only* the first
         # response (d[0]) was returned.  Note that this alters the behavior
         # between code bases.  However, it seems like a single UID is the intent
-        # of this function so retaining the modfication here for now.
+        # of this function so retaining the modification here for now.
         # 
         # TODO: Can we assume the server response containing the meta data is
         # always 'utf-8' encoded?  Assuming yes for now.

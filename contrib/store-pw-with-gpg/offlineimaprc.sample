@@ -20,7 +20,7 @@ localrepository = account2-local
 remoterepository = account2-remote
 status_backend = sqlite
 
-# thi sis a gmail account
+# this is a gmail account
 [Repository account1-local]
 type = Maildir
 # create with maildirmake or by hand by creating cur, new, tmp

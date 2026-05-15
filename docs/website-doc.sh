@@ -163,7 +163,7 @@ do
       echo "Usage: website-doc.sh <releases|api|contrib|usage>"
       ;;
     *)
-      echo "unkown option $arg"
+      echo "unknown option $arg"
       exit_code=$(( $exit_code + 1 ))
       ;;
   esac

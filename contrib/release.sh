@@ -186,7 +186,7 @@ function changelog_template_part1 () {
   cat <<EOF
 // vim: expandtab ts=2 syntax=markdown
 
-// WARNING: let at least one empy line before the real content.
+// WARNING: let at least one empty line before the real content.
 //
 // Write a new Changelog entry.
 //
@@ -319,7 +319,7 @@ function update_website () {
     if test ! $? -eq 0
     then
       echo "Oops! you don't have $SPHINXBUILD installed?"
-      echo "Cannot update the webite documentation..."
+      echo "Cannot update the website documentation..."
       echo "You should install it and run:"
       echo "  $ cd docs"
       echo "  $ make websitedoc"

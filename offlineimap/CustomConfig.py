@@ -195,19 +195,19 @@ class ConfigHelperMixin:
         """Returns CustomConfigParser object that we will use
         for all our actions.
 
-        Must be overriden in all classes that use this mix-in."""
+        Must be overridden in all classes that use this mix-in."""
 
         raise NotImplementedError("ConfigHelperMixin.getconfig() "
-                                  "is to be overriden")
+                                  "is to be overridden")
 
     def getsection(self):
         """Returns name of configuration section in which our
         class keeps its configuration.
 
-        Must be overriden in all classes that use this mix-in."""
+        Must be overridden in all classes that use this mix-in."""
 
         raise NotImplementedError("ConfigHelperMixin.getsection() "
-                                  "is to be overriden")
+                                  "is to be overridden")
 
     def getconf(self, option, default=CustomConfigDefault):
         """Retrieves string from the configuration.
