@@ -144,7 +144,9 @@ class IMAPServer:
                             "the 'ssl_version' must be set explicitly.")
 
         self.oauth2_refresh_token = repos.getoauth2_refresh_token()
-        self.oauth2_access_token = repos.getoauth2_access_token()
+        self.oauth2_access_token_getter = repos.getoauth2_access_token_getter()
+        # is used if the above getter is None or doesn't work
+        self.oauth2_access_token = None
         self.oauth2_client_id = repos.getoauth2_client_id()
         self.oauth2_client_secret = repos.getoauth2_client_secret()
         self.oauth2_request_url = repos.getoauth2_request_url()
@@ -262,59 +264,65 @@ class IMAPServer:
 
     def __xoauth2handler(self, response):
         now = datetime.datetime.now()
-        if self.oauth2_access_token_expires_at \
-                and self.oauth2_access_token_expires_at < now:
-            self.oauth2_access_token = None
-            self.ui.debug('imap', 'xoauth2handler: oauth2_access_token expired')
+        access_token_to_use = None
+        if self.oauth2_access_token_getter is not None:
+            access_token_to_use = self.oauth2_access_token_getter()
 
-        if self.oauth2_access_token is None:
-            if self.oauth2_request_url is None:
-                raise OfflineImapError("No remote oauth2_request_url for "
-                                       "repository '%s' specified." %
-                                       self, OfflineImapError.ERROR.REPO)
+        if access_token_to_use is None:
+            if self.oauth2_access_token_expires_at \
+                    and self.oauth2_access_token_expires_at < now:
+                self.oauth2_access_token = None
+                self.ui.debug('imap', 'xoauth2handler: oauth2_access_token expired')
 
-            # Generate new access token.
-            params = {}
-            params['client_id'] = self.oauth2_client_id
-            params['client_secret'] = self.oauth2_client_secret
-            params['refresh_token'] = self.oauth2_refresh_token
-            params['grant_type'] = 'refresh_token'
+            if self.oauth2_access_token is None:
+                if self.oauth2_request_url is None:
+                    raise OfflineImapError("No remote oauth2_request_url for "
+                                           "repository '%s' specified." %
+                                           self, OfflineImapError.ERROR.REPO)
 
-            self.ui.debug('imap', 'xoauth2handler: url "%s"' %
-                          self.oauth2_request_url)
-            self.ui.debug('imap', 'xoauth2handler: params "%s"' % params)
+                # Generate new access token.
+                params = {}
+                params['client_id'] = self.oauth2_client_id
+                params['client_secret'] = self.oauth2_client_secret
+                params['refresh_token'] = self.oauth2_refresh_token
+                params['grant_type'] = 'refresh_token'
 
-            original_socket = socket.socket
-            socket.socket = self.authproxied_socket
-            try:
-                response = urllib.request.urlopen(
-                    self.oauth2_request_url, urllib.parse.urlencode(params).encode('utf-8')).read()
-            except Exception as e:
+                self.ui.debug('imap', 'xoauth2handler: url "%s"' %
+                              self.oauth2_request_url)
+                self.ui.debug('imap', 'xoauth2handler: params "%s"' % params)
+
+                original_socket = socket.socket
+                socket.socket = self.authproxied_socket
                 try:
-                    msg = "%s (configuration is: %s)" % (e, str(params))
-                except Exception as eparams:
-                    msg = "%s [cannot display configuration: %s]" % (e, eparams)
+                    response = urllib.request.urlopen(
+                        self.oauth2_request_url, urllib.parse.urlencode(params).encode('utf-8')).read()
+                except Exception as e:
+                    try:
+                        msg = "%s (configuration is: %s)" % (e, str(params))
+                    except Exception as eparams:
+                        msg = "%s [cannot display configuration: %s]" % (e, eparams)
 
-                self.ui.error(e, exc_info()[2], msg)
-                raise
-            finally:
-                socket.socket = original_socket
+                    self.ui.error(e, exc_info()[2], msg)
+                    raise
+                finally:
+                    socket.socket = original_socket
 
-            resp = json.loads(response)
-            self.ui.debug('imap', 'xoauth2handler: response "%s"' % resp)
-            if 'error' in resp:
-                raise OfflineImapError("xoauth2handler got: %s" % resp,
-                                       OfflineImapError.ERROR.REPO)
-            self.oauth2_access_token = resp['access_token']
-            if 'expires_in' in resp:
-                self.oauth2_access_token_expires_at = now + datetime.timedelta(
-                    seconds=resp['expires_in'] / 2
-                )
+                resp = json.loads(response)
+                self.ui.debug('imap', 'xoauth2handler: response "%s"' % resp)
+                if 'error' in resp:
+                    raise OfflineImapError("xoauth2handler got: %s" % resp,
+                                           OfflineImapError.ERROR.REPO)
+                self.oauth2_access_token = resp['access_token']
+                if 'expires_in' in resp:
+                    self.oauth2_access_token_expires_at = now + datetime.timedelta(
+                        seconds=resp['expires_in'] / 2
+                    )
+                access_token_to_use = self.oauth2_access_token
 
         self.ui.debug('imap', 'xoauth2handler: access_token "%s expires %s"' % (
-            self.oauth2_access_token, self.oauth2_access_token_expires_at))
+            access_token_to_use, self.oauth2_access_token_expires_at))
         auth_string = 'user=%s\1auth=Bearer %s\1\1' % (
-            self.username, self.oauth2_access_token)
+            self.username, access_token_to_use)
         # auth_string = base64.b64encode(auth_string)
         self.ui.debug('imap', 'xoauth2handler: returning "%s"' % auth_string)
         return auth_string
@@ -494,7 +502,7 @@ class IMAPServer:
 
     def __authn_xoauth2(self, imapobj):
         if self.oauth2_refresh_token is None \
-                and self.oauth2_access_token is None:
+                and self.oauth2_access_token_getter is None:
             return False
 
         imapobj.authenticate('XOAUTH2', self.__xoauth2handler)

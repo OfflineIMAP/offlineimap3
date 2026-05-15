@@ -448,22 +448,27 @@ class IMAPRepository(BaseRepository):
                 refresh_token = refresh_token.strip("\n")
         return refresh_token
 
-    def getoauth2_access_token(self):
+    def getoauth2_access_token_getter(self):
         """
-        Get the OAUTH2 access token from the configuration (oauth2_access_token)
+        Get a function evaluating the OAUTH2 access token from the configuration (oauth2_access_token_getter)
         If the access token is not found, then returns None.
+        If evaluating the returned functions failed, it will return None.
 
-        Returns: OAUTH2 access token (oauth2_access_token)
+        Returns: a function returning OAUTH2 access token (oauth2_access_token_getter)
 
         """
         access_token = self.getconf('oauth2_access_token', None)
-        if access_token is None:
-            access_token = self.localeval.eval(
-                self.getconf('oauth2_access_token_eval', "None")
-            )
+        if access_token is not None:
+            return lambda:access_token
+        access_token_eval = self.getconf('oauth2_access_token_eval', None)
+        if access_token_eval is None:
+            return None
+        def access_token_getter():
+            access_token = self.localeval.eval(access_token_eval)
             if access_token is not None:
                 access_token = access_token.strip("\n")
-        return access_token
+            return access_token
+        return access_token_getter
 
     def getoauth2_client_id(self):
         """
