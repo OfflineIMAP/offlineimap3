@@ -390,9 +390,19 @@ class IMAPServer:
         caps_pre = set(getattr(imapobj, '_offlineimap_capabilities_pre_tls',
                                getattr(imapobj, 'capabilities', [])))
 
-        # If the server does not advertise STARTTLS, respect that.
+        # If the server does not advertise STARTTLS, warn but attempt anyway.
+        # Per RFC 2595 section 9, a man-in-the-middle attacker can strip
+        # STARTTLS from the capability list to force a cleartext connection.
+        # Silently skipping STARTTLS when the user configured it would make
+        # offlineimap vulnerable to this attack.  We try regardless and let
+        # the server reject the command if it genuinely does not support it.
         if 'STARTTLS' not in caps_pre:
-            return
+            self.ui.warn(
+                "Server '%s' did not advertise STARTTLS in its capabilities, "
+                "but starttls is configured.  Attempting STARTTLS anyway to "
+                "guard against capability-stripping attacks (RFC 2595 §9)."
+                % self.hostname
+            )
 
         # Execute STARTTLS.
         self.ui.debug('imap', 'Using STARTTLS connection')
