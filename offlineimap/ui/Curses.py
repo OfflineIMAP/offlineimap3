@@ -372,7 +372,7 @@ class Blinkenlights(UIBase, CursesUtil):
         # add the handlers to the logger
         self.logger.addHandler(ch)
         # the handler is not usable yet. We still need all the
-        # intialization stuff currently done in init_banner. Move here?
+        # initialization stuff currently done in init_banner. Move here?
         return ch
 
     def isusable(self):
@@ -424,7 +424,7 @@ class Blinkenlights(UIBase, CursesUtil):
         # set log handlers ui to ourself
         self._log_con_handler.ui = self
         self.setupwindows()
-        # Settup keyboard handler
+        # Set up keyboard handler
         self.inputhandler = InputHandler(self)
         self.inputhandler.set_char_hdlr(self.on_keypressed)
 

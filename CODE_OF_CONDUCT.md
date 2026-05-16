@@ -1,7 +1,7 @@
 
 # Realistic Code of Conduct
 
-1. We mostly care about making our softwares better.
+1. We mostly care about making our software better.
 
 2. Everybody is free to decide how to contribute.
 

@@ -89,7 +89,7 @@ class LocalStatusSQLiteFolder(BaseFolder):
                               dirname)
 
         self.connection = None
-        # The lock serialize the writing/open/close of database accross threads.
+        # The lock serialize the writing/open/close of database across threads.
         if self.filename not in LocalStatusSQLiteFolder.locks:
             LocalStatusSQLiteFolder.locks[self.filename] = DatabaseFileLock()
         self._databaseFileLock = LocalStatusSQLiteFolder.locks[self.filename]

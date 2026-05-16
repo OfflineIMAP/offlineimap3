@@ -279,7 +279,7 @@ class Website():
         except:
             print(("""
 Oops! you don't have {} installed?"
-Cannot update the webite documentation..."
+Cannot update the website documentation..."
 You should install it and manually run:"
   $ cd {}"
   $ make websitedoc"

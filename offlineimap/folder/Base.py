@@ -134,7 +134,7 @@ class BaseFolder:
         return self.name
 
     def __str__(self):
-        # FIMXE: remove calls of this. We have getname().
+        # FIXME: remove calls of this. We have getname().
         return self.name
 
     def __unicode__(self):
@@ -272,7 +272,7 @@ class BaseFolder:
         concurrent threads.
 
         :returns: Boolean indicating the match. Returns True in case it
-            implicitely saved the UIDVALIDITY."""
+            implicitly saved the UIDVALIDITY."""
 
         if self.get_saveduidvalidity() is not None:
             return self.get_saveduidvalidity() == self.get_uidvalidity()
@@ -350,7 +350,7 @@ class BaseFolder:
         return False
 
     def dropmessagelistcache(self):
-        """Empty everythings we know about messages."""
+        """Empty everything we know about messages."""
 
         self.messagelist = {}
 
@@ -697,7 +697,7 @@ class BaseFolder:
         return
 
     def getmessageheader(self, msg, headername):
-        """Return the value of an undefined occurence of the given header.
+        """Return the value of an undefined occurrence of the given header.
 
         Header name is case-insensitive.
 
@@ -1028,7 +1028,7 @@ class BaseFolder:
 
         if len(deletelist):
             # Delete in statusfolder first to play safe. In case of abort, we
-            # won't lose message, we will just unneccessarily retransmit some.
+            # won't lose message, we will just unnecessarily retransmit some.
             # Delete messages from statusfolder that were either deleted by the
             # user, or not being tracked (e.g. because of maxage).
             if not self.repository.account.dryrun:

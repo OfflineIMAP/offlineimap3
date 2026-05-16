@@ -248,7 +248,7 @@ def __split_quoted(s):
         next_q = rest.find(q)
         if next_q == -1:
             raise ValueError("can't find ending quote '%s' in '%s'" % (q, s))
-        # If quote is preceeded by even number of backslashes,
+        # If quote is preceded by even number of backslashes,
         # then it is the ending quote, otherwise the quote
         # character is escaped by backslash, so we should
         # continue our search.
