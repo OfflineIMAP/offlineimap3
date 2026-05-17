@@ -545,7 +545,6 @@ class IMAPServer:
         # Authentication routines, hash keyed by method name
         # with value that is a tuple with
         # - authentication function,
-        # - tryTLS flag,
         # - check IMAP capability flag.
         auth_methods = {
             "GSSAPI": (self.__authn_gssapi, True),
