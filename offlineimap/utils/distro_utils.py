@@ -90,9 +90,9 @@ def get_os_sslcertfile_searchpath():
             location += [cafile_hardcoded]
     except AttributeError:
         pass
-    finally:
-        if len(location) == 0:
-            return None
+
+    if len(location) == 0:
+        return None
 
     return location
 
