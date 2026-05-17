@@ -449,10 +449,6 @@ def utf7m_search_function(name):
 codecs.register(utf7m_search_function)
 
 
-def encode_mailbox_name(mbox_name):
-    return foldername_to_imapname(utf8_IMAP(mbox_name))
-
-
 def foldername_to_imapname(folder_name):
     """
     This function returns the folder_name ready to send to the
