@@ -373,7 +373,6 @@ class IMAPServer:
     def __start_tls(self, imapobj):
         """Upgrade connection to TLS if STARTTLS is configured.
 
-        - Uses pre-TLS capabilities only to decide whether to perform STARTTLS.
         - After STARTTLS, forces a CAPABILITY command and replaces internal
           capabilities with the post-TLS response.
         - If no reliable post-TLS CAPABILITY is available:
