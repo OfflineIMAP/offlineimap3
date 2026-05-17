@@ -608,10 +608,16 @@ class IMAPRepository(BaseRepository):
         # 3. Read password from file specified in Repository 'remotepassfile'.
         passfile = self.getconf('remotepassfile', None)
         if passfile is not None:
-            file_desc = open(os.path.expanduser(passfile), 'r',
-                             encoding='utf-8')
-            password = file_desc.readline().strip()
-            file_desc.close()
+            passfile = os.path.expanduser(passfile)
+            try:
+                with open(passfile, 'r', encoding='utf-8') as file_desc:
+                    password = file_desc.readline().strip()
+            except (IOError, OSError, UnicodeError) as e:
+                raise OfflineImapError(
+                    "Unable to read remotepassfile '{}' for repository '{}': {}"
+                    .format(passfile, self.name, e),
+                    OfflineImapError.ERROR.FOLDER,
+                )
 
             # We need a str password
             if isinstance(password, bytes):
