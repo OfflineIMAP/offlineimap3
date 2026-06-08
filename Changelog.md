@@ -15,6 +15,55 @@ Note to mainainers:
 * The following excerpt is only usefull when rendered in the website.
 {:toc}
 
+### OfflineIMAP v8.0.3 (2026-06-08)
+
+**Notes**
+
+Rodolfo García Peñas (kix): To my father, with love. Rest in peace, Dad.
+
+This release focuses on security hardening, deadlock prevention, and robustness improvements. A TLS-stripping attack vector when using STARTTLS has been closed, a deadlock in connection teardown has been fixed, and several crash and encoding edge cases have been resolved.
+
+#### Security
+
+- **Fix TLS-stripping attack on STARTTLS**: When `starttls = yes`, a MITM attacker could remove the `STARTTLS` capability from the server greeting, causing offlineimap to silently skip TLS negotiation and send credentials in plaintext. The connection now aborts if STARTTLS is expected but not offered. (Fixes #222)
+
+- **Fallback for non-standard STARTTLS capability handling**: Some servers do not re-advertise capabilities after the TLS handshake in the expected way. A configurable `allow_nonstandard_capabilities` option has been added to tolerate this without compromising security. (Fixes #242)
+
+#### Bug Fixes
+
+- **Prevent deadlock in `IMAPServer.close()`**: Calling `close()` while `maxsyncaccounts` or `maxconnections` > 1 could deadlock. The semaphore reset now happens outside the `connectionlock`. (Fixes #241)
+
+- **Retry connection on dead socket during authentication**: When an auth method fails due to a dead socket, the connection is re-established and the remaining auth methods are retried instead of failing immediately.
+
+- **Fix `UnicodeEncodeError` on emails with malformed bytes**: Message bodies with bytes that cannot be encoded in the local charset are now handled gracefully. (Fixes #239)
+
+- **Use correct IMAP folder name in `imapobj.select`**: The encoded mailbox name is now passed correctly, fixing sync failures with non-ASCII folder names.
+
+- **Reevaluate `oauth2_access_token_eval` on every connection**: The OAuth2 access token getter is now called on each `acquireconnection()` call, ensuring expired tokens are refreshed. (Fixes #244)
+
+- **Fix `Blinkenlights` UI crash**: The `isusable()` method had a wrong signature (`cls` instead of `self`) that caused an `AttributeError` at startup. The ncurses availability check has also been simplified.
+
+- **Handle exceptions from the IMAP `ID` command**: Servers that do not support the `ID` extension or return an error no longer crash the sync.
+
+- **Handle errors reading `remotepassfile` gracefully**: A missing or unreadable password file now produces a clear error instead of a traceback.
+
+#### Changes
+
+- **Make folder name encoding conditional on `utf8foldernames`**: IMAP folder name encoding via `encode_mailbox_name` is now only applied when `utf8foldernames = yes`, preventing double-encoding for servers that do not require it.
+
+- **Replace deprecated `platform.linux_distribution`** with the `distro` library in OS SSL certificate path detection.
+
+- **GitHub Actions workflow for PyPI publishing**: Automated release publishing to PyPI on tagged commits.
+
+#### Authors
+
+- Rodolfo García Peñas (kix) (30)
+- Noa Torstensvik (1)
+- Michael Hohmuth (1)
+- Derek Schrock (1)
+- Andreas Schacker (1)
+
+
 ### OfflineIMAP v8.0.2 (2026-04-11)
 
 **Notes**

@@ -38,6 +38,13 @@ class IMAPRepository(BaseRepository):
         self.idlefolders = None
         BaseRepository.__init__(self, reposname, account)
         # self.ui is being set by the BaseRepository
+
+        # Allow tolerance for non-standard IMAP servers that do not provide
+        # reliable CAPABILITY after STARTTLS. Default is strict (False).
+        # If set to True, heuristics using pre-TLS capabilities are applied
+        # as a fallback.
+        self.allow_nonstandard_capabilities = self.getconfboolean(
+            'allow_nonstandard_capabilities', False)
         self._host = None
         # Must be set before calling imapserver.IMAPServer(self)
         self.oauth2_request_url = None
@@ -322,7 +329,7 @@ class IMAPRepository(BaseRepository):
     def getsslcacertfile(self):
         """Determines CA bundle.
 
-        Returns path to the CA bundle.  It is either explicitely specified
+        Returns path to the CA bundle.  It is either explicitly specified
         or requested via "OS-DEFAULT" value (and we will search known
         locations for the current OS and distribution).
 
@@ -333,7 +340,7 @@ class IMAPRepository(BaseRepository):
         It is also an error to specify non-existent file via configuration:
         it will error out later, but, perhaps, with less verbose explanation,
         so we will also throw an exception.  It is consistent with
-        the above behaviour, so any explicitely-requested configuration
+        the above behaviour, so any explicitly-requested configuration
         that doesn't result in an existing file will give an exception.
         """
         xforms = [os.path.expanduser, os.path.expandvars, os.path.abspath]
@@ -441,22 +448,27 @@ class IMAPRepository(BaseRepository):
                 refresh_token = refresh_token.strip("\n")
         return refresh_token
 
-    def getoauth2_access_token(self):
+    def getoauth2_access_token_getter(self):
         """
-        Get the OAUTH2 access token from the configuration (oauth2_access_token)
+        Get a function evaluating the OAUTH2 access token from the configuration (oauth2_access_token_getter)
         If the access token is not found, then returns None.
+        If evaluating the returned functions failed, it will return None.
 
-        Returns: OAUTH2 access token (oauth2_access_token)
+        Returns: a function returning OAUTH2 access token (oauth2_access_token_getter)
 
         """
         access_token = self.getconf('oauth2_access_token', None)
-        if access_token is None:
-            access_token = self.localeval.eval(
-                self.getconf('oauth2_access_token_eval', "None")
-            )
+        if access_token is not None:
+            return lambda:access_token
+        access_token_eval = self.getconf('oauth2_access_token_eval', None)
+        if access_token_eval is None:
+            return None
+        def access_token_getter():
+            access_token = self.localeval.eval(access_token_eval)
             if access_token is not None:
                 access_token = access_token.strip("\n")
-        return access_token
+            return access_token
+        return access_token_getter
 
     def getoauth2_client_id(self):
         """
@@ -608,10 +620,16 @@ class IMAPRepository(BaseRepository):
         # 3. Read password from file specified in Repository 'remotepassfile'.
         passfile = self.getconf('remotepassfile', None)
         if passfile is not None:
-            file_desc = open(os.path.expanduser(passfile), 'r',
-                             encoding='utf-8')
-            password = file_desc.readline().strip()
-            file_desc.close()
+            passfile = os.path.expanduser(passfile)
+            try:
+                with open(passfile, 'r', encoding='utf-8') as file_desc:
+                    password = file_desc.readline().strip()
+            except (IOError, OSError, UnicodeError) as e:
+                raise OfflineImapError(
+                    "Unable to read remotepassfile '{}' for repository '{}': {}"
+                    .format(passfile, self.name, e),
+                    OfflineImapError.ERROR.FOLDER,
+                )
 
             # We need a str password
             if isinstance(password, bytes):
@@ -699,7 +717,7 @@ class IMAPRepository(BaseRepository):
         try:
             imapobj = self.imapserver.acquireconnection()
         except OfflineImapError as e:
-            err_msg = f"Error adquiring connection for repository {self.name}: {str(e)}"
+            err_msg = f"Error acquiring connection for repository {self.name}: {str(e)}"
             raise OfflineImapError(err_msg, OfflineImapError.ERROR.REPO, exc_info()[2])
 
         # check whether to list all folders, or subscribed only
@@ -740,7 +758,10 @@ class IMAPRepository(BaseRepository):
             try:
                 for foldername in self.folderincludes:
                     try:
-                        imapobj.select(imaputil.utf8_IMAP(imaputil.foldername_to_imapname(foldername)),
+                        imap_name = foldername
+                        if self.account.utf_8_support:
+                            imap_name = imaputil.utf8_IMAP(foldername)
+                        imapobj.select(imaputil.foldername_to_imapname(imap_name),
                                        readonly=True)
                     except OfflineImapError as exc:
                         # couldn't select this folderinclude, so ignore folder.
@@ -804,11 +825,9 @@ class IMAPRepository(BaseRepository):
     def deletefolder(self, foldername):
         """Delete a folder on the IMAP server."""
 
-        # Folder names with spaces requires quotes
-        foldername = imaputil.foldername_to_imapname(foldername)
-
         if self.account.utf_8_support:
             foldername = imaputil.utf8_IMAP(foldername)
+        foldername = imaputil.foldername_to_imapname(foldername)
         imapobj = self.imapserver.acquireconnection()
         try:
             result = imapobj.delete(foldername)
@@ -869,11 +888,9 @@ class IMAPRepository(BaseRepository):
             return
         imapobj = self.imapserver.acquireconnection()
         try:
-            # Folder names with spaces requires quotes
-            foldername = imaputil.foldername_to_imapname(foldername)
-
             if self.account.utf_8_support:
                 foldername = imaputil.utf8_IMAP(foldername)
+            foldername = imaputil.foldername_to_imapname(foldername)
 
             result = imapobj.create(foldername)
             if result[0] != 'OK':

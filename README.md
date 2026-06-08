@@ -69,7 +69,7 @@ If you are running Linux/BSD, you can install offlineimap with:
 -  Fedora `dnf install offlineimap`
 -  FreeBSD `pkg search offlineimap3`, and install the python versioned package, `pkg install py311-offlineimap3`
 -  Arch Linux: [`pacman -S offlineimap`](https://archlinux.org/packages/extra/any/offlineimap/), or through AUR package [offlineimap3-git](https://aur.archlinux.org/packages/offlineimap3-git/)
--  Docker image: `offlineimap/offlineimap:latest` 
+-  Docker image: `offlineimap/offlineimap:latest`
  (note: image not published yet, just an example)
 
 ## Feedbacks and contributions
@@ -100,12 +100,15 @@ Bugs, issues and contributions can be requested to both the mailing list or the
 
 ## Requirements & dependencies
 
-* Python v3+
+* Python v3.6+
 * rfc6555 (required)
-* imaplib2 >= 3.5
-* keyring
+* imaplib2 >= 3.5 (required)
+* keyring (optional), for storing passwords in a secure way
 * gssapi (optional), for Kerberos authentication
+* pysocks (optional), for proxy support
 * portalocker (optional), if you need to run offlineimap in Cygwin for Windows
+* certify (optional), for Internet SSL certificate validation
+* urllib3 (optional), for Internet SSL certificate validation
 
 ## Documentation
 

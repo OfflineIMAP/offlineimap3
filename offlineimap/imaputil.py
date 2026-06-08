@@ -248,7 +248,7 @@ def __split_quoted(s):
         next_q = rest.find(q)
         if next_q == -1:
             raise ValueError("can't find ending quote '%s' in '%s'" % (q, s))
-        # If quote is preceeded by even number of backslashes,
+        # If quote is preceded by even number of backslashes,
         # then it is the ending quote, otherwise the quote
         # character is escaped by backslash, so we should
         # continue our search.
@@ -461,7 +461,9 @@ def foldername_to_imapname(folder_name):
 
     """
     # If name includes some of these characters, quote it
-    atom_specials = [' ', '/', '(', ')', '{', '}', '"']
+    atom_specials = [' ', '/', '(', ')', '{', '}', '%', '*', '"', '\\', ']']
+    atom_specials.extend([chr(x) for x in range(32)])
+    atom_specials.append(chr(127))  # DEL, CTL per RFC 2234
 
     if any((c in atom_specials) for c in folder_name):
         folder_name = quote(folder_name)

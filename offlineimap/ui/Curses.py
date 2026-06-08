@@ -372,27 +372,27 @@ class Blinkenlights(UIBase, CursesUtil):
         # add the handlers to the logger
         self.logger.addHandler(ch)
         # the handler is not usable yet. We still need all the
-        # intialization stuff currently done in init_banner. Move here?
+        # initialization stuff currently done in init_banner. Move here?
         return ch
 
-    def isusable(s):
+    def isusable(self):
         """Returns true if the backend is usable ie Curses works."""
 
         # Not a terminal?  Can't use curses.
-        if not sys.stdout.isatty() and sys.stdin.isatty():
+        if not sys.stdout.isatty():
             return False
+
         # No TERM specified?  Can't use curses.
         if not os.environ.get('TERM', None):
             return False
-        # Test if ncurses actually starts up fine. Only do so for
-        # python>=2.6.6 as calling initscr() twice messing things up.
-        # see http://bugs.python.org/issue7567 in python 2.6 to 2.6.5
-        if sys.version_info[0:3] < (2, 6) or sys.version_info[0:3] >= (2, 6, 6):
-            try:
-                curses.initscr()
-                curses.endwin()
-            except:
+
+        # Test if ncurses actually starts up fine.
+        try:
+            curses.initscr()
+            curses.endwin()
+        except Exception:
                 return False
+
         return True
 
     def init_banner(self):
@@ -424,7 +424,7 @@ class Blinkenlights(UIBase, CursesUtil):
         # set log handlers ui to ourself
         self._log_con_handler.ui = self
         self.setupwindows()
-        # Settup keyboard handler
+        # Set up keyboard handler
         self.inputhandler = InputHandler(self)
         self.inputhandler.set_char_hdlr(self.on_keypressed)
 

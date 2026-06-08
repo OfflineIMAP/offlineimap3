@@ -5,6 +5,7 @@ Module that supports distribution-specific functions.
 """
 import platform
 import os
+import distro
 
 # For the former we will just return the value, for an iterable
 # we will walk through the values and will return the first
@@ -30,9 +31,11 @@ __DEF_OS_LOCATIONS = {
         # Fedora 44 and after
         '/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem'
     ],
-    'linux-redhat': ['/etc/pki/tls/certs/ca-bundle.crt'],
-    'linux-suse': ['/etc/ssl/ca-bundle.pem'],
-    'linux-opensuse': ['/etc/ssl/ca-bundle.pem'],
+    'linux-rhel': ['/etc/pki/tls/certs/ca-bundle.crt'],
+    'linux-sles': ['/etc/ssl/ca-bundle.pem'],
+    'linux-sled': ['/etc/ssl/ca-bundle.pem'],
+    'linux-opensuse-leap': ['/etc/ssl/ca-bundle.pem'],
+    'linux-opensuse-tumbleweed': ['/etc/ssl/ca-bundle.pem'],
     'linux-arch': ['/etc/ssl/certs/ca-certificates.crt'],
 }
 
@@ -42,7 +45,7 @@ def get_os_name():
     Finds out OS name.  For non-Linux system it will be just a plain
     OS name (like FreeBSD), for Linux it will be "linux-<distro>",
     where <distro> is the name of the distribution, as returned by
-    the first component of platform.linux_distribution.
+    distro.id().
 
     Return value will be all-lowercase to avoid confusion about
     proper name capitalisation.
@@ -51,15 +54,9 @@ def get_os_name():
     os_name = platform.system().lower()
 
     if os_name.startswith('linux'):
-        # linux_distribution deprecated in Python 3.7
-        try:
-            from platform import linux_distribution
-        except ImportError:
-            from distro import linux_distribution
-
-        distro_name = linux_distribution()[0]
+        distro_name = distro.id()
         if distro_name:
-            os_name = os_name + "-%s" % distro_name.split()[0].lower()
+            os_name = os_name + "-%s" % distro_name
         if os.path.exists('/etc/arch-release'):
             os_name = "linux-arch"
 
@@ -93,9 +90,9 @@ def get_os_sslcertfile_searchpath():
             location += [cafile_hardcoded]
     except AttributeError:
         pass
-    finally:
-        if len(location) == 0:
-            return None
+
+    if len(location) == 0:
+        return None
 
     return location
 

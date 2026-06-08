@@ -144,7 +144,9 @@ class IMAPServer:
                             "the 'ssl_version' must be set explicitly.")
 
         self.oauth2_refresh_token = repos.getoauth2_refresh_token()
-        self.oauth2_access_token = repos.getoauth2_access_token()
+        self.oauth2_access_token_getter = repos.getoauth2_access_token_getter()
+        # is used if the above getter is None or doesn't work
+        self.oauth2_access_token = None
         self.oauth2_client_id = repos.getoauth2_client_id()
         self.oauth2_client_secret = repos.getoauth2_client_secret()
         self.oauth2_request_url = repos.getoauth2_request_url()
@@ -158,6 +160,7 @@ class IMAPServer:
         self.lastowner = {}
         self.semaphore = BoundedSemaphore(self.maxconnections)
         self.connectionlock = Lock()
+        self.closing = False
         self.reference = repos.getreference()
         self.idlefolders = repos.getidlefolders()
         self.gss_vc = None
@@ -261,59 +264,65 @@ class IMAPServer:
 
     def __xoauth2handler(self, response):
         now = datetime.datetime.now()
-        if self.oauth2_access_token_expires_at \
-                and self.oauth2_access_token_expires_at < now:
-            self.oauth2_access_token = None
-            self.ui.debug('imap', 'xoauth2handler: oauth2_access_token expired')
+        access_token_to_use = None
+        if self.oauth2_access_token_getter is not None:
+            access_token_to_use = self.oauth2_access_token_getter()
 
-        if self.oauth2_access_token is None:
-            if self.oauth2_request_url is None:
-                raise OfflineImapError("No remote oauth2_request_url for "
-                                       "repository '%s' specified." %
-                                       self, OfflineImapError.ERROR.REPO)
+        if access_token_to_use is None:
+            if self.oauth2_access_token_expires_at \
+                    and self.oauth2_access_token_expires_at < now:
+                self.oauth2_access_token = None
+                self.ui.debug('imap', 'xoauth2handler: oauth2_access_token expired')
 
-            # Generate new access token.
-            params = {}
-            params['client_id'] = self.oauth2_client_id
-            params['client_secret'] = self.oauth2_client_secret
-            params['refresh_token'] = self.oauth2_refresh_token
-            params['grant_type'] = 'refresh_token'
+            if self.oauth2_access_token is None:
+                if self.oauth2_request_url is None:
+                    raise OfflineImapError("No remote oauth2_request_url for "
+                                           "repository '%s' specified." %
+                                           self, OfflineImapError.ERROR.REPO)
 
-            self.ui.debug('imap', 'xoauth2handler: url "%s"' %
-                          self.oauth2_request_url)
-            self.ui.debug('imap', 'xoauth2handler: params "%s"' % params)
+                # Generate new access token.
+                params = {}
+                params['client_id'] = self.oauth2_client_id
+                params['client_secret'] = self.oauth2_client_secret
+                params['refresh_token'] = self.oauth2_refresh_token
+                params['grant_type'] = 'refresh_token'
 
-            original_socket = socket.socket
-            socket.socket = self.authproxied_socket
-            try:
-                response = urllib.request.urlopen(
-                    self.oauth2_request_url, urllib.parse.urlencode(params).encode('utf-8')).read()
-            except Exception as e:
+                self.ui.debug('imap', 'xoauth2handler: url "%s"' %
+                              self.oauth2_request_url)
+                self.ui.debug('imap', 'xoauth2handler: params "%s"' % params)
+
+                original_socket = socket.socket
+                socket.socket = self.authproxied_socket
                 try:
-                    msg = "%s (configuration is: %s)" % (e, str(params))
-                except Exception as eparams:
-                    msg = "%s [cannot display configuration: %s]" % (e, eparams)
+                    response = urllib.request.urlopen(
+                        self.oauth2_request_url, urllib.parse.urlencode(params).encode('utf-8')).read()
+                except Exception as e:
+                    try:
+                        msg = "%s (configuration is: %s)" % (e, str(params))
+                    except Exception as eparams:
+                        msg = "%s [cannot display configuration: %s]" % (e, eparams)
 
-                self.ui.error(e, exc_info()[2], msg)
-                raise
-            finally:
-                socket.socket = original_socket
+                    self.ui.error(e, exc_info()[2], msg)
+                    raise
+                finally:
+                    socket.socket = original_socket
 
-            resp = json.loads(response)
-            self.ui.debug('imap', 'xoauth2handler: response "%s"' % resp)
-            if 'error' in resp:
-                raise OfflineImapError("xoauth2handler got: %s" % resp,
-                                       OfflineImapError.ERROR.REPO)
-            self.oauth2_access_token = resp['access_token']
-            if 'expires_in' in resp:
-                self.oauth2_access_token_expires_at = now + datetime.timedelta(
-                    seconds=resp['expires_in'] / 2
-                )
+                resp = json.loads(response)
+                self.ui.debug('imap', 'xoauth2handler: response "%s"' % resp)
+                if 'error' in resp:
+                    raise OfflineImapError("xoauth2handler got: %s" % resp,
+                                           OfflineImapError.ERROR.REPO)
+                self.oauth2_access_token = resp['access_token']
+                if 'expires_in' in resp:
+                    self.oauth2_access_token_expires_at = now + datetime.timedelta(
+                        seconds=resp['expires_in'] / 2
+                    )
+                access_token_to_use = self.oauth2_access_token
 
         self.ui.debug('imap', 'xoauth2handler: access_token "%s expires %s"' % (
-            self.oauth2_access_token, self.oauth2_access_token_expires_at))
+            access_token_to_use, self.oauth2_access_token_expires_at))
         auth_string = 'user=%s\1auth=Bearer %s\1\1' % (
-            self.username, self.oauth2_access_token)
+            self.username, access_token_to_use)
         # auth_string = base64.b64encode(auth_string)
         self.ui.debug('imap', 'xoauth2handler: returning "%s"' % auth_string)
         return auth_string
@@ -362,26 +371,104 @@ class IMAPServer:
             return None
 
     def __start_tls(self, imapobj):
-        if 'STARTTLS' in imapobj.capabilities and not self.usessl:
-            self.ui.debug('imap', 'Using STARTTLS connection')
-            # imaplib2.starttls() unconditionally calls _get_capabilities() right
-            # after the TLS handshake (before setting _tls_established=True).
-            # Servers like Protonmail Bridge do not respond to CAPABILITY at
-            # that stage, causing a 60-second hang.  We bypass it by temporarily
-            # substituting a no-op; imaplib2 still sets _tls_established=True
-            # normally, and acquireconnection() already guards its own
-            # post-login CAPABILITY refresh against that flag (see below).
-            _orig_get_cap = imapobj._get_capabilities
-            imapobj._get_capabilities = lambda: None
+        """Upgrade connection to TLS if STARTTLS is configured.
+
+        - After STARTTLS, forces a CAPABILITY command and replaces internal
+          capabilities with the post-TLS response.
+        - If no reliable post-TLS CAPABILITY is available:
+          - In strict mode (allow_nonstandard_capabilities = no): abort.
+          - In tolerant mode (allow_nonstandard_capabilities = yes):
+            reuse pre-TLS capabilities, removing LOGINDISABLED.
+        """
+
+        # If the repository does not want STARTTLS, do nothing.
+        if not self.starttls or self.usessl:
+            return
+
+        # Pre-TLS capabilities (from initial banner / CAPABILITY).
+        caps_pre = set(getattr(imapobj, '_offlineimap_capabilities_pre_tls',
+                               getattr(imapobj, 'capabilities', [])))
+
+        # If the server does not advertise STARTTLS, warn but attempt anyway.
+        # Per RFC 2595 section 9, a man-in-the-middle attacker can strip
+        # STARTTLS from the capability list to force a cleartext connection.
+        # Silently skipping STARTTLS when the user configured it would make
+        # offlineimap vulnerable to this attack.  We try regardless and let
+        # the server reject the command if it genuinely does not support it.
+        if 'STARTTLS' not in caps_pre:
+            self.ui.warn(
+                "Server '%s' did not advertise STARTTLS in its capabilities, "
+                "but starttls is configured.  Attempting STARTTLS anyway to "
+                "guard against capability-stripping attacks (RFC 2595 §9)."
+                % self.hostname
+            )
+
+        # Execute STARTTLS.
+        self.ui.debug('imap', 'Using STARTTLS connection')
+
+        # Disable _get_capabilities() during starttls() to prevent imaplib2
+        # from issuing CAPABILITY before we can do it ourselves.
+        _orig_get_cap = imapobj._get_capabilities
+        imapobj._get_capabilities = lambda: None
+        try:
             try:
                 imapobj.starttls()
             except imapobj.error as e:
                 err = "Failed to start TLS connection: %s" % str(e)
                 raise OfflineImapError(err, OfflineImapError.ERROR.REPO,
                                        exc_info()[2])
-            finally:
-                # Always restore the original method, even on success.
-                imapobj._get_capabilities = _orig_get_cap
+        finally:
+            # Always restore the original method, even on error.
+            imapobj._get_capabilities = _orig_get_cap
+
+        # At this point, the socket is encrypted. Now we must refresh CAPABILITY.
+        caps_post = None
+        try:
+            typ, data = imapobj.capability()
+            if typ == 'OK' and data:
+                # data is a list of bytes, e.g. [b'IMAP4rev1 IDLE AUTH=PLAIN']
+                line = data[0]
+                if isinstance(line, bytes):
+                    line = line.decode('ascii', 'ignore')
+                caps_post = set(line.upper().split())
+        except Exception:
+            caps_post = None
+
+        if caps_post is not None:
+            # Standard path: completely replace capabilities
+            imapobj.capabilities = caps_post
+            imapobj._offlineimap_capabilities_post_tls = caps_post
+            return
+
+        # If we reach here, we do not have reliable post-TLS capabilities.
+        # Decide based on repository configuration.
+        allow_nonstandard = getattr(self.repos,
+                                    'allow_nonstandard_capabilities', False)
+
+        if not allow_nonstandard:
+            # Strict mode: abort with clear error.
+            raise OfflineImapError(
+                "Server did not provide valid CAPABILITY after STARTTLS; "
+                "set 'allow_nonstandard_capabilities = yes' in repository "
+                "configuration to enable a non-standard fallback.",
+                OfflineImapError.ERROR.REPO
+            )
+
+        # Tolerant mode: best-effort using caps_pre.
+        caps_fallback = set(caps_pre)
+        if 'LOGINDISABLED' in caps_fallback:
+            # We assume that after STARTTLS, LOGINDISABLED no longer applies,
+            # so we remove it to allow LOGIN/AUTH configured by the user.
+            caps_fallback.remove('LOGINDISABLED')
+
+        imapobj.capabilities = caps_fallback
+        imapobj._offlineimap_capabilities_post_tls = caps_fallback
+
+        self.ui.warn(
+            "Server did not provide CAPABILITY after STARTTLS; "
+            "falling back to pre-TLS capabilities without LOGINDISABLED "
+            "due to allow_nonstandard_capabilities = yes."
+        )
 
     # All __authn_* procedures are helpers that do authentication.
     # They are class methods that take one parameter, IMAP object.
@@ -424,7 +511,7 @@ class IMAPServer:
 
     def __authn_xoauth2(self, imapobj):
         if self.oauth2_refresh_token is None \
-                and self.oauth2_access_token is None:
+                and self.oauth2_access_token_getter is None:
             return False
 
         imapobj.authenticate('XOAUTH2', self.__xoauth2handler)
@@ -455,20 +542,19 @@ class IMAPServer:
         # Stack stores pairs of (method name, exception)
         exc_stack = []
         tried_to_authn = False
-        tried_tls = False
         # Authentication routines, hash keyed by method name
         # with value that is a tuple with
         # - authentication function,
-        # - tryTLS flag,
         # - check IMAP capability flag.
         auth_methods = {
-            "GSSAPI": (self.__authn_gssapi, False, True),
-            "XOAUTH2": (self.__authn_xoauth2, True, True),
-            "CRAM-MD5": (self.__authn_cram_md5, True, True),
-            "PLAIN": (self.__authn_plain, True, True),
-            "LOGIN": (self.__authn_login, True, False),
+            "GSSAPI": (self.__authn_gssapi, True),
+            "XOAUTH2": (self.__authn_xoauth2, True),
+            "CRAM-MD5": (self.__authn_cram_md5, True),
+            "PLAIN": (self.__authn_plain, True),
+            "LOGIN": (self.__authn_login, False),
         }
 
+        did_starttls = False
         # GSSAPI is tried first by default: we will probably go TLS after it and
         # GSSAPI mustn't be tunneled over TLS.
         for m in self.authmechs:
@@ -476,12 +562,12 @@ class IMAPServer:
                 raise Exception("Bad authentication method %s, "
                                 "please, file OfflineIMAP bug" % m)
 
-            func, tryTLS, check_cap = auth_methods[m]
+            func, check_cap = auth_methods[m]
 
             # TLS must be initiated before checking capabilities:
             # they could have been changed after STARTTLS.
-            if tryTLS and self.starttls and not tried_tls:
-                tried_tls = True
+            if self.starttls and not did_starttls:
+                did_starttls = True
                 self.__start_tls(imapobj)
 
             if check_cap:
@@ -569,6 +655,11 @@ class IMAPServer:
 
         self.semaphore.acquire()
         self.connectionlock.acquire()
+        if self.closing:
+            self.connectionlock.release()
+            self.semaphore.release()
+            raise OfflineImapError("Server is closing",
+                                   OfflineImapError.ERROR.REPO)
         curThread = current_thread()
         imapobj = None
 
@@ -592,6 +683,15 @@ class IMAPServer:
             self.assignedconnections.append(imapobj)
             self.lastowner[imapobj] = curThread.ident
             self.connectionlock.release()
+
+            # Store the pre-TLS capabilities (from banner and initial CAPABILITY).
+            # This will be used only to decide STARTTLS and, in case of non-standard
+            # fallback, to reconstruct an approximate post-TLS capability list.
+            try:
+                caps_pre = set(getattr(imapobj, 'capabilities', []))
+            except Exception:
+                caps_pre = set()
+            imapobj._offlineimap_capabilities_pre_tls = caps_pre
 
             # Verify that the connection is still alive before returning it
             # to the caller.  If not, clean up and recursively call
@@ -618,7 +718,8 @@ class IMAPServer:
         # and release locks / threads so that the next attempt can try...
         success = False
         try:
-            while success is not True:
+            retries = 0
+            while success is not True and retries < 3:
                 # Generate a new connection.
                 if self.tunnel:
                     self.ui.connecting(
@@ -664,7 +765,10 @@ class IMAPServer:
                 # If 'ID' extension is used by the server, we should use it
                 if 'ID' in imapobj.capabilities:
                     l_str = '("name" "OfflineIMAP" "version" "{}")'.format(offlineimap.__version__)
-                    imapobj.id(l_str)
+                    try:
+                        imapobj.id(l_str)
+                    except Exception as e:
+                        self.ui.warn("IMAP ID command failed: %s" % str(e))
 
                 if not self.preauth_tunnel:
                     try:
@@ -672,6 +776,19 @@ class IMAPServer:
                         self.goodpassword = self.password
                         success = True
                     except OfflineImapError as e:
+                        if not _is_socket_alive(imapobj):
+                            retries += 1
+                            if retries >= 3:
+                                self.ui.warn("Authentication failed after 3 attempts due to dead sockets.")
+                                raise
+                            self.ui.warn("Connection lost during authentication. "
+                                         "Retrying from scratch (%d/3)..." % retries)
+                            if imapobj is not None:
+                                try:
+                                    imapobj.shutdown()
+                                except:
+                                    pass
+                            continue
                         self.passworderror = str(e)
                         raise
 
@@ -793,14 +910,17 @@ class IMAPServer:
         self.semaphore.release()
 
     def close(self):
+        # First make sure no new connections can be established.
+        self.connectionlock.acquire()
+        self.closing = True
+        self.connectionlock.release()
+
         # Make sure I own all the semaphores.  Let the threads finish
         # their stuff.  This is a blocking method.
+        # Make sure to not call this under connectionlock to avoid deadlocks.
+        threadutil.semaphorereset(self.semaphore, self.maxconnections)
+
         with self.connectionlock:
-            # first, wait till all connections had been released.
-            # TODO: won't work IMHO, as releaseconnection() also
-            # requires the connectionlock, leading to a potential
-            # deadlock! Audit & check!
-            threadutil.semaphorereset(self.semaphore, self.maxconnections)
             for imapobj in self.assignedconnections + self.availableconnections:
                 imapobj.logout()
             self.assignedconnections = []
@@ -809,6 +929,7 @@ class IMAPServer:
             # reset GSSAPI state
             self.gss_vc = None
             self.gssapi = False
+            self.closing = False
 
     def keepalive(self, timeout, event):
         """Sends a NOOP to each connection recorded.
@@ -972,7 +1093,7 @@ class IdleThread:
             while not success:
                 imapobj = self.parent.acquireconnection()
                 try:
-                    imapobj.select(self.folder)
+                    imapobj.select(imaputil.foldername_to_imapname(self.folder))
                 except OfflineImapError as e:
                     if e.severity == OfflineImapError.ERROR.FOLDER_RETRY:
                         # Connection closed, release connection and retry.

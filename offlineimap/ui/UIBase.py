@@ -66,7 +66,7 @@ class UIBase:
         # linking active accounts with the time.time() when sync started
         self.logfile = None
         self.exc_queue = Queue()
-        # saves all occuring exceptions, so we can output them at the end
+        # saves all occurring exceptions, so we can output them at the end
         self.uidval_problem = False
         # at least one folder skipped due to UID validity problem
         # create logger with 'OfflineImap' app

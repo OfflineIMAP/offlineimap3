@@ -20,7 +20,7 @@ import importlib.util
 
 
 class LocalEval:
-    """Here is a powerfull but very dangerous option, of course."""
+    """Here is a powerful but very dangerous option, of course."""
 
     def __init__(self, path=None):
         self.namespace = {}

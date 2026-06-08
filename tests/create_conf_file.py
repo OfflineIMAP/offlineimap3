@@ -6,7 +6,7 @@
 # Input: Seven shell environment variables.
 # Output: it writes the config settings to "filename" (./oli-travis.conf) and "additionalfilename" (./test/credentials.conf).
 # "filename" is used by normal run of ./offlineimap -c ./oli-travis.conf , "additionalfilename" is used by "pytest".
-# They are the same conf file, copie to two different locations for convenience.
+# They are the same conf file, copied to two different locations for convenience.
 
 import os
 import shutil

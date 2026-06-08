@@ -18,7 +18,7 @@ Synchronize the accounts configured in the configuration file via IMAP. Each
 account has two sides.  One of the side must be an IMAP server.  The other side
 can either be a Maildir or another IMAP server.
 
-Works with Python 2.
+Works with Python 3.
 
 
 OPTIONS
@@ -304,6 +304,24 @@ server.
 +
 *DO NOT RELY ON STARTTLS AS A SAFE CONNECTION GUARANTEEING THE AUTHENTICITY OF
 YOUR IMAP SERVER!*
+
+* allow_nonstandard_capabilities
++
+Some non-standard IMAP servers do not send a CAPABILITY response after
+completing the STARTTLS handshake, as required by RFC 2595. By default,
+OfflineIMAP aborts with an error in this situation to avoid silently
+proceeding over a potentially broken encrypted channel.
++
+Setting `allow_nonstandard_capabilities = yes` in the repository section
+enables a best-effort fallback: OfflineIMAP reuses the capabilities advertised
+before STARTTLS, removing `LOGINDISABLED`, so that authentication can continue
+over the (assumed) encrypted connection.
++
+*WARNING: only enable this option when you have verified that TLS is actually
+established correctly.* If the server is not performing STARTTLS properly,
+enabling this option could cause credentials to be transmitted in plain text.
++
+Default: `no`.
 
 
 Unix Signals
