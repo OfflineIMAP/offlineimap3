@@ -62,20 +62,6 @@ def _is_socket_alive(imapobj):
         return False
 
 
-def _check_pooled_connection(imapobj, ui):
-    """Verify that a pooled connection is still alive by sending a NOOP command.
-    Returns True if the connection is healthy and False if it is not.  Logs
-    any exceptions encountered during the NOOP command as debug messages, since
-    they are expected to occur when a connection has gone stale.
-    """
-    try:
-        typ, _ = imapobj.noop()
-        return typ == 'OK'
-    except Exception as e:
-        ui.debug('imap', 'Pooled connection health check (NOOP) failed: %s' % e)
-        return False
-
-
 class IMAPServer:
     """Initializes all variables from an IMAPRepository() instance
 
@@ -696,19 +682,12 @@ class IMAPServer:
             # Verify that the connection is still alive before returning it
             # to the caller.  If not, clean up and recursively call
             # acquireconnection() to get a new one.
-            if not _check_pooled_connection(imapobj, self.ui):
-                self.ui.debug('imap', 'Pooled connection to %s is dead, '
-                                    'creating a new one' % self.hostname)
-                # Clean up and release the slot to force a new connection
-                self.connectionlock.acquire()
-                self.assignedconnections.remove(imapobj)
-                self.connectionlock.release()
-                try:
-                    imapobj.logout()
-                except Exception:
-                    pass
-                self.semaphore.release()
-                return self.acquireconnection()  # Recursive call to get a new connection
+            try:
+                imapobj.noop()
+            except imapobj.abort:
+                self.ui.warn('Connection %s is dead, dropping' % imapobj.identifier)
+                self.releaseconnection(imapobj, True)
+                return self.acquireconnection()
 
             return imapobj
 
