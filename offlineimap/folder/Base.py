@@ -947,8 +947,6 @@ class BaseFolder:
         # We have no new mail yet.
         self.have_newmail = False
 
-        threads = []
-
         copylist = [uid for uid in self.getmessageuidlist()
                     if not statusfolder.uidexists(uid)]
         num_to_copy = len(copylist)
@@ -988,21 +986,7 @@ class BaseFolder:
                 self.ui.copyingmessage(uid, num + 1, num_to_copy, self,
                                        dstfolder)
                 # Exceptions are caught in copymessageto().
-                if self.suggeststhreads():
-                    self.waitforthread()
-                    thread = threadutil.InstanceLimitedThread(
-                        self.getinstancelimitnamespace(),
-                        target=self.copymessageto,
-                        name="Copy message from %s:%s" % (self.repository,
-                                                          self),
-                        args=(uid, dstfolder, statusfolder)
-                    )
-                    thread.start()
-                    threads.append(thread)
-                else:
-                    self.copymessageto(uid, dstfolder, statusfolder, register=0)
-            for thread in threads:
-                thread.join()  # Block until all "copy" threads are done.
+                self.copymessageto(uid, dstfolder, statusfolder, register=0)
 
         # Execute new mail hook if we have new mail.
         if self.have_newmail:
