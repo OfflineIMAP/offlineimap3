@@ -919,26 +919,6 @@ class IMAPServer:
             # re-raise all other errors
             raise
 
-    def connectionwait(self):
-        """Wait hint before spawning a copy thread.
-
-        This is intentionally a no-op.  The previous implementation acquired
-        and immediately released the semaphore as a probe, which introduced a
-        TOCTOU race: between the release here and the actual acquire inside
-        acquireconnection(), another thread could grab the slot, leading to
-        more simultaneous connections than maxconnections allows.
-
-        Thread concurrency is already correctly enforced by two mechanisms:
-         - InstanceLimitedThread (via the MSGCOPY_NAMESPACE semaphore) limits
-           how many copy threads can run in parallel.
-         - acquireconnection() acquires self.semaphore before handing out a
-           connection, which is the authoritative concurrency gate.
-
-        Removing the probe here eliminates the race without changing the
-        effective concurrency limits."""
-
-        pass
-
     def close(self):
         # First make sure no new connections can be established.
         self.connectionlock.acquire()

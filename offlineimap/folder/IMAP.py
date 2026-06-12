@@ -102,7 +102,7 @@ class IMAPFolder(BaseFolder):
 
     # Interface from BaseFolder
     def waitforthread(self):
-        self.imapserver.connectionwait()
+        pass
 
     def getmaxage(self):
         if self.config.getdefault("Account %s" %
