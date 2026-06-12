@@ -1158,8 +1158,10 @@ class IdleThread:
                     elif e.severity == OfflineImapError.ERROR.FOLDER:
                         # Just continue the process on such error for now.
                         self.ui.error(e, exc_info()[2])
+                        self.parent.releaseconnection(imapobj, True)
                     else:
                         # Stops future attempts to sync this account.
+                        self.parent.releaseconnection(imapobj, True)
                         raise
                 else:
                     success = True
