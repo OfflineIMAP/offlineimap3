@@ -636,8 +636,14 @@ class IMAPServer:
 
         if len(exc_stack):
             msg = "\n\t".join([": ".join((x[0], str(x[1]))) for x in exc_stack])
-            raise OfflineImapError("All authentication types "
+            err = OfflineImapError("All authentication types "
                                    "failed:\n\t%s" % msg, OfflineImapError.ERROR.REPO)
+            # Signal to acquireconnection() that at least one auth method was
+            # attempted and rejected by the server.  A dead socket here means
+            # the server closed the connection after rejecting credentials, not
+            # a transient network failure — retrying would not help.
+            err.auth_attempted = True
+            raise err
 
         if not tried_to_authn:
             methods = ", ".join([x[5:] for x in
@@ -816,17 +822,25 @@ class IMAPServer:
                         self.goodpassword = self.password
                         success = True
                     except OfflineImapError as e:
-                        if not _is_socket_alive(imapobj):
+                        # Retry only for transient network failures: the socket
+                        # died before any auth method was attempted.
+                        # If auth_attempted is set, the server received and
+                        # rejected our credentials — retrying with the same
+                        # credentials would not help and may trigger server-side
+                        # connection limits (e.g. Gmail "Too many simultaneous
+                        # connections" after closing the socket on PLAIN failure).
+                        if not getattr(e, 'auth_attempted', False) \
+                                and not _is_socket_alive(imapobj):
                             retries += 1
                             if retries >= 3:
                                 self.ui.warn("Authentication failed after 3 attempts due to dead sockets.")
                                 raise
-                            self.ui.warn("Connection lost during authentication. "
+                            self.ui.warn("Connection lost before authentication. "
                                          "Retrying from scratch (%d/3)..." % retries)
                             if imapobj is not None:
                                 try:
                                     imapobj.shutdown()
-                                except:
+                                except Exception:
                                     pass
                             continue
                         self.passworderror = str(e)
