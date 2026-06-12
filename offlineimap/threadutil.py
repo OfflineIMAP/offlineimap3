@@ -202,7 +202,14 @@ class InstanceLimitedThread(ExitNotifyThread):
 
         # Will block until the semaphore has free slots.
         limitedNamespaces[self.limitNamespace].acquire()
-        ExitNotifyThread.start(self)
+        try:
+            ExitNotifyThread.start(self)
+        except Exception:
+            # Thread failed to start: run() will never execute so release()
+            # would never be called. Release the slot here to avoid leaking
+            # the semaphore and deadlocking the calling thread permanently.
+            limitedNamespaces[self.limitNamespace].release()
+            raise
 
     def run(self):
         global limitedNamespaces
