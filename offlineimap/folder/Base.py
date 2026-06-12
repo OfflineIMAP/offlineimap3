@@ -176,19 +176,6 @@ class BaseFolder:
         """
         return self._dofsync
 
-    def suggeststhreads(self):
-        """Returns True if this folder suggests using threads for actions.
-
-        Only IMAP returns True. This method must honor any CLI or configuration
-        option."""
-
-        return False
-
-    def waitforthread(self):
-        """Implements method that waits for thread to be usable.
-        Should be implemented only for folders that suggest threads."""
-        raise NotImplementedError
-
     def quickchanged(self, statusfolder):
         """ Runs quick check for folder changes and returns changed
         status: True -- changed, False -- not changed.
@@ -197,12 +184,6 @@ class BaseFolder:
         """
 
         return True
-
-    def getinstancelimitnamespace(self):
-        """For threading folders, returns the instancelimitname for
-        InstanceLimitedThreads."""
-
-        raise NotImplementedError
 
     def storesmessages(self):
         """Should be true for any backend that actually saves message bodies.

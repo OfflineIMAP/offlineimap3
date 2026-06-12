@@ -87,23 +87,6 @@ class IMAPFolder(BaseFolder):
             name = imaputil.utf8_IMAP(name)
         return imaputil.foldername_to_imapname(name)
 
-    # Interface from BaseFolder
-    def suggeststhreads(self):
-        singlethreadperfolder_default = False
-        if self.idle_mode is True:
-            singlethreadperfolder_default = True
-
-        onethread = self.config.getdefaultboolean(
-            "Repository %s" % self.repository.getname(),
-            "singlethreadperfolder", singlethreadperfolder_default)
-        if onethread is True:
-            return False
-        return not globals.options.singlethreading
-
-    # Interface from BaseFolder
-    def waitforthread(self):
-        pass
-
     def getmaxage(self):
         if self.config.getdefault("Account %s" %
                                   self.accountname, "maxage", None):
@@ -111,10 +94,6 @@ class IMAPFolder(BaseFolder):
                 "maxage is not supported on IMAP-IMAP sync",
                 OfflineImapError.ERROR.REPO,
                 exc_info()[2])
-
-    # Interface from BaseFolder
-    def getinstancelimitnamespace(self):
-        return MSGCOPY_NAMESPACE + self.repository.getname()
 
     # Interface from BaseFolder
     def get_uidvalidity(self):
