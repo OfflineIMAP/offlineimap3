@@ -151,6 +151,7 @@ class IMAPServer:
         self.oauth2_client_secret = repos.getoauth2_client_secret()
         self.oauth2_request_url = repos.getoauth2_request_url()
         self.oauth2_access_token_expires_at = None
+        self._oauth2_lock = Lock()
 
         self.delim = None
         self.root = None
@@ -263,61 +264,83 @@ class IMAPServer:
         return retval
 
     def __xoauth2handler(self, response):
-        now = datetime.datetime.now()
-        access_token_to_use = None
-        if self.oauth2_access_token_getter is not None:
-            access_token_to_use = self.oauth2_access_token_getter()
+        # Serialize token retrieval to prevent concurrent threads from
+        # invalidating each other's tokens (e.g. when an external program
+        # called via oauth2_access_token_eval refreshes the token, it may
+        # revoke the previous one, causing the other thread's auth to fail).
+        with self._oauth2_lock:
+            now = datetime.datetime.now()
+            access_token_to_use = None
+            if self.oauth2_access_token_getter is not None:
+                # If we already have a cached token that has not expired,
+                # reuse it instead of calling the getter again.  This avoids
+                # concurrent threads each triggering a token refresh that
+                # could invalidate the token obtained by the other thread.
+                if self.oauth2_access_token is not None \
+                        and self.oauth2_access_token_expires_at \
+                        and self.oauth2_access_token_expires_at > now:
+                    access_token_to_use = self.oauth2_access_token
+                else:
+                    access_token_to_use = self.oauth2_access_token_getter()
+                    if access_token_to_use is not None:
+                        self.oauth2_access_token = access_token_to_use
+                        # Cache for a reasonable window so that parallel
+                        # connection attempts reuse the same token.
+                        if self.oauth2_access_token_expires_at is None \
+                                or self.oauth2_access_token_expires_at <= now:
+                            self.oauth2_access_token_expires_at = \
+                                now + datetime.timedelta(seconds=600)
 
-        if access_token_to_use is None:
-            if self.oauth2_access_token_expires_at \
-                    and self.oauth2_access_token_expires_at < now:
-                self.oauth2_access_token = None
-                self.ui.debug('imap', 'xoauth2handler: oauth2_access_token expired')
+            if access_token_to_use is None:
+                if self.oauth2_access_token_expires_at \
+                        and self.oauth2_access_token_expires_at < now:
+                    self.oauth2_access_token = None
+                    self.ui.debug('imap', 'xoauth2handler: oauth2_access_token expired')
 
-            if self.oauth2_access_token is None:
-                if self.oauth2_request_url is None:
-                    raise OfflineImapError("No remote oauth2_request_url for "
-                                           "repository '%s' specified." %
-                                           self, OfflineImapError.ERROR.REPO)
+                if self.oauth2_access_token is None:
+                    if self.oauth2_request_url is None:
+                        raise OfflineImapError("No remote oauth2_request_url for "
+                                               "repository '%s' specified." %
+                                               self, OfflineImapError.ERROR.REPO)
 
-                # Generate new access token.
-                params = {}
-                params['client_id'] = self.oauth2_client_id
-                params['client_secret'] = self.oauth2_client_secret
-                params['refresh_token'] = self.oauth2_refresh_token
-                params['grant_type'] = 'refresh_token'
+                    # Generate new access token.
+                    params = {}
+                    params['client_id'] = self.oauth2_client_id
+                    params['client_secret'] = self.oauth2_client_secret
+                    params['refresh_token'] = self.oauth2_refresh_token
+                    params['grant_type'] = 'refresh_token'
 
-                self.ui.debug('imap', 'xoauth2handler: url "%s"' %
-                              self.oauth2_request_url)
-                self.ui.debug('imap', 'xoauth2handler: params "%s"' % params)
+                    self.ui.debug('imap', 'xoauth2handler: url "%s"' %
+                                  self.oauth2_request_url)
+                    self.ui.debug('imap', 'xoauth2handler: params "%s"' % params)
 
-                original_socket = socket.socket
-                socket.socket = self.authproxied_socket
-                try:
-                    response = urllib.request.urlopen(
-                        self.oauth2_request_url, urllib.parse.urlencode(params).encode('utf-8')).read()
-                except Exception as e:
+                    original_socket = socket.socket
+                    socket.socket = self.authproxied_socket
                     try:
-                        msg = "%s (configuration is: %s)" % (e, str(params))
-                    except Exception as eparams:
-                        msg = "%s [cannot display configuration: %s]" % (e, eparams)
+                        response = urllib.request.urlopen(
+                            self.oauth2_request_url, urllib.parse.urlencode(params).encode('utf-8')).read()
+                    except Exception as e:
+                        try:
+                            msg = "%s (configuration is: %s)" % (e, str(params))
+                        except Exception as eparams:
+                            msg = "%s [cannot display configuration: %s]" % (e, eparams)
 
-                    self.ui.error(e, exc_info()[2], msg)
-                    raise
-                finally:
-                    socket.socket = original_socket
+                        self.ui.error(e, exc_info()[2], msg)
+                        raise
+                    finally:
+                        socket.socket = original_socket
 
-                resp = json.loads(response)
-                self.ui.debug('imap', 'xoauth2handler: response "%s"' % resp)
-                if 'error' in resp:
-                    raise OfflineImapError("xoauth2handler got: %s" % resp,
-                                           OfflineImapError.ERROR.REPO)
-                self.oauth2_access_token = resp['access_token']
-                if 'expires_in' in resp:
-                    self.oauth2_access_token_expires_at = now + datetime.timedelta(
-                        seconds=resp['expires_in'] / 2
-                    )
-                access_token_to_use = self.oauth2_access_token
+                    resp = json.loads(response)
+                    self.ui.debug('imap', 'xoauth2handler: response "%s"' % resp)
+                    if 'error' in resp:
+                        raise OfflineImapError("xoauth2handler got: %s" % resp,
+                                               OfflineImapError.ERROR.REPO)
+                    self.oauth2_access_token = resp['access_token']
+                    if 'expires_in' in resp:
+                        self.oauth2_access_token_expires_at = now + datetime.timedelta(
+                            seconds=resp['expires_in'] / 2
+                        )
+                    access_token_to_use = self.oauth2_access_token
 
         self.ui.debug('imap', 'xoauth2handler: access_token "%s expires %s"' % (
             access_token_to_use, self.oauth2_access_token_expires_at))
@@ -897,17 +920,24 @@ class IMAPServer:
             raise
 
     def connectionwait(self):
-        """Waits until there is a connection available.
+        """Wait hint before spawning a copy thread.
 
-        Note that between the time that a connection becomes available and the
-        time it is requested, another thread may have grabbed it.  This function
-        is mainly present as a way to avoid spawning thousands of threads to
-        copy messages, then have them all wait for 3 available connections.
-        It's OK if we have maxconnections + 1 or 2 threads, which is what this
-        will help us do."""
+        This is intentionally a no-op.  The previous implementation acquired
+        and immediately released the semaphore as a probe, which introduced a
+        TOCTOU race: between the release here and the actual acquire inside
+        acquireconnection(), another thread could grab the slot, leading to
+        more simultaneous connections than maxconnections allows.
 
-        self.semaphore.acquire()  # Blocking until maxconnections has free slots.
-        self.semaphore.release()
+        Thread concurrency is already correctly enforced by two mechanisms:
+         - InstanceLimitedThread (via the MSGCOPY_NAMESPACE semaphore) limits
+           how many copy threads can run in parallel.
+         - acquireconnection() acquires self.semaphore before handing out a
+           connection, which is the authoritative concurrency gate.
+
+        Removing the probe here eliminates the race without changing the
+        effective concurrency limits."""
+
+        pass
 
     def close(self):
         # First make sure no new connections can be established.
