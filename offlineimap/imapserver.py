@@ -871,6 +871,21 @@ class IMAPServer:
                 self.root = imaputil.dequote(self.root)
 
             with self.connectionlock:
+                # close() may have been called while we were doing network
+                # I/O (the lock was not held during connection + auth).
+                # If so, logout the new connection and bail out rather than
+                # adding it to a pool that is being torn down.
+                # Do NOT release the semaphore here: the outer except block
+                # will do it when the OfflineImapError propagates up.
+                if self.closing:
+                    try:
+                        imapobj.logout()
+                    except Exception:
+                        pass
+                    raise OfflineImapError(
+                        "Server '%s' is closing; discarding new connection "
+                        "acquired during teardown." % self.repos,
+                        OfflineImapError.ERROR.REPO)
                 self.assignedconnections.append(imapobj)
                 self.lastowner[imapobj] = curThread.ident
             return imapobj
