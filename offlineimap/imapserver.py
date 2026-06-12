@@ -1168,7 +1168,6 @@ class IdleThread:
             else:
                 self.ui.warn("IMAP IDLE not supported on server '%s'."
                              "Sleep until next refresh cycle." % imapobj.identifier)
-                noop(imapobj)  # XXX: why?
             self.stop_sig.wait()  # self.stop() or IDLE callback are invoked.
             noop(imapobj)
 
