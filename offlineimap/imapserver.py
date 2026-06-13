@@ -290,6 +290,16 @@ class IMAPServer:
                                 or self.oauth2_access_token_expires_at <= now:
                             self.oauth2_access_token_expires_at = \
                                 now + datetime.timedelta(seconds=600)
+                    else:
+                        # Getter returned None: clear any stale expiry so that
+                        # the next call does not skip straight to the cached-token
+                        # path and silently use None as the Bearer token.
+                        self.oauth2_access_token = None
+                        self.oauth2_access_token_expires_at = None
+                        raise OfflineImapError(
+                            "oauth2_access_token_eval returned None for "
+                            "repository '%s'. Check your token getter." % self,
+                            OfflineImapError.ERROR.REPO)
 
             if access_token_to_use is None:
                 if self.oauth2_access_token_expires_at \
@@ -607,6 +617,13 @@ class IMAPServer:
             except (imapobj.error, OfflineImapError) as e:
                 self.ui.warn('%s authentication failed: %s' % (m, e))
                 exc_stack.append((m, e))
+
+                # If XOAUTH2 failed, invalidate the cached token so the
+                # next attempt calls the getter again instead of reusing
+                # a token that was rejected by the server.
+                if m == 'XOAUTH2':
+                    self.oauth2_access_token = None
+                    self.oauth2_access_token_expires_at = None
 
                 # If the socket is dead, don't even try to authenticate
                 # with the next method, since it will just fail with a socket
