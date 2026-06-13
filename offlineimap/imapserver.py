@@ -951,14 +951,20 @@ class IMAPServer:
                     "for repository '%s'. Remote does not answer." % (self.hostname, self.repos),
                     OfflineImapError.ERROR.REPO,
                     exc_info()[2])
+            # IMAP protocol errors (e.g. server not responding to welcome,
+            # socket errors during handshake) are transient and should be
+            # retried by the account sync loop.
             if e.args:
                 try:
-                    if e.args[0][:35] == 'IMAP4 protocol error: socket error:':
+                    if str(e.args[0]).startswith('IMAP4 protocol error'):
                         raise OfflineImapError(
-                            "Could not connect to remote server '{}' "
-                            "for repository '{}'. Connection Refused.".format(
-                                self.hostname, self.repos),
-                            OfflineImapError.ERROR.CRITICAL)
+                            "IMAP protocol error connecting to '%s:%d' for "
+                            "repository '%s': %s" %
+                            (self.hostname, self.port, self.repos, e),
+                            OfflineImapError.ERROR.REPO,
+                            exc_info()[2])
+                except OfflineImapError:
+                    raise
                 except:
                     pass
 
