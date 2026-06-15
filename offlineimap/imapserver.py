@@ -309,7 +309,7 @@ class IMAPServer:
 
                 if self.oauth2_access_token is not None:
                     access_token_to_use = self.oauth2_access_token
-                elif self.oauth2_access_token is None:
+                else:
                     if self.oauth2_request_url is None:
                         raise OfflineImapError("No remote oauth2_request_url for "
                                                "repository '%s' specified." %
