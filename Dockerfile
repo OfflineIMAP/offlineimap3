@@ -21,7 +21,7 @@ RUN /usr/local/bin/python3 -m pip install --upgrade pip && pip install -r requir
 COPY . /app-src
 
 # Install the app
-RUN /usr/local/bin/python3 setup.py install
+RUN /usr/local/bin/python3 -m pip install .
 
 ##############
 # Run tests in a throwaway stage

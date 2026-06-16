@@ -472,7 +472,7 @@ Make your checks and push the changes for both offlineimap and the website.
 Announce template stands in '$TMP_ANNOUNCE'.
 Command samples to do manually:
 - git push <remote> master next $new_version
-- python setup.py sdist && twine upload dist/* && rm -rf dist MANIFEST
+- python -m build && twine upload dist/* && rm -rf dist
 - cd website
 - git checkout master
 - git merge $branch_name

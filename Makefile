@@ -17,6 +17,7 @@
 # Warning: VERSION, ABBREV and TARGZ are used in docs/build-uploads.sh.
 VERSION=$(shell ./offlineimap.py --version)
 ABBREV=$(shell git rev-parse --short HEAD)
+DIRNAME=$(shell basename $(CURDIR))
 TARGZ=offlineimap-v$(VERSION)-$(ABBREV)
 SHELL=/bin/bash
 RST2HTML=`type rst2html >/dev/null 2>&1 && echo rst2html || echo rst2html.py`
@@ -24,13 +25,14 @@ RST2HTML=`type rst2html >/dev/null 2>&1 && echo rst2html || echo rst2html.py`
 all: build
 
 build:
-	python setup.py build
+	python -m build
 	@echo
-	@echo "Build process finished, run 'python setup.py install' to install" \
-		"or 'python setup.py --help' for more information".
+	@echo "Build process finished, run 'pip install .' to install" \
+		"or 'pip install dist/*.whl' for a specific wheel." \
+		"Use 'uv pip install .' if using uv."
 
 clean:
-	-python setup.py clean --all
+	-rm -rf build dist *.egg-info
 	-rm -f bin/offlineimapc 2>/dev/null
 	-find . -name '*.pyc' -exec rm -f {} \;
 	-find . -name '*.pygc' -exec rm -f {} \;
@@ -50,7 +52,7 @@ websitedoc:
 
 targz: ../$(TARGZ)
 ../$(TARGZ):
-	cd .. && tar -zhcv --transform s,^offlineimap,offlineimap-v$(VERSION), -f $(TARGZ).tar.gz --exclude '.*.swp' --exclude '.*.swo' --exclude '*.pyc' --exclude '__pycache__' offlineimap/{bin,Changelog.md,Changelog.maint.md,contrib,CONTRIBUTING.rst,COPYING,docs,MAINTAINERS.rst,Makefile,MANIFEST.in,offlineimap,offlineimap.conf,offlineimap.conf.minimal,offlineimap.py,README.md,requirements.txt,scripts,setup.cfg,setup.py,snapcraft.yaml,test,tests,TODO.rst}
+	cd .. && tar -zhcv --transform s,^$(DIRNAME),offlineimap-v$(VERSION), -f $(TARGZ).tar.gz --exclude '.*.swp' --exclude '.*.swo' --exclude '*.pyc' --exclude '__pycache__' $(DIRNAME)/{bin,Changelog.md,Changelog.maint.md,contrib,CONTRIBUTING.rst,COPYING,docs,MAINTAINERS.rst,Makefile,MANIFEST.in,offlineimap,offlineimap.conf,offlineimap.conf.minimal,offlineimap.py,pyproject.toml,README.md,requirements.txt,scripts,setup.cfg,snapcraft.yaml,test,tests,TODO.rst}
 
 rpm: targz
 	cd .. && sudo rpmbuild -ta $(TARGZ)
