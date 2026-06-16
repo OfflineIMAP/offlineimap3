@@ -19,7 +19,7 @@ make targz >/dev/null
 
 # Defined in the root Makefile.
 version="$(./offlineimap.py --version)"
-abbrev="$(git log --format='%h' HEAD~1..)"
+abbrev="$(git rev-parse --short HEAD)"
 targz="../offlineimap-v${version}-${abbrev}.tar.gz"
 
 filename="offlineimap-v${version}.tar.gz"

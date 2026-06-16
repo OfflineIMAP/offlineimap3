@@ -16,7 +16,7 @@
 
 # Warning: VERSION, ABBREV and TARGZ are used in docs/build-uploads.sh.
 VERSION=$(shell ./offlineimap.py --version)
-ABBREV=$(shell git log --format='%h' HEAD~1..)
+ABBREV=$(shell git rev-parse --short HEAD)
 TARGZ=offlineimap-v$(VERSION)-$(ABBREV)
 SHELL=/bin/bash
 RST2HTML=`type rst2html >/dev/null 2>&1 && echo rst2html || echo rst2html.py`
