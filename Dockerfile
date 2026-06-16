@@ -14,6 +14,7 @@ WORKDIR /app-src
 #RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -qq -y krb5-user -y && rm -rf /var/lib/apt/lists/*
 
 # Get latest pip and dependencies
+ENV PIP_ROOT_USER_ACTION=ignore
 RUN /usr/local/bin/python3 -m pip install --upgrade pip && pip install -r requirements.txt
 
 # Copy in rest of the code after deps are in place
