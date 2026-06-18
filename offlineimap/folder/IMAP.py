@@ -862,7 +862,7 @@ class IMAPFolder(BaseFolder):
                                   exc_info()[2],
                                   "While fetching msg %r in folder %r."
                                   " Query: %s Retrying (%d/%d)" % (
-                                      e, uids, self.name, query,
+                                      uids, self.name, query,
                                       retry_num - fails_left, retry_num))
                     # Release dropped connection, and get a new one.
                     self.imapserver.releaseconnection(imapobj, True)
