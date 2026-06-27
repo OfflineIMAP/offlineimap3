@@ -99,8 +99,12 @@ class CustomConfigParser(ConfigParser):
         else:
             metadatadir = self.apply_xforms(d, xforms)
 
-        if not os.path.exists(metadatadir):
+        if os.path.exists(metadatadir):
+            if not os.path.isdir(metadatadir):
+                raise Error("Metadata path '%s' exists but is not a directory" % metadatadir)
+        else:
             os.mkdir(metadatadir, 0o700)
+
         return metadatadir
 
     def getlocaleval(self):

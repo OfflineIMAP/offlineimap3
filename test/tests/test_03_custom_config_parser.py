@@ -18,6 +18,7 @@ import tempfile
 import shutil
 import os
 from unittest.mock import patch
+from configparser import Error
 
 from offlineimap.CustomConfig import CustomConfigParser
 
@@ -314,3 +315,23 @@ class TestCustomConfigParser(unittest.TestCase):
             self.assertTrue(os.path.exists(metadatadir))
             self.assertTrue(os.path.isdir(metadatadir))
             self.assertEqual(os.stat(metadatadir).st_mode & 0o777, 0o700)
+
+    def test_15_metadata_path_is_file(self):
+        """Test getmetadatadir() raises error when path is a file
+
+        When the metadata path points to an existing file instead of
+        a directory, getmetadatadir() should raise a configparser.Error."""
+        # Create a file (not a directory)
+        file_path = os.path.join(self.test_dir, "metadata_file")
+        with open(file_path, 'w') as f:
+            f.write("This is a file, not a directory")
+
+        config = CustomConfigParser()
+        config.add_section("general")
+        config.set("general", "metadata", file_path)
+
+        with self.assertRaises(Error) as cm:
+            config.getmetadatadir()
+
+        # Verify the error message contains the path
+        self.assertIn(file_path, str(cm.exception))
