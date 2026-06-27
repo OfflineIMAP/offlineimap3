@@ -293,3 +293,24 @@ class TestCustomConfigParser(unittest.TestCase):
             self.assertEqual(metadatadir, expected)
             self.assertTrue(os.path.exists(metadatadir))
             self.assertTrue(os.path.isdir(metadatadir))
+
+    def test_14_non_ascii_characters_in_metadata_path(self):
+        """Test getmetadatadir() handles non-ASCII characters correctly.
+
+        When metadata directory path contains non-ASCII characters
+        (like German umlauts: ä, ö, ü, ß), it should handle them
+        correctly and create the directory successfully."""
+        with patch.dict("os.environ", {"HOME": self.test_dir}, clear=False):
+            # Test with German umlauts and special characters
+            non_ascii_dir = os.path.join(self.test_dir, "métadonnées_äöüß")
+            config = CustomConfigParser()
+            config.add_section("general")
+            config.set("general", "metadata", non_ascii_dir)
+
+            metadatadir = config.getmetadatadir()
+
+            expected = non_ascii_dir
+            self.assertEqual(metadatadir, expected)
+            self.assertTrue(os.path.exists(metadatadir))
+            self.assertTrue(os.path.isdir(metadatadir))
+            self.assertEqual(os.stat(metadatadir).st_mode & 0o777, 0o700)
