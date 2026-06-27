@@ -86,7 +86,7 @@ class CustomConfigParser(ConfigParser):
         xforms = [os.path.expanduser, os.path.expandvars]
 
         d = self.getdefault("general", "metadata", None)
-        if d is None:
+        if d is None or not d.strip():
             # Try XDG location, then fall back to ~/.offlineimap
             xdg_home = os.environ.get("XDG_DATA_HOME") \
                 or os.path.expanduser("~/.local/share")

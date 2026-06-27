@@ -259,3 +259,37 @@ class TestCustomConfigParser(unittest.TestCase):
             self.assertNotEqual(metadatadir, xdg_dir)
             self.assertTrue(os.path.exists(metadatadir))
             self.assertTrue(os.path.isdir(metadatadir))
+
+    def test_12_empty_string_metadata_uses_default(self):
+        """Test that empty string metadata config uses default path.
+
+        When metadata is set to an empty string in config, it should
+        fall back to the default XDG or ~/.offlineimap path."""
+        with patch.dict("os.environ", {"HOME": self.test_dir}, clear=False):
+            config = CustomConfigParser()
+            config.add_section("general")
+            config.set("general", "metadata", "")
+
+            metadatadir = config.getmetadatadir()
+
+            expected = os.path.join(self.test_dir, ".offlineimap")
+            self.assertEqual(metadatadir, expected)
+            self.assertTrue(os.path.exists(metadatadir))
+            self.assertTrue(os.path.isdir(metadatadir))
+
+    def test_13_whitespace_only_metadata_uses_default(self):
+        """Test that whitespace-only metadata config uses default path.
+
+        When metadata is set to only whitespace (spaces, tabs, newlines),
+        it should fall back to the default XDG or ~/.offlineimap path."""
+        with patch.dict("os.environ", {"HOME": self.test_dir}, clear=False):
+            config = CustomConfigParser()
+            config.add_section("general")
+            config.set("general", "metadata", "   \t\n  ")
+
+            metadatadir = config.getmetadatadir()
+
+            expected = os.path.join(self.test_dir, ".offlineimap")
+            self.assertEqual(metadatadir, expected)
+            self.assertTrue(os.path.exists(metadatadir))
+            self.assertTrue(os.path.isdir(metadatadir))
