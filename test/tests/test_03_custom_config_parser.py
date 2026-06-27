@@ -67,6 +67,7 @@ class TestCustomConfigParser(unittest.TestCase):
 
         self.assertEqual(metadatadir, custom_dir)
         self.assertTrue(os.path.exists(metadatadir))
+        self.assertTrue(os.path.isdir(metadatadir))
 
     def test_03_tilde_expansion(self):
         """Test getmetadatadir() expands tilde in config value
@@ -102,7 +103,7 @@ class TestCustomConfigParser(unittest.TestCase):
             expected = os.path.join(self.test_dir, "env_metadata")
             self.assertEqual(metadatadir, expected)
             self.assertTrue(os.path.exists(metadatadir))
-            self.assertTrue(os.path.isdir(expected))
+            self.assertTrue(os.path.isdir(metadatadir))
 
     def test_05_directory_not_recreated(self):
         """Test getmetadatadir() doesn't fail if directory already exists
@@ -124,7 +125,7 @@ class TestCustomConfigParser(unittest.TestCase):
 
     def test_06_creates_metadata_directory_when_parent_exists(self):
         """Create the metadata directory if its parent already exists.
-        
+
         The original implementation uses os.mkdir() which only
         creates a single directory level. The parent must exist.
         This test verifies the current behavior."""
@@ -157,3 +158,104 @@ class TestCustomConfigParser(unittest.TestCase):
 
         with self.assertRaises(OSError):
             config.getmetadatadir()
+
+    def test_08_xdg_data_home_used_when_set(self):
+        """Test that XDG_DATA_HOME is used when set in the
+        environment and its default offlineimap subdirectory
+        exists.
+
+        If XDG_DATA_HOME is set and the "offlineimap" subdirectory
+        exists, the metadata directory should default to
+        $XDG_DATA_HOME/offlineimap."""
+        xdg_dir = os.path.join(self.test_dir, "xdg_data")
+        xdg_metadata_dir = os.path.join(xdg_dir, "offlineimap")
+        os.makedirs(xdg_metadata_dir, exist_ok=True)
+
+        with patch.dict("os.environ", {
+            "HOME": self.test_dir,
+            "XDG_DATA_HOME": xdg_dir,
+        }, clear=False):
+            config = CustomConfigParser()
+            config.add_section("general")
+
+            metadatadir = config.getmetadatadir()
+
+            expected = xdg_metadata_dir
+            self.assertEqual(metadatadir, expected)
+            self.assertTrue(os.path.exists(expected))
+            self.assertTrue(os.path.isdir(expected))
+
+    def test_09_xdg_default_path_when_env_not_set(self):
+        """Test that the default XDG path (~/.local/share/offlineimap)
+        is used when XDG_DATA_HOME is not set and its default
+        offlineimap subdirectory exists.
+
+        When metadata not in config and XDG_DATA_HOME is not set,
+        it should use ~/.local/share/offlineimap if that path exists."""
+        xdg_dir = os.path.join(self.test_dir, ".local", "share")
+        xdg_metadata_dir = os.path.join(xdg_dir, "offlineimap")
+        os.makedirs(xdg_metadata_dir, exist_ok=True)
+
+        with patch.dict("os.environ", {
+            "HOME": self.test_dir,
+        }, clear=True):
+            config = CustomConfigParser()
+            config.add_section("general")
+
+            metadatadir = config.getmetadatadir()
+
+            expected = xdg_metadata_dir
+            self.assertEqual(metadatadir, expected)
+            self.assertTrue(os.path.exists(expected))
+            self.assertTrue(os.path.isdir(expected))
+
+    def test_10_fallback_to_legacy_when_xdg_not_exists(self):
+        """Test fallback to ~/.offlineimap when XDG path doesn't exist.
+
+        When metadata not in config, XDG_DATA_HOME points to a location
+        where the offlineimap subdirectory doesn't exist, it should
+        fall back to ~/.offlineimap."""
+        xdg_dir = os.path.join(self.test_dir, "xdg_data")
+        os.makedirs(xdg_dir, exist_ok=True)
+        # Don't create the offlineimap subdirectory
+
+        with patch.dict("os.environ", {
+            "HOME": self.test_dir,
+            "XDG_DATA_HOME": xdg_dir,
+        }, clear=False):
+            config = CustomConfigParser()
+            config.add_section("general")
+
+            metadatadir = config.getmetadatadir()
+
+            expected = os.path.join(self.test_dir, ".offlineimap")
+            not_expected = os.path.join(xdg_dir, "offlineimap")
+            self.assertEqual(metadatadir, expected)
+            self.assertFalse(os.path.exists(not_expected))
+            self.assertTrue(os.path.exists(expected))
+            self.assertTrue(os.path.isdir(expected))
+
+    def test_11_explicit_config_overrides_xdg(self):
+        """Test explicit metadata config overrides XDG path.
+
+        When metadata is explicitly set in config, it should be used
+        even if XDG_DATA_HOME path exists."""
+        xdg_dir = os.path.join(self.test_dir, "xdg_data")
+        os.makedirs(os.path.join(xdg_dir, "offlineimap"), exist_ok=True)
+
+        custom_dir = os.path.join(self.test_dir, "custom_metadata")
+
+        with patch.dict("os.environ", {
+            "HOME": self.test_dir,
+            "XDG_DATA_HOME": xdg_dir,
+        }, clear=False):
+            config = CustomConfigParser()
+            config.add_section("general")
+            config.set("general", "metadata", custom_dir)
+
+            metadatadir = config.getmetadatadir()
+
+            self.assertEqual(metadatadir, custom_dir)
+            self.assertNotEqual(metadatadir, xdg_dir)
+            self.assertTrue(os.path.exists(metadatadir))
+            self.assertTrue(os.path.isdir(metadatadir))
