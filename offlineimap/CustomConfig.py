@@ -84,8 +84,21 @@ class CustomConfigParser(ConfigParser):
 
     def getmetadatadir(self):
         xforms = [os.path.expanduser, os.path.expandvars]
-        d = self.getdefault("general", "metadata", "~/.offlineimap")
-        metadatadir = self.apply_xforms(d, xforms)
+
+        d = self.getdefault("general", "metadata", None)
+        if d is None:
+            # Try XDG location, then fall back to ~/.offlineimap
+            xdg_home = os.environ.get("XDG_DATA_HOME") \
+                or os.path.expanduser("~/.local/share")
+            xdg_metadata = os.path.join(xdg_home, "offlineimap")
+            default_metadata = os.path.expanduser("~/.offlineimap")
+            if os.path.exists(xdg_metadata):
+                metadatadir = xdg_metadata
+            else:
+                metadatadir = default_metadata
+        else:
+            metadatadir = self.apply_xforms(d, xforms)
+
         if not os.path.exists(metadatadir):
             os.mkdir(metadatadir, 0o700)
         return metadatadir
