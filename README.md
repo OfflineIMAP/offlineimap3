@@ -52,11 +52,6 @@ links or packages could refer to the Python 2 version. In that case, please
 open an issue.
 
 
-## License
-
-GNU General Public License v2.0 or later.
-
-
 ## Downloads
 
 You should first check if your distribution already packages OfflineIMAP for you.
@@ -127,3 +122,8 @@ $ make html  # Requires rst2html
 $ make man   # Requires a2x (http://asciidoc.org)
 $ make api   # Requires sphinx
 ```
+
+## License
+
+This project is licensed under the **GNU General Public License v2.0 or later**.
+See the [LICENSE](LICENSE) file for details.
