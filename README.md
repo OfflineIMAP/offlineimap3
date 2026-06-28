@@ -15,17 +15,16 @@ Upstream status (`next` branch):
 [wiki]: https://github.com/OfflineIMAP/offlineimap/wiki
 [blog]: https://www.offlineimap.org/posts.html
 
-Links:
-* Official github code repository
-  * for Python 2: [offlineimap]
-  * for Python 3: [offlineimap3]
-* Website: [website]
-* Wiki: [wiki]
-* Blog: [blog]
+<h1 align="center">OfflineIMAP</h1>
 
-# OfflineIMAP
+<p align="center"><i>"Get the emails where you need them."</i><p>
 
-***"Get the emails where you need them."***
+<p align="center">
+  <a href="https://www.offlineimap.org">Website</a> •
+  <a href="https://www.offlineimap.org/documentation.html">Documetation</a> •
+  <a href="https://github.com/OfflineIMAP/offlineimap/wiki">Wiki</a> •
+  <a href="https://www.offlineimap.org/posts.html">Blog</a>
+</p>
 
 
 ## Description
@@ -85,13 +84,6 @@ Bugs, issues and contributions can be requested to both the mailing list or the
 - Steps to reproduce the error
 
 
-## The community
-
-* OfflineIMAP's main site is the [project page at Github][offlineimap3].
-* There is the [OfflineIMAP community's website][website].
-* And finally, [the wiki][wiki].
-
-
 ## Requirements & dependencies
 
 * Python v3.6+
@@ -103,10 +95,6 @@ Bugs, issues and contributions can be requested to both the mailing list or the
 * portalocker (optional), if you need to run offlineimap in Cygwin for Windows
 * certify (optional), for Internet SSL certificate validation
 * urllib3 (optional), for Internet SSL certificate validation
-
-## Documentation
-
-All current and updated documentation is on the [community's website][website].
 
 
 ### Read documentation locally
