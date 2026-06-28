@@ -15,7 +15,7 @@ Upstream status (`next` branch):
 [wiki]: https://github.com/OfflineIMAP/offlineimap/wiki
 [blog]: https://www.offlineimap.org/posts.html
 
-<h1 align="center">OfflineIMAP</h1>
+<h1 align="center">OfflineIMAP3</h1>
 
 <p align="center"><i>"Get the emails where you need them."</i><p>
 
