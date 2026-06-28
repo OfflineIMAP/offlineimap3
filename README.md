@@ -75,22 +75,7 @@ Check if your distribution provides a package for OfflineIMAP3. If available, us
 -->
 
 
-## Feedbacks
-
-Bugs, issues and contributions can be requested to both the mailing list or the
-[official Github project][offlineimap3].  Provide the following information:
-- system/distribution (with version)
-- offlineimap version (`offlineimap -V`)
-- Python version
-- server name or domain
-- CLI options
-- Configuration file (offlineimaprc)
-- pythonfile (if any)
-- Logs, error
-- Steps to reproduce the error
-
-
-## Requirements & dependencies
+### Requirements & dependencies
 
 * Python v3.6+
 * rfc6555 (required)
@@ -115,6 +100,20 @@ $ make html  # Requires rst2html
 $ make man   # Requires a2x (http://asciidoc.org)
 $ make api   # Requires sphinx
 ```
+
+## Feedbacks
+
+Bugs, issues and contributions can be requested to both the mailing list or the
+[official Github project][offlineimap3].  Provide the following information:
+- system/distribution (with version)
+- offlineimap version (`offlineimap -V`)
+- Python version
+- server name or domain
+- CLI options
+- Configuration file (offlineimaprc)
+- pythonfile (if any)
+- Logs, error
+- Steps to reproduce the error
 
 
 ## Contributing
