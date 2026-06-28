@@ -14,6 +14,7 @@ Upstream status (`next` branch):
 [website]: https://www.offlineimap.org
 [wiki]: https://github.com/OfflineIMAP/offlineimap/wiki
 [blog]: https://www.offlineimap.org/posts.html
+[issues]: https://github.com/OfflineIMAP/offlineimap3/issues
 
 <h1 align="center">OfflineIMAP3</h1>
 
@@ -29,15 +30,15 @@ Upstream status (`next` branch):
 
 ## Description
 
-OfflineIMAP is software that downloads your email mailbox(es) as **local
-Maildirs**. OfflineIMAP will synchronize both sides via *IMAP*.
+OfflineIMAP3 is software that downloads your email mailbox(es) as **local
+Maildirs**. OfflineIMAP3 will synchronize both sides via *IMAP*.
 
 
-## Why should I use OfflineIMAP?
+## Why should I use OfflineIMAP3?
 
 IMAP's main downside is that you have to **trust** your email provider to
 not lose your email. While certainly unlikely, it's not impossible.
-With OfflineIMAP, you can download your Mailboxes and make you own backups of
+With OfflineIMAP3, you can download your Mailboxes and make you own backups of
 your [Maildir](https://en.wikipedia.org/wiki/Maildir).
 
 This allows reading your email offline without the need for your mail
@@ -47,11 +48,7 @@ message without internet connection? No problem, the message is still there.
 
 ## Project status and future
 
-OfflineIMAP, using Python 3, is based on OfflineIMAP for Python 2.
-Currently we are updating the source code. These changes should not affect
-the user (documentation, configuration files,... are the same) but some
-links or packages could refer to the Python 2 version. In that case, please
-open an issue.
+This project, **OfflineIMAP3**, is a Python 3 port of the original [OfflineIMAP](offlineimap) (Python 2). We are currently updating the source code to ensure full compatibility. While user-facing elements (documentation, configuration files, etc.) remain unchanged, some links or packages may still reference the Python 2 version. If you encounter any such references, please [open an issue](issues).
 
 
 ## Downloads
