@@ -1,3 +1,4 @@
+<!--
 Upstream status (`master` branch):
 [![OfflineIMAP build status on Travis-CI.org](https://travis-ci.org/OfflineIMAP/offlineimap.svg?branch=master)](https://travis-ci.org/OfflineIMAP/offlineimap)
 [![OfflineIMAP code coverage on Codecov.io](https://codecov.io/gh/OfflineIMAP/offlineimap/branch/master/graph/badge.svg)](https://codecov.io/gh/OfflineIMAP/offlineimap)
@@ -5,6 +6,8 @@ Upstream status (`master` branch):
 
 Upstream status (`next` branch):
 [![OfflineIMAP build status on Travis-CI.org](https://travis-ci.org/OfflineIMAP/offlineimap.svg?branch=next)](https://travis-ci.org/OfflineIMAP/offlineimap)
+-->
+
 
 [offlineimap]: https://github.com/OfflineIMAP/offlineimap
 [offlineimap3]: https://github.com/OfflineIMAP/offlineimap3
