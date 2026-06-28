@@ -69,6 +69,7 @@ Check if your distribution provides a package for OfflineIMAP3. If available, us
 - **Fedora:** `sudo dnf install offlineimap`
 - **FreeBSD:** `pkg search offlineimap3`, then `sudo pkg install py311-offlineimap3`
 - **Arch Linux:** `sudo pacman -S offlineimap` (or AUR: [offlineimap3-git](https://aur.archlinux.org/packages/offlineimap3-git/))
+- **MacOS:** `brew install offlineimap`
 <!--
 - **Docker:** `docker pull offlineimap/offlineimap:latest` *(example, not yet published)*
 -->
