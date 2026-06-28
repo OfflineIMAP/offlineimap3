@@ -51,20 +51,28 @@ message without internet connection? No problem, the message is still there.
 This project, **OfflineIMAP3**, is a Python 3 port of the original [OfflineIMAP](offlineimap) (Python 2). We are currently updating the source code to ensure full compatibility. While user-facing elements (documentation, configuration files, etc.) remain unchanged, some links or packages may still reference the Python 2 version. If you encounter any such references, please [open an issue](issues).
 
 
-## Downloads
+## Installation
 
-You should first check if your distribution already packages OfflineIMAP for you.
-Downloads releases as [tarball or zipball](https://github.com/OfflineIMAP/offlineimap3/tags).
+### Option A: Install from Source (Tarball/Zipball)
+Download a release from [GitHub tags](https://github.com/OfflineIMAP/offlineimap3/tags), then:
+```bash
+tar -xzf offlineimap3-*.tar.gz
+cd offlineimap3-*
+pip install .
+```
 
-If you are running Linux/BSD, you can install offlineimap with:
+### Option B: Install via Package Manager
+Check if your distribution provides a package for OfflineIMAP3. If available, use one of the following commands:
 
--  Debian and Ubuntu `apt install offlineimap3`
--  openSUSE `zypper install offlineimap`
--  Fedora `dnf install offlineimap`
--  FreeBSD `pkg search offlineimap3`, and install the python versioned package, `pkg install py311-offlineimap3`
--  Arch Linux: [`pacman -S offlineimap`](https://archlinux.org/packages/extra/any/offlineimap/), or through AUR package [offlineimap3-git](https://aur.archlinux.org/packages/offlineimap3-git/)
--  Docker image: `offlineimap/offlineimap:latest`
- (note: image not published yet, just an example)
+- **Debian/Ubuntu:** `sudo apt install offlineimap3`
+- **openSUSE:** `sudo zypper install offlineimap`
+- **Fedora:** `sudo dnf install offlineimap`
+- **FreeBSD:** `pkg search offlineimap3`, then `sudo pkg install py311-offlineimap3`
+- **Arch Linux:** `sudo pacman -S offlineimap` (or AUR: [offlineimap3-git](https://aur.archlinux.org/packages/offlineimap3-git/))
+<!--
+- **Docker:** `docker pull offlineimap/offlineimap:latest` *(example, not yet published)*
+-->
+
 
 ## Feedbacks
 
