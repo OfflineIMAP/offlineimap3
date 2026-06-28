@@ -67,11 +67,7 @@ If you are running Linux/BSD, you can install offlineimap with:
 -  Docker image: `offlineimap/offlineimap:latest`
  (note: image not published yet, just an example)
 
-## Feedbacks and contributions
-
-**The user discussions, development, announcements and all the exciting stuff take
-place on the mailing list.** While not mandatory to send emails, you can
-[subscribe here](http://lists.alioth.debian.org/mailman/listinfo/offlineimap-project).
+## Feedbacks
 
 Bugs, issues and contributions can be requested to both the mailing list or the
 [official Github project][offlineimap3].  Provide the following information:
@@ -122,6 +118,16 @@ $ make html  # Requires rst2html
 $ make man   # Requires a2x (http://asciidoc.org)
 $ make api   # Requires sphinx
 ```
+
+
+## Contributing
+
+Pull requests are welcome! For details on the development workflow and coding guidelines, please refer to:
+- [Development Workflow](https://www.offlineimap.org/doc/GitAdvanced.html)
+- [Coding Guidelines](https://www.offlineimap.org/doc/CodingGuidelines.html)
+
+**The user discussions, development, announcements and all the exciting stuff take place on the mailing list.** While not mandatory to send emails, you can [subscribe here](http://lists.alioth.debian.org/mailman/listinfo/offlineimap-project).
+
 
 ## License
 
