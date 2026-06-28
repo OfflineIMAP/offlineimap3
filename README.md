@@ -8,14 +8,6 @@ Upstream status (`next` branch):
 [![OfflineIMAP build status on Travis-CI.org](https://travis-ci.org/OfflineIMAP/offlineimap.svg?branch=next)](https://travis-ci.org/OfflineIMAP/offlineimap)
 -->
 
-
-[offlineimap]: https://github.com/OfflineIMAP/offlineimap
-[offlineimap3]: https://github.com/OfflineIMAP/offlineimap3
-[website]: https://www.offlineimap.org
-[wiki]: https://github.com/OfflineIMAP/offlineimap/wiki
-[blog]: https://www.offlineimap.org/posts.html
-[issues]: https://github.com/OfflineIMAP/offlineimap3/issues
-
 <h1 align="center">OfflineIMAP3</h1>
 
 <p align="center"><i>"Get the emails where you need them."</i><p>
@@ -48,7 +40,7 @@ message without internet connection? No problem, the message is still there.
 
 ## Project status and future
 
-This project, **OfflineIMAP3**, is a Python 3 port of the original [OfflineIMAP](offlineimap) (Python 2). We are currently updating the source code to ensure full compatibility. While user-facing elements (documentation, configuration files, etc.) remain unchanged, some links or packages may still reference the Python 2 version. If you encounter any such references, please [open an issue](issues).
+This project, **OfflineIMAP3**, is a Python 3 port of the original [OfflineIMAP](https://github.com/OfflineIMAP/offlineimap) (Python 2). We are currently updating the source code to ensure full compatibility. While user-facing elements (documentation, configuration files, etc.) remain unchanged, some links or packages may still reference the Python 2 version. If you encounter any such references, please [open an issue](https://github.com/OfflineIMAP/offlineimap3/issues).
 
 
 ## Installation
@@ -104,7 +96,7 @@ $ make api   # Requires sphinx
 ## Feedbacks
 
 Bugs, issues and contributions can be requested to both the mailing list or the
-[official Github project][offlineimap3].  Provide the following information:
+[official Github project][https://github.com/OfflineIMAP/offlineimap3].  Provide the following information:
 - system/distribution (with version)
 - offlineimap version (`offlineimap -V`)
 - Python version
@@ -128,4 +120,4 @@ Pull requests are welcome! For details on the development workflow and coding gu
 ## License
 
 This project is licensed under the **GNU General Public License v2.0 or later**.
-See the [LICENSE](LICENSE) file for details.
+See the [LICENSE](https://github.com/lb803/offlineimap3/blob/master/COPYING) file for details.
