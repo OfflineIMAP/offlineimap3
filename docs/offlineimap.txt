@@ -24,8 +24,7 @@ Works with Python 3.
 OPTIONS
 -------
 
--h::
---help::
+-h, --help::
 
   Display summary of options.
 
@@ -107,16 +106,16 @@ included), implies the single-thread option `-1'.
 
 -l <path/to/file.log>::
 
-   Send logs to <file.log>.
+  Send logs to <file.log>.
 
 -s::
 
-   Send logs to syslog.
+  Send logs to syslog.
 
 
 -f <folder1[,folder1[,...]]>::
 
-    Only sync the specified folders.
+  Only sync the specified folders.
 +
 The folder names are the untranslated foldernames of the remote repository.
 This command-line option overrides any 'folderfilter' and 'folderincludes'
@@ -158,6 +157,7 @@ blinkenlights, machineui.
 
 
 --delete-folder::
+
   Delete a folder on the remote repository.
 +
 Only one account must be specified/configured for this feature to work or you
@@ -167,6 +167,7 @@ otherwise. E.g.: "Remote/folder/name".
 
 
 --migrate-fmd5-using-nametrans::
+
   Migrate FMD5 hashes from versions prior to 6.3.5.
 +
 The way that FMD5 hashes are calculated was changed in version 6.3.5 (now using
@@ -181,6 +182,7 @@ flag first.
 
 
 --mbnames-prune::
+
   Remove dangling entries for removed accounts or if mbnames is not enabled/used
   anymore.
 +
