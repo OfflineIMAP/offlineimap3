@@ -121,7 +121,7 @@ The folder names are the untranslated foldernames of the remote repository.
 This command-line option overrides any 'folderfilter' and 'folderincludes'
 options in the configuration file.
 
--k <[section:]option=value::
+-k <[section:]option=value>::
 
   Override any configuration file option.
 +
