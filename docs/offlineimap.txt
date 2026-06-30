@@ -303,8 +303,8 @@ will not protect you from active attacks, such as Man-In-The-Middle attacks
 which cause you to connect to the wrong server and pretend to be your mail
 server.
 +
-*DO NOT RELY ON STARTTLS AS A SAFE CONNECTION GUARANTEEING THE AUTHENTICITY OF
-YOUR IMAP SERVER!*
+WARNING: DO NOT RELY ON STARTTLS AS A SAFE CONNECTION GUARANTEEING THE
+AUTHENTICITY OF YOUR IMAP SERVER!
 
 * allow_nonstandard_capabilities
 +
@@ -318,8 +318,8 @@ enables a best-effort fallback: OfflineIMAP reuses the capabilities advertised
 before STARTTLS, removing `LOGINDISABLED`, so that authentication can continue
 over the (assumed) encrypted connection.
 +
-*WARNING: only enable this option when you have verified that TLS is actually
-established correctly.* If the server is not performing STARTTLS properly,
+WARNING: Only enable this option when you have verified that TLS is actually
+established correctly. If the server is not performing STARTTLS properly,
 enabling this option could cause credentials to be transmitted in plain text.
 +
 Default: `no`.
