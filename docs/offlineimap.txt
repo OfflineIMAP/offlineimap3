@@ -264,8 +264,7 @@ Security and SSL
 By default, OfflineIMAP will connect using any method that 'openssl' supports,
 that is SSLv2, SSLv3, or TLSv1.
 
-Do note that SSLv2 is notoriously insecure and deprecated.  Unfortunately,
-python2 does not offer easy ways to disable SSLv2. It is recommended you test
+Do note that SSLv2 is notoriously insecure and deprecated. It is recommended you test
 your setup and make sure that the mail server does not use an SSLv2
 connection. Use e.g. "openssl s_client -host mail.server -port 443" to find
 out the connection that is used by default.
