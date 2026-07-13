@@ -96,7 +96,7 @@ $ make api   # Requires sphinx
 ## Feedbacks
 
 Bugs, issues and contributions can be requested to both the mailing list or the
-[official Github project][https://github.com/OfflineIMAP/offlineimap3].  Provide the following information:
+[official Github project](https://github.com/OfflineIMAP/offlineimap3). Provide the following information:
 - system/distribution (with version)
 - offlineimap version (`offlineimap -V`)
 - Python version
