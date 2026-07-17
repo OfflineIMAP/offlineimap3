@@ -378,9 +378,9 @@ class SyncableAccount(Account):
                 remoterepos.getfolders()
             except OfflineImapError as e:
                 msg = f"Error while getting folders for repository "
-                msg += f"'{remoterepos.name}' of account '{self}': {e} - "
+                msg += f"'{remoterepos.name}' of account '{self}' - "
                 msg += "skipping account."
-                self.ui.warn(msg)
+                self.ui.error(e, exc_info()[2], msg=msg)
                 return  # Continue with next account.
 
             localrepos.getfolders()
