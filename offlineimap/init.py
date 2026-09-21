@@ -456,7 +456,7 @@ class OfflineImap:
                 # tell each account to stop looping
                 getglobalui().warn("Terminating after this sync...")
                 accounts.Account.set_abort_event(self.config, 2)
-            elif sig in (signal.SIGTERM, signal.SIGINT, signal.SIGHUP):
+            elif sig in (signal.SIGINT, signal.SIGHUP):
                 # tell each account to ABORT ASAP (ctrl-c)
                 getglobalui().warn("Preparing to shutdown after sync (this may "
                                    "take some time), press CTRL-C three "
@@ -470,6 +470,10 @@ class OfflineImap:
                 if self.num_sigterm >= 3:
                     getglobalui().warn("Signaled thrice. Aborting!")
                     sys.exit(1)
+            elif sig == signal.SIGTERM:
+                getglobalui().warn("Terminating on SIGTERM...")
+                accounts.Account.set_abort_event(self.config, 3)
+                sys.exit(0)
             elif sig == signal.SIGQUIT:
                 stacktrace.dump(sys.stderr)
                 os.abort()
