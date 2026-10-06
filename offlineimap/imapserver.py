@@ -317,7 +317,7 @@ class IMAPServer:
                     self.oauth2_access_token_expires_at = now + datetime.timedelta(
                         seconds=resp['expires_in'] / 2
                     )
-                access_token_to_use = self.oauth2_access_token
+            access_token_to_use = self.oauth2_access_token
 
         self.ui.debug('imap', 'xoauth2handler: access_token "%s expires %s"' % (
             access_token_to_use, self.oauth2_access_token_expires_at))
