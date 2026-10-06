@@ -705,12 +705,18 @@ class IMAPFolder(BaseFolder):
                     self.ui.msgtoreadonly(self, uid)
                     return uid
 
+                try:
+                    # Serialize the message
+                    raw_msg = msg.as_bytes(policy=output_policy)
+                except UnicodeEncodeError:
+                    # Fall back for messages that as_bytes() cannot write (real non-ASCII chars in nested parts).
+                    raw_msg = msg.as_string(policy=output_policy).encode('utf-8', 'surrogateescape')
                 # Do the APPEND.
                 try:
                     (typ, dat) = imapobj.append(
                         self.getfullIMAPname(),
                         imaputil.flagsmaildir2imap(flags),
-                        date,  msg.as_bytes(policy=output_policy))
+                        date,  raw_msg)
                     # This should only catch 'NO' responses since append()
                     # will raise an exception for 'BAD' responses:
                     if typ != 'OK':
