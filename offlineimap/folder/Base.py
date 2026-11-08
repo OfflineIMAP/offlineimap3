@@ -24,6 +24,7 @@ import time
 from sys import exc_info
 
 from email import policy
+from email.errors import NoBoundaryInMultipartDefect
 from email.parser import BytesParser
 from email.utils import parsedate_tz, mktime_tz
 from email.charset import Charset
@@ -930,6 +931,57 @@ class BaseFolder:
         else:
             new_field = b''.join([boundary, b'="', value, b'"'])
             return(raw_msg_bytes.replace(boundary_field, new_field, 1))
+
+    def _repair_message_defects(self, message, parser, raw_msg, policy, uid):
+        """Return message repaired of parsing defects, or raise if it cannot
+        be serialized.
+
+        Defects can live on nested message/rfc822 parts, which the root
+        message's defects list does not include, so the whole tree is
+        checked.  The message is repaired in-place (boundary quoting and
+        utf-8 charset fix) and validated with as_bytes().
+        """
+
+        defects = [defect for part in message.walk() for defect in part.defects]
+        if not defects:
+            return message
+        self.ui.warn("UID {} has defects: {}".format(uid, defects))
+        if any(isinstance(defect, NoBoundaryInMultipartDefect) for defect in defects):
+            # (Hopefully) Rare defect from a broken client where multipart boundary is
+            # not properly quoted.  Attempt to solve by fixing the boundary and parsing
+            self.ui.warn(" ... applying multipart boundary fix.")
+            message = parser.parsebytes(self._quote_boundary_fix(raw_msg))
+        try:
+            # See if the defects after fixes are preventing us from obtaining bytes
+            _ = message.as_bytes(policy=policy)
+        except UnicodeEncodeError:
+            # Apply utf-8 charset to parts that fail to encode with their current charset
+            # This usually happens when malformed bytes were replaced with \ufffd during parsing
+            # The email.policy.default also replaces unencodable characters with \ufffd
+            # so we need to set the charset to utf-8 to avoid this and instead let the user
+            # know that the message has defects.
+            self.ui.warn(" ... applying charset fix for unencodable characters (\\ufffd).")
+            for part in message.walk():
+                payload = part.get_payload()
+                if isinstance(payload, str):
+                    charset = part.get_content_charset() or 'us-ascii'
+                    try:
+                        payload.encode(charset, 'surrogateescape')
+                    except UnicodeEncodeError:
+                        part.set_charset('utf-8')
+            try:
+                # Retry obtaining bytes after charset fixes
+                _ = message.as_bytes(policy=policy)
+            except UnicodeEncodeError as err:
+                # Unknown issue which is causing failure of as_bytes()
+                msg_id = self.getmessageheader(message, "message-id")
+                if msg_id is None:
+                    msg_id = '<Unknown Message-ID>'
+                raise OfflineImapError(
+                        "UID {} ({}) has defects preventing it from being processed!\n  {}: {}".format(
+                            uid, msg_id, type(err).__name__, err),
+                        OfflineImapError.ERROR.MESSAGE)
+        return message
 
     def __syncmessagesto_copy(self, dstfolder, statusfolder):
         """Pass1: Copy locally existing messages not on the other side.
