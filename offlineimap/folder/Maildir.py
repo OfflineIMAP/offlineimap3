@@ -25,7 +25,6 @@ from threading import Lock
 from hashlib import md5
 from offlineimap import OfflineImapError
 from .Base import BaseFolder
-from email.errors import NoBoundaryInMultipartDefect
 
 # Find the UID in a message filename
 re_uidmatch = re.compile(r',U=(\d+)')
@@ -270,26 +269,9 @@ class MaildirFolder(BaseFolder):
                 "Exception parsing message with ID ({}) from file ({}).\n {}: {}".format(
                     msg_id, filename, err[0].__name__, err[1]),
                 OfflineImapError.ERROR.MESSAGE)
-        if len(retval.defects) > 0:
-            # We don't automatically apply fixes as to attempt to preserve the original message
-            self.ui.warn("UID {} has defects: {}".format(uid, retval.defects))
-            if any(isinstance(defect, NoBoundaryInMultipartDefect) for defect in retval.defects):
-                # (Hopefully) Rare defect from a broken client where multipart boundary is
-                # not properly quoted.  Attempt to solve by fixing the boundary and parsing
-                self.ui.warn(" ... applying multipart boundary fix.")
-                retval = self.parser['8bit'].parsebytes(self._quote_boundary_fix(_fd_bytes))
-            try:
-                # See if the defects after fixes are preventing us from obtaining bytes
-                _ = retval.as_bytes(policy=self.policy['8bit'])
-            except UnicodeEncodeError as err:
-                # Unknown issue which is causing failure of as_bytes()
-                msg_id = self.getmessageheader(retval, "message-id")
-                if msg_id is None:
-                    msg_id = '<unknown-message-id>'
-                raise OfflineImapError(
-                        "UID {} ({}) has defects preventing it from being processed!\n  {}: {}".format(
-                            uid, msg_id, type(err).__name__, err),
-                        OfflineImapError.ERROR.MESSAGE)
+        retval = self._repair_message_defects(
+            retval, self.parser['8bit'], _fd_bytes,
+            self.policy['8bit'], uid)
         return retval
 
     # Interface from BaseFolder

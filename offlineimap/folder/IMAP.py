@@ -24,7 +24,7 @@ from offlineimap import imaputil, imaplibutil, OfflineImapError
 from offlineimap import globals
 from imaplib2 import MonthNames
 from .Base import BaseFolder
-from email.errors import HeaderParseError, NoBoundaryInMultipartDefect
+from email.errors import HeaderParseError
 
 # Globals
 CRLF = '\r\n'
@@ -916,44 +916,9 @@ class IMAPFolder(BaseFolder):
                 "Exception parsing message with ID ({}) from imaplib (response type: {}).\n {}: {}".format(
                     msg_id, response_type, err[0].__name__, err[1]),
                 OfflineImapError.ERROR.MESSAGE)
-        if len(ndata1.defects) > 0:
-            # We don't automatically apply fixes as to attempt to preserve the original message
-            self.ui.warn("UID {} has defects: {}".format(uids, ndata1.defects))
-            if any(isinstance(defect, NoBoundaryInMultipartDefect) for defect in ndata1.defects):
-                # (Hopefully) Rare defect from a broken client where multipart boundary is
-                # not properly quoted.  Attempt to solve by fixing the boundary and parsing
-                self.ui.warn(" ... applying multipart boundary fix.")
-                ndata1 = self.parser['8bit-RFC'].parsebytes(self._quote_boundary_fix(data[0][1]))
-            try:
-                # See if the defects after fixes are preventing us from obtaining bytes
-                _ = ndata1.as_bytes(policy=self.policy['8bit-RFC'])
-            except UnicodeEncodeError:
-                # Apply utf-8 charset to parts that fail to encode with their current charset
-                # This usually happens when malformed bytes were replaced with \ufffd during parsing
-                # The email.policy.default also replaces unencodable characters with \ufffd
-                # so we need to set the charset to utf-8 to avoid this and instead let the user
-                # know that the message has defects.
-                self.ui.warn(" ... applying charset fix for unencodable characters (\\ufffd).")
-                for part in ndata1.walk():
-                    payload = part.get_payload()
-                    if isinstance(payload, str):
-                        charset = part.get_content_charset() or 'us-ascii'
-                        try:
-                            payload.encode(charset, 'surrogateescape')
-                        except UnicodeEncodeError:
-                            part.set_charset('utf-8')
-                try:
-                    # Retry obtaining bytes after charset fixes
-                    _ = ndata1.as_bytes(policy=self.policy['8bit-RFC'])
-                except UnicodeEncodeError as err:
-                    # Unknown issue which is causing failure of as_bytes()
-                    msg_id = self.getmessageheader(ndata1, "message-id")
-                    if msg_id is None:
-                        msg_id = '<Unknown Message-ID>'
-                    raise OfflineImapError(
-                            "UID {} ({}) has defects preventing it from being processed!\n  {}: {}".format(
-                                uids, msg_id, type(err).__name__, err),
-                            OfflineImapError.ERROR.MESSAGE)
+        ndata1 = self._repair_message_defects(
+            ndata1, self.parser['8bit-RFC'], data[0][1],
+            self.policy['8bit-RFC'], uids)
         ndata = [ndata0, ndata1]
 
         return ndata
