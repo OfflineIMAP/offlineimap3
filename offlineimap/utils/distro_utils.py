@@ -74,7 +74,7 @@ def get_os_sslcertfile_searchpath():
     at all.
     """
     os_name = get_os_name()
-    location = __DEF_OS_LOCATIONS.get(os_name, [])
+    location = list(__DEF_OS_LOCATIONS.get(os_name, []))
 
     try:
         import ssl
